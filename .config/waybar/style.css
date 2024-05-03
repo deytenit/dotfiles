@@ -1,0 +1,272 @@
+@import url("./colors.css");
+
+* {
+  border: none;
+  border-radius: 0;
+  /* `otf-font-awesome` is required to be installed for icons */
+  font-family: Sans-Serif;
+  min-height: 20px;
+}
+
+window#waybar {
+  background: transparent;
+}
+
+window#waybar.hidden {
+  opacity: 0.2;
+}
+
+#system {
+  background: @background;
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+#system #custom-pacman {
+  color: @foreground;
+}
+
+#system #custom-lock {
+  color: @foreground;
+  margin-left: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 4px;
+  transition: 300ms;
+}
+
+#system #custom-quit {
+  color: @color3;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 4px;
+  transition: 300ms;
+}
+
+#system #custom-reboot {
+  color: @color4;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 4px;
+  transition: 300ms;
+}
+
+#system #custom-power {
+  color: @color1;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 4px;
+  transition: 300ms;
+}
+
+#system #custom-lock:hover {
+  color: @background;
+  background: @foreground;
+}
+
+#system #custom-quit:hover {
+  color: @background;
+  background: @color3;
+}
+
+#system #custom-reboot:hover {
+  color: @background;
+  background: @color2;
+}
+
+#system #custom-power:hover {
+  color: @background;
+  background: @color1;
+}
+
+#irl {
+  margin-left: 8px;
+  color: @foreground;
+  background: @background;
+  border-radius: 8px;
+  padding-left: 8px;
+}
+
+#irl #clock {
+  padding-right: 8px;
+}
+
+#irl #custom-weather {
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 8px;
+  background: @color2;
+}
+
+#keyboard {
+  margin-left: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 8px;
+  color: @background;
+  background: @color4;
+}
+
+#keyboard #language {
+}
+
+#keyboard #keyboard-state {
+  margin-left: 4px;
+}
+
+#workspace {
+  margin-left: 8px;
+  border-radius: 8px;
+  padding: 2px 4px;
+  background: @background;
+  color: @foreground;
+}
+
+#workspace #workspaces {
+  transition: none;
+}
+
+#workspace #workspaces button {
+  transition: 300ms;
+  padding-left: 4px;
+  padding-right: 4px;
+  border-radius: 8px;
+}
+
+#workspace #workspaces button.persistent {
+  color: @foreground;
+  font-size: 12px;
+}
+
+/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
+#workspace #workspaces button:hover {
+  box-shadow: inherit;
+  text-shadow: inherit;
+  border-radius: 8px;
+  color: @background;
+  background: @foreground;
+}
+
+#workspace #workspaces button.focused {
+  color: white;
+}
+
+#window {
+  border-radius: 10px;
+  padding-left: 8px;
+  padding-right: 8px;
+  background: @backgroundA;
+  color: @foreground;
+}
+
+window#waybar.empty #window {
+  background-color: transparent;
+}
+
+#tray {
+  margin-right: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 8px;
+  transition: none;
+  color: @foreground;
+  background: @background;
+}
+
+#media {
+  margin-right: 8px;
+  padding-right: 8px;
+  border-radius: 8px;
+  color: @foreground;
+  background: @background;
+}
+
+#media #custom-mediaplayer {
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  transition: 300ms;
+}
+
+#media .playing {
+  background: @color2;
+}
+
+#media .paused {
+  color: @background;
+  background: @color3;
+}
+
+#media .idle {
+  background: @background;
+}
+
+#media #audio {
+  padding-left: 8px;
+}
+
+#media #audio #pulseaudio {
+  transition: none;
+}
+
+#hardware {
+  border-radius: 8px;
+  background: @background;
+  color: @foreground;
+}
+
+#hardware #backlight {
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 8px;
+  transition: none;
+}
+
+#hardware #power-profiles-daemon {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-right: 8px;
+  border-radius: 8px;
+  transition: 300ms;
+}
+
+#hardware #power-profiles-daemon:hover {
+  background: @foreground;
+  color: @background;
+}
+
+#hardware #battery {
+  padding-right: 8px;
+  padding-left: 8px;
+  border-radius: 8px;
+  transition: none;
+}
+
+#hardware #battery.charging {
+  color: @foreground;
+  background-color: @color2;
+}
+
+#hardware #battery.warning:not(.charging) {
+  background-color: @color3;
+  color: @background;
+}
+
+#hardware #battery.critical:not(.charging) {
+  background-color: @color1;
+  color: @foreground;
+  animation-name: blink;
+  animation-duration: 0.5s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes blink {
+  to {
+    background-color: @foreground;
+    color: @background;
+  }
+}

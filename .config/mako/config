@@ -1,0 +1,49 @@
+# Global conf
+sort=-time
+
+# Binding opts
+on-button-middle=exec makoctl menu -n "$id" dmenu -p 'Select action: '
+on-notify=exec mpv /usr/share/sounds/freedesktop/stereo/message.oga
+
+# Style
+layer=overlay
+background-color=#1F1F28F0
+width=420
+height=420
+border-size=2
+border-color=#DCD7BAF8
+border-radius=8
+icons=1
+icon-path=/usr/share/icons/Papirus-Light
+max-icon-size=64
+font=sans-serif 11
+progress-color=over #81ABBF
+group-by=app-name
+default-timeout=5000
+ignore-timeout=1
+format=<b>%s</b> | <i>%a</i>\n%b
+
+[grouped]
+format=<b>%s</b> | <i>%a <b>(%g)</b></i>\n%b
+
+# Flameshot ignore
+[body="grim's screenshot component is implemented based on wlroots, it may not be used in GNOME or similar desktop environments"]
+invisible=1
+default-timeout=1
+
+[urgency=low]
+border-color=#DCD7BAF8
+
+[urgency=normal]
+border-color=#7E9CD8F8
+
+[urgency=high]
+border-color=#C34043F8
+default-timeout=0
+
+[category=mpd]
+default-timeout=2000
+group-by=category
+
+[mode=do-not-disturb]
+invisible=1

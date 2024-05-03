@@ -1,0 +1,76 @@
+@import url("./colors.css");
+
+/* ::root{ */
+/*     --accent: #5291e2; */
+/*     --dark:   #383C4A; */
+/*     --light:  #7C818C; */
+/*     --ld:     #404552; */
+/*     --dl:     #4B5162 */
+/*     --white:  white; */
+/* } */
+
+* {
+  font-family: Sans-Serif;
+  font-size: 1rem;
+}
+
+window {
+  background-color: rgba(31, 31, 40, 0.9);
+  border-radius: 8px;
+}
+
+#input {
+  margin: 5px;
+  min-height: 50px;
+  border-radius: 0px;
+  border: none;
+  border-bottom: 2px solid #727169;
+  background-color: transparent;
+  color: rgb(220, 215, 186);
+  font-size: 1.75rem;
+}
+
+#input:focus {
+  box-shadow: none;
+}
+
+/* search icon */
+#input:first-child > :nth-child(1) {
+  min-width: 2em;
+}
+
+/* clear icon */
+#input:first-child > :nth-child(4) {
+  min-height: 1.25em;
+  min-width: 1.25em;
+}
+
+#inner-box {
+  background-color: transparent;
+}
+
+#outer-box {
+  margin: 2px;
+  padding: 0px;
+  background-color: transparent;
+}
+
+#text {
+  padding: 5px;
+  color: rgb(220, 215, 186);
+}
+
+#entry:selected {
+  background-color: #6a9589;
+  border-radius: 4px;
+}
+
+#text:selected {
+  font-weight: bold;
+}
+
+#scroll {
+}
+
+#img {
+}
