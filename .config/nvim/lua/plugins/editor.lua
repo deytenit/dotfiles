@@ -6,70 +6,56 @@ return {
     },
     keys = {
       {
-        ";f",
-        function()
-          require("telescope.builtin").find_files({
-            no_ignore = false,
-            hidden = true,
-          })
-        end,
-      },
-      {
-        ";g",
-        function()
-          require("telescope.builtin").live_grep()
-        end,
-      },
-      {
-        ";b",
-        function()
-          require("telescope.builtin").buffers()
-        end,
-      },
-      {
-        ";t",
-        function()
-          require("telescope.builtin").help_tags()
-        end,
-      },
-      {
-        ";c",
-        function()
-          require("telescope.builtin").resume()
-        end,
-      },
-      {
-        ";d",
-        function()
-          require("telescope.builtin").diagnostics()
-        end,
-      },
-      {
-        ";s",
-        function()
-          require("telescope.builtin").treesitter()
-        end,
-      },
-      {
-        ";e",
+        "<leader>fE",
         function()
           local telescope = require("telescope")
-          local function telescope_buffer_dir()
-            return vim.fn.expand("%:p:h")
-          end
 
           telescope.extensions.file_browser.file_browser({
             path = "%:p:h",
-            cwd = telescope_buffer_dir(),
+            cwd = vim.fn.expand("%:p:h"),
             respect_gitignore = false,
             hidden = true,
             grouped = true,
-            previewer = false,
-            initial_mode = "normal",
-            layout_config = { height = 40 },
-            hijack_netrw = true,
           })
         end,
+        desc = "Explorer (cwd)",
+      },
+      {
+        "<leader>fe",
+        function()
+          local telescope = require("telescope")
+          telescope.extensions.file_browser.file_browser({
+            respect_gitignore = false,
+            hidden = true,
+            grouped = true,
+          })
+        end,
+        desc = "Explorer (Root Dir)",
+      },
+      {
+        "<leader>sg",
+        LazyVim.pick("live_grep", { root = false }),
+        desc = "Grep (Root Dir)"
+      },
+      {
+        "<leader>sG",
+        LazyVim.pick("live_grep", { cwd = vim.fn.expand("%:p:h") }),
+        desc = "Grep (cwd)"
+      },
+      {
+        "<leader>ff",
+        LazyVim.pick("files", { root = false }),
+        desc = "Find Files (Root Dir)"
+      },
+      {
+        "<leader>fF",
+        LazyVim.pick("files", { cwd = vim.fn.expand("%:p:h") }),
+        desc = "Find Files (cwd)"
+      },
+      {
+        "<leader><space>",
+        LazyVim.pick("files", { root = false }),
+        desc = "Find Files (Root Dir)"
       },
     },
   },

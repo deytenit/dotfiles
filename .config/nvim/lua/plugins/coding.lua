@@ -10,8 +10,7 @@ return {
         },
         documentation = {
           border = "rounded",
-          col_offset = 3,
-          winhighlight = "Normal:Normal,FloatBorder:NoiceCmdlinePopupBorder,Search:None",
+          winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
         },
       }
       opts.formatting = {
@@ -28,30 +27,11 @@ return {
   },
   {
     "L3MON4D3/LuaSnip",
-    -- stylua: ignore
-    init = function ()
-      local luasnip = require('luasnip')
-
-      local unlinkgrp = vim.api.nvim_create_augroup(
-        'UnlinkSnippetOnModeChange',
-        { clear = true }
-      )
-
-      vim.api.nvim_create_autocmd('ModeChanged', {
-        group = unlinkgrp,
-        pattern = {'s:n', 'i:*'},
-        desc = 'Forget the current snippet when leaving the insert mode',
-        callback = function(evt)
-          if
-            luasnip.session
-            and luasnip.session.current_nodes[evt.buf]
-            and not luasnip.session.jump_active
-          then
-            luasnip.unlink_current()
-          end
-        end,
-      })
-    end
-,
-  },
+    opts = {
+      history = true,
+      region_check_events = "CursorHold,InsertLeave",
+      -- those are for removing deleted snippets, also a common problem
+      delete_check_events = "TextChanged,InsertEnter",
+    }
+  }
 }

@@ -5,12 +5,10 @@
   ignorecase = false
 [user]
   name = Vladimir Eremin
-  email = personal@ermnvldmr.com 
+  email = personal@ermnvldmr.com
 [filter "lfs"]
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
   required = true
 
-[credential "https://www.kgeorgiy.info"]
-	provider = generic

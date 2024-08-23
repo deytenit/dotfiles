@@ -1,6 +1,7 @@
 set fish_greeting ""
 
 set -gx LC_ALL en_US.UTF-8
+set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git --exclude .arc'
 
 export GPG_TTY=$(tty)
 
