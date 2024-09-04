@@ -19,16 +19,16 @@ window#waybar.hidden {
 #system {
   background: @background;
   border-radius: 8px;
-  padding: 4px 8px;
 }
 
 #system #custom-pacman {
+  margin-left: 8px;
+  margin-right: 8px;
   color: @foreground;
 }
 
 #system #custom-lock {
   color: @foreground;
-  margin-left: 8px;
   padding-left: 8px;
   padding-right: 8px;
   border-radius: 4px;
@@ -95,6 +95,7 @@ window#waybar.hidden {
   padding-left: 8px;
   padding-right: 8px;
   border-radius: 8px;
+  color: @background;
   background: @color2;
 }
 
@@ -103,7 +104,7 @@ window#waybar.hidden {
   padding-left: 8px;
   padding-right: 8px;
   border-radius: 8px;
-  color: @background;
+  color: @foreground;
   background: @color4;
 }
 
@@ -112,14 +113,6 @@ window#waybar.hidden {
 
 #keyboard #keyboard-state {
   margin-left: 4px;
-}
-
-#workspace {
-  margin-left: 8px;
-  border-radius: 8px;
-  padding: 2px 4px;
-  background: @background;
-  color: @foreground;
 }
 
 #workspace #workspaces {
@@ -151,16 +144,24 @@ window#waybar.hidden {
   color: white;
 }
 
-#window {
-  border-radius: 10px;
+#workspace #window {
+  border-radius: 8px;
   padding-left: 8px;
   padding-right: 8px;
-  background: @backgroundA;
+  background: @background;
   color: @foreground;
 }
 
-window#waybar.empty #window {
-  background-color: transparent;
+#workspace #custom-mako {
+  margin-left: 8px;
+  color: @foreground;
+  background: @background;
+  border-radius: 8px;
+  padding: 0px 8px;
+}
+
+#workspace #custom-mako.dnd {
+  color: @color1;
 }
 
 #tray {
@@ -189,11 +190,12 @@ window#waybar.empty #window {
 }
 
 #media .playing {
+  color: @background;
   background: @color2;
 }
 
 #media .paused {
-  color: @background;
+  color: @foreground;
   background: @color3;
 }
 
@@ -215,19 +217,21 @@ window#waybar.empty #window {
   color: @foreground;
 }
 
-#hardware #backlight {
-  padding-left: 8px;
-  padding-right: 8px;
+#hardware #idle_inhibitor {
+  padding-left: 6px;
+  padding-right: 6px;
   border-radius: 8px;
-  transition: none;
+  transition: 300ms;
+}
+
+#hardware #idle_inhibitor:hover {
+  background: @foreground;
+  color: @background;
 }
 
 #hardware #power-profiles-daemon {
-  margin-top: 2px;
-  margin-bottom: 2px;
-  padding-left: 8px;
-  padding-right: 8px;
-  margin-right: 8px;
+  padding-left: 6px;
+  padding-right: 6px;
   border-radius: 8px;
   transition: 300ms;
 }
@@ -238,6 +242,7 @@ window#waybar.empty #window {
 }
 
 #hardware #battery {
+  min-width: 16px;
   padding-right: 8px;
   padding-left: 8px;
   border-radius: 8px;

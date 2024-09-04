@@ -70,9 +70,14 @@ class PlayerManager:
     def write_output(self, text, status, player):
         logger.debug(f"Writing output: {text}")
 
+        if status == "idle":
+            self.clear_output()
+            return
+
         output = {"text": text,
                   "class": status,
-                  "alt": player.props.player_name}
+                  "alt": player.props.player_name if status != "idle" else ""}
+
 
         sys.stdout.write(json.dumps(output) + "\n")
         sys.stdout.flush()

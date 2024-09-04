@@ -1,8 +1,8 @@
-@define-color background rgba(31, 31, 40, 1);
-@define-color backgroundA rgba(31, 31, 40, 0.8);
+@define-color foreground rgba(31, 31, 40, 1);
+@define-color foregroundA rgba(31, 31, 40, 0.8);
 
-@define-color foreground rgba(220, 215, 186, 1);
-@define-color foregroundA rgba(220, 215, 186, 0.8);
+@define-color background rgba(220, 215, 186, 1);
+@define-color backgroundA rgba(220, 215, 186, 0.8);
 
 @define-color color0 #16161D;
 @define-color color1 #C34043;

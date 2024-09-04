@@ -26,11 +26,6 @@ format=<b>%s</b> | <i>%a</i>\n%b
 [grouped]
 format=<b>%s</b> | <i>%a <b>(%g)</b></i>\n%b
 
-# Flameshot ignore
-[body="grim's screenshot component is implemented based on wlroots, it may not be used in GNOME or similar desktop environments"]
-invisible=1
-default-timeout=1
-
 [urgency=low]
 border-color=#DCD7BAF8
 
@@ -45,5 +40,9 @@ default-timeout=0
 default-timeout=2000
 group-by=category
 
-[mode=do-not-disturb]
+[mode=dnd]
+invisible=1
+on-notify=exec :
+
+[mode=invisible]
 invisible=1

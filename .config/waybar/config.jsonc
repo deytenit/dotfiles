@@ -4,7 +4,7 @@
   "spacing": 0,
   "margin": "8 8 0 8",
   "modules-left": ["group/system", "group/irl", "group/keyboard"],
-  "modules-center": ["hyprland/window"],
+  "modules-center": ["group/workspace"],
   "modules-right": ["tray", "group/media", "group/hardware"],
 
   // Modules configuration
@@ -94,10 +94,10 @@
     },
   },
 
-  // @orkspace
+  // Workspace
   "group/workspace": {
     "orientation": "inherit",
-    "modules": ["hyprland/workspaces"],
+    "modules": ["hyprland/window", "custom/mako"],
   },
   "hyprland/workspaces": {
     "disable-scroll": true,
@@ -109,7 +109,24 @@
     },
   },
   "hyprland/window": {
+    "max-length": 56,
+    "rewrite": {
+      "": "Hyprland",
+    },
     "separate-outputs": true,
+  },
+  "custom/mako": {
+    "exec": "sleep 1; $HOME/.config/waybar/scripts/custom-mako.py",
+    "interval": "once",
+    "on-click": "$HOME/.config/waybar/scripts/custom-mako.py -s",
+    "format": "<b>{icon}</b>",
+    "format-icons": {
+      "default": "",
+      "invisible": "",
+      "dnd": "󰍶",
+    },
+    "escape": true,
+    "return-type": "json",
   },
 
   // Tray
@@ -176,12 +193,14 @@
       "children-class": "group-hardware",
       "transition-left-to-right": false,
     },
-    "modules": ["battery", "backlight", "power-profiles-daemon"],
+    "modules": ["battery", "idle_inhibitor", "power-profiles-daemon"],
   },
-  "backlight": {
-    // "device": "acpi_video1",
+  "idle_inhibitor": {
     "format": "{icon}",
-    "format-icons": ["", "", "", "", "", "", "", "", ""],
+    "format-icons": {
+      "activated": "",
+      "deactivated": "",
+    },
   },
   "power-profiles-daemon": {
     "format": "{icon}",

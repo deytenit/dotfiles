@@ -16,10 +16,24 @@ return {
       }
       opts.formatting = {
         fields = { "kind", "abbr", "menu" },
-        format = function(_, item)
-          local icons = require("lazyvim.config").icons.kinds
+        format = function(entry, item)
           item.menu = "    (" .. (item.kind or "unknown") .. ")"
+
+          if item.kind == "Color" and entry.completion_item.documentation then
+            local _, _, r, g, b = string.find(entry.completion_item.documentation, "^rgb%((%d+), (%d+), (%d+)")
+            if r and g and b then
+              local color = string.format("%02x", r) .. string.format("%02x", g) .. string.format("%02x", b)
+              local group = "Tw_" .. color
+              if vim.fn.hlID(group) < 1 then
+                vim.api.nvim_set_hl(0, group, { bg = "#" .. color })
+              end
+              item.kind_hl_group = group
+            end
+          end
+
+          local icons = require("lazyvim.config").icons.kinds
           item.kind = " " .. (icons[item.kind] or " ")
+
           return item
         end,
       }
