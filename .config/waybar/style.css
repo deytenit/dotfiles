@@ -1,11 +1,10 @@
-@import url("./colors.css");
+@import url("./latte.css");
 
 * {
   border: none;
-  border-radius: 0;
-  /* `otf-font-awesome` is required to be installed for icons */
-  font-family: Sans-Serif;
-  min-height: 20px;
+  border-radius: 8px;
+  font-family: "NotoSans Nerd Font Propo";
+  min-height: 30px;
 }
 
 window#waybar {
@@ -17,104 +16,53 @@ window#waybar.hidden {
 }
 
 #system {
-  background: @background;
-  border-radius: 8px;
+  background: @base;
 }
 
 #system #custom-pacman {
-  margin-left: 8px;
-  margin-right: 8px;
-  color: @foreground;
-}
+  padding: 0 12px;
 
-#system #custom-lock {
-  color: @foreground;
-  padding-left: 8px;
-  padding-right: 8px;
-  border-radius: 4px;
-  transition: 300ms;
-}
-
-#system #custom-quit {
-  color: @color3;
-  padding-left: 8px;
-  padding-right: 8px;
-  border-radius: 4px;
-  transition: 300ms;
-}
-
-#system #custom-reboot {
-  color: @color4;
-  padding-left: 8px;
-  padding-right: 8px;
-  border-radius: 4px;
-  transition: 300ms;
-}
-
-#system #custom-power {
-  color: @color1;
-  padding-left: 8px;
-  padding-right: 8px;
-  border-radius: 4px;
-  transition: 300ms;
-}
-
-#system #custom-lock:hover {
-  color: @background;
-  background: @foreground;
-}
-
-#system #custom-quit:hover {
-  color: @background;
-  background: @color3;
-}
-
-#system #custom-reboot:hover {
-  color: @background;
-  background: @color2;
-}
-
-#system #custom-power:hover {
-  color: @background;
-  background: @color1;
+  color: @text;
 }
 
 #irl {
   margin-left: 8px;
-  color: @foreground;
-  background: @background;
-  border-radius: 8px;
-  padding-left: 8px;
+
+  background: @base;
 }
 
 #irl #clock {
-  padding-right: 8px;
+  padding: 0 12px;
+
+  color: @text;
 }
 
 #irl #custom-weather {
-  padding-left: 8px;
-  padding-right: 8px;
-  border-radius: 8px;
-  color: @background;
-  background: @color2;
+  padding: 0 12px;
+
+  color: @base;
+  background: @sky;
 }
 
 #keyboard {
   margin-left: 8px;
-  padding-left: 8px;
-  padding-right: 8px;
-  border-radius: 8px;
-  color: @foreground;
-  background: @color4;
+
+  color: @text;
+  background: @base;
 }
 
 #keyboard #language {
+  padding: 0 12px;
 }
 
 #keyboard #keyboard-state {
-  margin-left: 4px;
+  padding: 0 12px;
+
+  color: @base;
+  background: @flamingo;
 }
 
+/*
 #workspace #workspaces {
   transition: none;
 }
@@ -127,141 +75,124 @@ window#waybar.hidden {
 }
 
 #workspace #workspaces button.persistent {
-  color: @foreground;
+  color: @text;
   font-size: 12px;
 }
+*/
 
 /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
+/*
 #workspace #workspaces button:hover {
   box-shadow: inherit;
   text-shadow: inherit;
   border-radius: 8px;
-  color: @background;
-  background: @foreground;
+  color: @base;
+  background: @text;
 }
 
 #workspace #workspaces button.focused {
   color: white;
 }
+*/
 
 #workspace #window {
-  border-radius: 8px;
-  padding-left: 8px;
-  padding-right: 8px;
-  background: @background;
-  color: @foreground;
-}
+  padding: 0 12px;
 
-#workspace #custom-mako {
-  margin-left: 8px;
-  color: @foreground;
-  background: @background;
-  border-radius: 8px;
-  padding: 0px 8px;
-}
-
-#workspace #custom-mako.dnd {
-  color: @color1;
+  background: @base;
+  color: @text;
 }
 
 #tray {
   margin-right: 8px;
-  padding-left: 8px;
-  padding-right: 8px;
-  border-radius: 8px;
+  padding: 0 12px;
   transition: none;
-  color: @foreground;
-  background: @background;
+
+  color: @base;
+  background: @text;
 }
 
 #media {
   margin-right: 8px;
-  padding-right: 8px;
-  border-radius: 8px;
-  color: @foreground;
-  background: @background;
+
+  color: @text;
+  background: @base;
 }
 
 #media #custom-mediaplayer {
-  border-radius: 8px;
-  padding-left: 8px;
-  padding-right: 8px;
+  padding: 0 8px;
   transition: 300ms;
 }
 
 #media .playing {
-  color: @background;
-  background: @color2;
+  color: @base;
+  background: @green;
 }
 
 #media .paused {
-  color: @foreground;
-  background: @color3;
+  color: @text;
+  background: @yellow;
 }
 
 #media .idle {
-  background: @background;
+  background: @base;
 }
 
 #media #audio {
-  padding-left: 8px;
 }
 
 #media #audio #pulseaudio {
+  padding: 0 12px;
   transition: none;
 }
 
 #hardware {
-  border-radius: 8px;
-  background: @background;
-  color: @foreground;
+  background: @base;
+  color: @text;
+}
+
+#hardware * {
+  min-width: 16px;
 }
 
 #hardware #idle_inhibitor {
-  padding-left: 6px;
-  padding-right: 6px;
-  border-radius: 8px;
+  padding: 0 12px;
   transition: 300ms;
 }
 
 #hardware #idle_inhibitor:hover {
-  background: @foreground;
-  color: @background;
+  background: @text;
+  color: @base;
 }
 
 #hardware #power-profiles-daemon {
-  padding-left: 6px;
-  padding-right: 6px;
-  border-radius: 8px;
+  padding: 0 12px;
   transition: 300ms;
 }
 
 #hardware #power-profiles-daemon:hover {
-  background: @foreground;
-  color: @background;
+  background: @text;
+  color: @base;
 }
 
 #hardware #battery {
-  min-width: 16px;
-  padding-right: 8px;
-  padding-left: 8px;
-  border-radius: 8px;
+  padding: 0 12px;
   transition: none;
 }
 
 #hardware #battery.charging {
-  color: @foreground;
-  background-color: @color2;
+  color: @base;
+  background-color: @sapphire;
 }
 
 #hardware #battery.warning:not(.charging) {
-  background-color: @color3;
-  color: @background;
+  background-color: @yellow;
+  color: @base;
 }
 
 #hardware #battery.critical:not(.charging) {
-  background-color: @color1;
-  color: @foreground;
+  background-color: @red;
+  color: @text;
+
   animation-name: blink;
   animation-duration: 0.5s;
   animation-timing-function: linear;
@@ -271,7 +202,7 @@ window#waybar.hidden {
 
 @keyframes blink {
   to {
-    background-color: @foreground;
-    color: @background;
+    background-color: @text;
+    color: @base;
   }
 }

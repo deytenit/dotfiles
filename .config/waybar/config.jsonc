@@ -11,140 +11,100 @@
   // System
   "group/system": {
     "orientation": "inherit",
-    "drawer": {
-      "transition-duration": 300,
-      "children-class": "group-system",
-      "transition-left-to-right": true,
-    },
+    // "drawer": {
+    //   "transition-duration": 300,
+    //   "children-class": "group-system",
+    //   "transition-left-to-right": true,
+    // },
     "modules": [
-      "custom/pacman",
-      "custom/lock",
-      "custom/quit",
-      "custom/reboot",
-      "custom/power",
-    ],
-  },
-  "custom/quit": {
-    "format": "󰗼",
-    "tooltip": false,
-    "on-click": "hyprctl dispatch exit",
-  },
-  "custom/lock": {
-    "format": "󰍁",
-    "tooltip": false,
-    "on-click": "hyprlock",
-  },
-  "custom/reboot": {
-    "format": "󰜉",
-    "tooltip": false,
-    "on-click": "reboot",
-  },
-  "custom/power": {
-    "format": "",
-    "tooltip": false,
-    "on-click": "shutdown now",
+      "custom/pacman"
+    ]
   },
   "custom/pacman": {
-    "tooltip": true,
-    "tooltip-format": "Update System",
-    "format": " {}",
-    "interval": 3600, // every hour
-    "exec": "$HOME/.config/waybar/scripts/custom-pacman.sh", // # of updates
-    "exec-if": "exit 0", // always run; consider advanced run conditions
-    "on-click": "kitty sh -c 'sudo pacman -Su; echo Done - Press enter to exit; read'; pkill -SIGRTMIN+8 waybar", // update system
-    "signal": 8,
+    "format": "{text}",
+    "interval": 3600, // Run every hour
+    "exec": "$HOME/.config/waybar/scripts/custom-pacman.sh", // Fetch number of outdate packages
+    "exec-if": "exit 0", // Always run
+    "tooltip": false
   },
 
   // IRL
   "group/irl": {
     "orientation": "inherit",
-    "modules": ["clock", "custom/weather"],
+    "modules": ["clock", "custom/weather"]
   },
   "clock": {
     // "timezone": "America/New_York",
-    "format": "<b>{:%H:%M</b> %Y %B %d}",
-    "tooltip-format": "<b>{:%Y %B}</b>\n<tt><small>{calendar}</small></tt>",
-    "format-alt": "{:%Y-%m-%d}",
+    "format": "<b>{:%H:%M</b>\t%Y %B %d}",
+    "on-click": "thunderbird -calendar",
+    "tooltip": false
   },
   "custom/weather": {
-    "format": "<b>{}</b>",
+    "format": "<b>{text}</b>",
     "tooltip": true,
     "interval": 1800,
     "exec": "$HOME/.config/waybar/scripts/custom-weather.py",
-    "return-type": "json",
+    "return-type": "json"
   },
 
   // keyboard
   "group/keyboard": {
     "orientation": "inherit",
-    "modules": ["hyprland/language", "keyboard-state"],
+    "modules": ["hyprland/language", "keyboard-state"]
   },
   "hyprland/language": {
-    "format-en": "🇺🇸 ",
-    "format-ru": "🇷🇺 ²",
+    "format-en": "🇺🇸¹",
+    "format-ru": "🇷🇺²",
     "min-length": 5,
-    "tooltip": false,
+    "tooltip": false
   },
   "keyboard-state": {
     "capslock": true,
     "format": "{icon}",
     "format-icons": {
-      "locked": "<sub><small></small></sub>",
-      "unlocked": "<small></small>",
-    },
+      "locked": "",
+      "unlocked": ""
+    }
   },
 
   // Workspace
   "group/workspace": {
     "orientation": "inherit",
-    "modules": ["hyprland/window", "custom/mako"],
+    "modules": ["hyprland/window"]
   },
-  "hyprland/workspaces": {
-    "disable-scroll": true,
-    "persistent-workspaces": {
-      "1": [],
-      "2": [],
-      "3": [],
-      "4": [],
-    },
-  },
+  // "hyprland/workspaces": {
+  //   "disable-scroll": true,
+  //   "persistent-workspaces": {
+  //     "1": [],
+  //     "2": [],
+  //     "3": [],
+  //     "4": []
+  //   }
+  // },
   "hyprland/window": {
     "max-length": 56,
     "rewrite": {
-      "": "Hyprland",
+      "": "Hyprland"
     },
-    "separate-outputs": true,
-  },
-  "custom/mako": {
-    "exec": "sleep 1; $HOME/.config/waybar/scripts/custom-mako.py",
-    "interval": "once",
-    "on-click": "$HOME/.config/waybar/scripts/custom-mako.py -s",
-    "format": "<b>{icon}</b>",
-    "format-icons": {
-      "default": "",
-      "invisible": "",
-      "dnd": "󰍶",
-    },
-    "escape": true,
-    "return-type": "json",
+    "separate-outputs": true
   },
 
   // Tray
   "tray": {
     // "icon-size": 21,
-    "spacing": 10,
+    "spacing": 12
   },
 
   // Media
   "group/media": {
     "orientation": "inherit",
-    "modules": ["custom/mediaplayer", "group/audio"],
+    "modules": ["custom/mediaplayer", "group/audio"]
   },
   "custom/mediaplayer": {
-    "format": "{icon}  {}",
+    "format": "{icon} {text}",
     "format-icons": {
       "spotify": "",
-      "chromium": "",
+      "firefox": "󰈹"
     },
     "escape": true,
     "return-type": "json",
@@ -154,23 +114,23 @@
     "smooth-scrolling-threshold": 10, // This value was tested using a trackpad, it should be lowered if using a mouse.
     "on-scroll-up": "playerctl next",
     "on-scroll-down": "playerctl previous",
-    "exec": "$HOME/.config/waybar/scripts/custom-mediaplayer.py 2> /dev/null", // Script in resources/custom_modules folder
+    "exec": "$HOME/.config/waybar/scripts/custom-mediaplayer.py 2> /dev/null"
   },
   "group/audio": {
     "orientation": "inherit",
     "drawer": {
       "transition-duration": 300,
       "children-class": "group-audio",
-      "transition-left-to-right": false,
+      "transition-left-to-right": false
     },
-    "modules": ["pulseaudio"],
+    "modules": ["pulseaudio"]
   },
   "pulseaudio": {
     // "scroll-step": 1, // %, can be a float
-    "format": "{icon} <sub>{volume}%</sub>｜ {format_source}",
-    "format-bluetooth": " {icon} <sub>{volume}%</sub>｜ {format_source}",
-    "format-bluetooth-muted": " 󰝟 ｜ {format_source}",
-    "format-muted": "󰝟 ｜ {format_source}",
+    "format": "{icon} <sub>{volume}%</sub>\t{format_source}",
+    "format-bluetooth": " {icon} <sub>{volume}%</sub>\t{format_source}",
+    "format-bluetooth-muted": " 󰝟\t{format_source}",
+    "format-muted": "󰝟\t{format_source}",
     "format-source": "",
     "format-source-muted": "",
     "format-icons": {
@@ -180,9 +140,9 @@
       "phone": "",
       "portable": "",
       "car": "",
-      "default": ["", "", ""],
+      "default": ["", "", ""]
     },
-    "on-click": "pavucontrol",
+    "on-click": "pavucontrol"
   },
 
   // Hardware
@@ -191,39 +151,41 @@
     "drawer": {
       "transition-duration": "300",
       "children-class": "group-hardware",
-      "transition-left-to-right": false,
+      "transition-left-to-right": false
     },
-    "modules": ["battery", "idle_inhibitor", "power-profiles-daemon"],
+    "modules": ["battery", "idle_inhibitor", "power-profiles-daemon"]
   },
   "idle_inhibitor": {
     "format": "{icon}",
     "format-icons": {
-      "activated": "",
-      "deactivated": "",
+      "activated": "󰨀",
+      "deactivated": "󰧿"
     },
+    "tooltip-format-activated": "Idle: Disabled",
+    "tooltip-format-deactivated": "Idle: Normal"
   },
   "power-profiles-daemon": {
     "format": "{icon}",
-    "tooltip-format": "Power profile: {profile}",
+    "tooltip-format": "Profile: {profile}",
     "tooltip": true,
     "format-icons": {
       "default": "",
       "performance": "",
       "balanced": "",
-      "power-saver": "",
-    },
+      "power-saver": ""
+    }
   },
   "battery": {
     "states": {
       // "good": 95,
       "warning": 30,
-      "critical": 15,
+      "critical": 15
     },
+    "interval": 15,
     "format": "{icon}",
     "format-full": "{icon}",
     "format-charging": "󰂄",
     "format-plugged": "",
-    "format-alt": "{capacity}% - {time}",
-    "format-icons": ["", "", "", "", ""],
-  },
+    "format-icons": ["", "", "", "", ""]
+  }
 }

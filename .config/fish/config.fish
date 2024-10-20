@@ -1,8 +1,10 @@
 set fish_greeting ""
 
-set -gx LC_ALL en_US.UTF-8
+set -gx LC_ALL C.UTF-8
 
-export GPG_TTY=$(tty)
+set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git --exclude .arc'
+
+set -gx GPG_TTY $(tty)
 
 if type -q nvim
     alias vim nvim
@@ -16,4 +18,6 @@ if status is-interactive
     else
         alias l "ls -la"
     end
+
+    eval (zellij setup --generate-auto-start fish | string collect)
 end

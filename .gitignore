@@ -1,59 +1,69 @@
-# ignore everything by default.
+# Ignore everything by default.
 *
 
+# Root
+
+!README.md
+
+!.gitconfig
+!.gitignore
+
+# Assets
+!assets/
+assets/**
+!assets/**/*
+
+# Config
 !.config/
 .config/*
 
-# Neovim
-!.config/nvim
-.config/nvim/**
-!.config/nvim/**/*
+## Dunst
+!.config/dunst
+.config/dunst/**
+!.config/dunst/dunstrc
 
-# Fish
+## Fish
 !.config/fish
 .config/fish/**
 !.config/fish/config.fish
 
-# Git
-!.gitconfig
-!.gitignore
-
-# Tmux
-!.tmux
-!.tmux.conf
-!.tmux/*.yml
-
-# Fontconfig
-!.config/fontconfig
-.config/fontconfig/**
-!.config/fontconfig/fonts.conf
-
-# Hyprland
+## Hyprland
 !.config/hypr
 .config/hypr/**
 !.config/hypr/**/*
 
-# Kitty
+## Kitty
 !.config/kitty
 .config/kitty/**
 !.config/kitty/kitty.conf
 
-# Mako
-!.config/mako
-.config/mako/**
-!.config/mako/config
+## Neovim
+!.config/nvim
+.config/nvim/**
+!.config/nvim/**/*
 
-# Share
-!.config/share
-.config/share/**
-!.config/share/**/*
+## Rofi
+!.config/rofi
+.config/rofi/**
+!.config/rofi/**/*
 
-# WayBar
+# Themes
+!.config/themes
+.config/themes/**
+!.config/themes/**/*
+
+# Waybar
 !.config/waybar
 .config/waybar/**
 !.config/waybar/**/*
 
-# Wofi
-!.config/wofi
-.config/wofi/**
-!.config/wofi/style.css
+# Zellij
+!.config/zellij
+.config/zellij/**
+!.config/zellij/config.kdl
+
+
+
+
+
+
