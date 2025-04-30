@@ -1,0 +1,3 @@
+# BEGIN_ALACRITTY_THEME
+general.import = [ "~/.config/alacritty/dark.toml" ]
+# END_ALACRITTY_THEME

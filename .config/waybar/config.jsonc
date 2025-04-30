@@ -1,0 +1,193 @@
+// -*- mode: jsonc -*-
+{
+  "height": 30,
+  "spacing": 0,
+  "margin": "8 8 0 8",
+  "modules-left": ["group/system", "group/irl", "group/keyboard"],
+  "modules-center": ["group/workspace"],
+  "modules-right": ["tray", "group/media", "group/hardware"],
+
+  // Modules configuration
+  // System
+  "group/system": {
+    "orientation": "inherit",
+    // "drawer": {
+    //   "transition-duration": 300,
+    //   "children-class": "group-system",
+    //   "transition-left-to-right": true,
+    // },
+    "modules": [
+      "custom/pacman"
+    ]
+  },
+  "custom/pacman": {
+    "format": "{}",
+    "interval": 3600, // Run every hour
+    "exec": "$HOME/.config/waybar/scripts/custom-pacman.sh", // Fetch number of outdate packages
+    "exec-if": "exit 0", // Always run
+    "tooltip": false
+  },
+
+  // IRL
+  "group/irl": {
+    "orientation": "inherit",
+    "modules": ["clock", "custom/weather"]
+  },
+  "clock": {
+    // "timezone": "America/New_York",
+    "format": "<b>{:%H:%M</b>\t%Y %B %d}",
+    "on-click": "thunderbird -calendar",
+    "tooltip": false
+  },
+  "custom/weather": {
+    "format": "<b>{}</b>",
+    "tooltip": true,
+    "interval": 1800,
+    "exec": "$HOME/.config/waybar/scripts/custom-weather.py",
+    "return-type": "json"
+  },
+
+  // keyboard
+  "group/keyboard": {
+    "orientation": "inherit",
+    "modules": ["hyprland/language", "keyboard-state"]
+  },
+  "hyprland/language": {
+    "format-en": "🇺🇸¹",
+    "format-ru": "🇷🇺²",
+    "min-length": 5,
+    "tooltip": false
+  },
+  "keyboard-state": {
+    "capslock": true,
+    "format": "{icon}",
+    "format-icons": {
+      "locked": "",
+      "unlocked": ""
+    }
+  },
+
+  // Workspace
+  "group/workspace": {
+    "orientation": "inherit",
+    "modules": ["hyprland/window", "custom/dunst", "custom/darkman"]
+  },
+  // "hyprland/workspaces": {
+  //   "disable-scroll": true,
+  //   "persistent-workspaces": {
+  //     "1": [],
+  //     "2": [],
+  //     "3": [],
+  //     "4": []
+  //   }
+  // },
+  "hyprland/window": {
+    "max-length": 56,
+    "rewrite": {
+      "": "Hyprland"
+    },
+    "separate-outputs": true
+  },
+  "custom/dunst": {
+    "format": "{}",
+    "exec": "sleep 1 && [[ `dunstctl is-paused` == \"true\" ]] && echo \"\" || echo \"\"",
+    "on-click": "dunstctl set-paused toggle",
+    "interval": "once",
+    "exec-on-event": true,
+    "tooltip": false
+  },
+  "custom/darkman": {
+    "format": "{}",
+    "exec": "sleep 1 && [[ `darkman get` == 'dark' ]] && echo '' || echo ''",
+    "on-click": "darkman toggle",
+    "interval": "once",
+    "exec-on-event": true,
+    "tooltip": false
+  },
+
+  // Tray
+  "tray": {
+    // "icon-size": 21,
+    "spacing": 12
+  },
+
+  // Media
+  "group/media": {
+    "orientation": "inherit",
+    "modules": ["custom/mediaplayer", "group/audio"]
+  },
+  "custom/mediaplayer": {
+    "format": "{icon} {text}",
+    "format-icons": {
+      "spotify": "",
+      "firefox": "󰈹"
+    },
+    "escape": true,
+    "return-type": "json",
+    "max-length": 36,
+    "on-click": "playerctl play-pause",
+    "on-click-right": "playerctl stop",
+    "smooth-scrolling-threshold": 10, // This value was tested using a trackpad, it should be lowered if using a mouse.
+    "on-scroll-up": "playerctl next",
+    "on-scroll-down": "playerctl previous",
+    "exec": "$HOME/.config/waybar/scripts/custom-mediaplayer.py 2> /dev/null"
+  },
+  "group/audio": {
+    "orientation": "inherit",
+    "drawer": {
+      "transition-duration": 300,
+      "children-class": "group-audio",
+      "transition-left-to-right": false
+    },
+    "modules": ["wireplumber"]
+  },
+  "wireplumber": {
+    "format": "{volume}% {icon}",
+    "format-muted": "",
+    "on-click": "pwvucontrol",
+    "format-icons": ["", "", ""]
+  },
+  // Hardware
+  "group/hardware": {
+    "orientation": "inherit",
+    "drawer": {
+      "transition-duration": "300",
+      "children-class": "group-hardware",
+      "transition-left-to-right": false
+    },
+    "modules": ["battery", "idle_inhibitor", "power-profiles-daemon"]
+  },
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "󰨀",
+      "deactivated": "󰧿"
+    },
+    "tooltip-format-activated": "Idle: Disabled",
+    "tooltip-format-deactivated": "Idle: Normal"
+  },
+  "power-profiles-daemon": {
+    "format": "{icon}",
+    "tooltip-format": "Profile: {profile}",
+    "tooltip": true,
+    "format-icons": {
+      "default": "",
+      "performance": "",
+      "balanced": "",
+      "power-saver": ""
+    }
+  },
+  "battery": {
+    "states": {
+      // "good": 95,
+      "warning": 30,
+      "critical": 15
+    },
+    "interval": 15,
+    "format": "{icon}",
+    "format-full": "{icon}",
+    "format-charging": "󰂄",
+    "format-plugged": "",
+    "format-icons": ["", "", "", "", ""]
+  }
+}

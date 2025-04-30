@@ -1,0 +1,18 @@
+@define-color red-blur #9D3017;
+@define-color orange-blur #9A3B12;
+@define-color yellow-blur #85550E;
+@define-color green-blur #44551F;
+@define-color cyan-blur #265464;
+@define-color blue-blur #1D38B0;
+@define-color violet-blur #442EA5;
+
+@define-color red-focus #FEF4F2;
+@define-color orange-focus #FFF8ED;
+@define-color yellow-focus #FEFDE8;
+@define-color green-focus #F8FAEB;
+@define-color cyan-focus #EFFBFC;
+@define-color blue-focus #EFF5FF;
+@define-color violet-focus #EEF0FF;
+
+@define-color text #F6F6F6;
+@define-color base #262626;

@@ -1,0 +1,23 @@
+[include]
+  path = ~/.gitconfig.local
+[core]
+  editor = nvim
+  ignorecase = false
+[user]
+  name = Vladimir Eremin
+  email = personal@ermnvldmr.com 
+  signingkey = A823B39D0A24B37E
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+[credential]
+  helper = /home/deytenit/.dotnet/tools/git-credential-manager
+  credentialStore = gpg
+[credential "https://dev.azure.com"]
+  useHttpPath = true
+[commit]
+  gpgsign = true
+[init]
+  defaultBranch = main

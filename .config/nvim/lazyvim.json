@@ -1,0 +1,12 @@
+{
+  "extras": [
+    "lazyvim.plugins.extras.lang.clangd",
+    "lazyvim.plugins.extras.lang.omnisharp",
+    "lazyvim.plugins.extras.lang.tailwind"
+  ],
+  "install_version": 7,
+  "news": {
+    "NEWS.md": "10960"
+  },
+  "version": 8
+}

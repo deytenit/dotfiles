@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+rofi_command="rofi -theme $HOME/.config/rofi/config/screenshot.rasi"
+
+time=`date -u +%Y-%m-%d-%H%M%S.%3N`
+dir="$HOME/Pictures/Screenshots"
+file="$HOME/Pictures/Screenshots/${time}.png"
+
+# Icons
+icon1="$HOME/.config/dunst/icons/collections.svg"
+icon2="$HOME/.config/dunst/icons/timer.svg"
+
+# Buttons
+layout=`cat $HOME/.config/rofi/config/screenshot.rasi | grep BUTTON | cut -d'=' -f2 | tr -d '[:blank:],*/'`
+if [[ "$layout" == "TRUE" ]]; then
+	screen="󰍹"
+	area="󰆞"
+	window="󰖲"
+	infive="󰔝"
+	inten="󰔜"
+else
+	screen="󰍹 Capture Desktop"
+	area="󰆞 Capture Area"
+	window="󰖲 Capture Window"
+	infive="󰔝 Take in 3s"
+	inten="󰔜 Take in 10s"
+fi
+
+# countdown
+countdown () {
+	for sec in `seq $1 -1 1`; do
+		dunstify -t 1000 --replace=699 -i $icon2 "Taking screenshot in : $sec"
+		sleep 1
+	done
+}
+
+# take shots
+shotnow () {
+	sleep 0.5 && grimblast --notify copysave screen "$file"
+}
+
+shot5 () {
+	countdown '3'
+	sleep 1 && grimblast --notify copysave screen "$file"
+}
+
+shot10 () {
+	countdown '10'
+	sleep 1 && grimblast --notify copysave screen "$file"
+	notify_view
+}
+
+shotwin () {
+	grimblast --notify copysave active "$file"
+}
+
+shotarea () {
+	grimblast --notify copysave area "$file"
+}
+
+if [[ ! -d "$dir" ]]; then
+	mkdir -p "$dir"
+fi
+
+# Variable passed to rofi
+options="$screen\n$area\n$window\n$infive\n$inten"
+
+chosen="$(echo -e "$options" | $rofi_command -p 'Take A Shot' -dmenu -selected-row 0)"
+case $chosen in
+    $screen)
+		shotnow
+        ;;
+    $area)
+		shotarea
+        ;;
+    $window)
+		shotwin
+		;;
+    $infive)
+		shot5
+		;;
+    $inten)
+		shot10
+        ;;
+esac
+

@@ -1,0 +1,223 @@
+@import url("./.theme.css");
+
+* {
+  border: none;
+  border-radius: 8px;
+  font-family: "NotoSans Nerd Font Propo";
+  min-height: 30px;
+}
+
+window#waybar {
+  background: transparent;
+}
+
+window#waybar.hidden {
+  opacity: 0.2;
+}
+
+#system {
+  background: @base;
+}
+
+#system #custom-pacman {
+  padding: 0 12px;
+
+  color: @text;
+}
+
+#irl {
+  margin-left: 8px;
+
+  background: @base;
+}
+
+#irl #clock {
+  padding: 0 12px;
+
+  color: @text;
+}
+
+#irl #custom-weather {
+  padding: 0 12px;
+
+  color: @cyan-focus;
+  background: @cyan-blur;
+}
+
+#keyboard {
+  margin-left: 8px;
+
+  color: @text;
+  background: @base;
+}
+
+#keyboard #language {
+  padding: 0 12px;
+}
+
+#keyboard #keyboard-state {
+  padding: 0 12px;
+
+  color: @red-focus;
+  background: @red-blur;
+}
+
+/*
+#workspace #workspaces {
+  transition: none;
+}
+
+#workspace #workspaces button {
+  transition: 300ms;
+  padding-left: 4px;
+  padding-right: 4px;
+  border-radius: 8px;
+}
+
+#workspace #workspaces button.persistent {
+  color: @text;
+  font-size: 12px;
+}
+*/
+
+/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
+/*
+#workspace #workspaces button:hover {
+  box-shadow: inherit;
+  text-shadow: inherit;
+  border-radius: 8px;
+  color: @base;
+  background: @text;
+}
+
+#workspace #workspaces button.focused {
+  color: white;
+}
+*/
+
+#workspace #window {
+  padding: 0 12px;
+
+  background: @base;
+  color: @text;
+}
+
+#workspace #custom-dunst {
+  margin-left: 8px;
+  padding: 0 12px;
+
+  background: @base;
+  color: @text;
+}
+
+#workspace #custom-darkman {
+  margin-left: 8px;
+  padding: 0 12px;
+
+  background: @base;
+  color: @text;
+}
+
+#tray {
+  margin-right: 8px;
+  padding: 0 12px;
+  transition: none;
+
+  background: #11111b;
+}
+
+#media {
+  margin-right: 8px;
+
+  color: @text;
+  background: @base;
+}
+
+#media #custom-mediaplayer {
+  padding: 0 8px;
+  transition: 300ms;
+}
+
+#media .playing {
+  color: @green-focus;
+  background: @green-blur;
+}
+
+#media .paused {
+  color: @yellow-focus;
+  background: @yellow-blur;
+}
+
+#media .idle {
+  background: @base;
+}
+
+#media #audio {
+}
+
+#media #audio #wireplumber {
+  padding: 0 12px;
+  transition: none;
+}
+
+#hardware {
+  background: @base;
+  color: @text;
+}
+
+#hardware * {
+  min-width: 16px;
+}
+
+#hardware #idle_inhibitor {
+  padding: 0 12px;
+  transition: 300ms;
+}
+
+#hardware #idle_inhibitor:hover {
+  background: @text;
+  color: @base;
+}
+
+#hardware #power-profiles-daemon {
+  padding: 0 12px;
+  transition: 300ms;
+}
+
+#hardware #power-profiles-daemon:hover {
+  background: @text;
+  color: @base;
+}
+
+#hardware #battery {
+  padding: 0 12px;
+  transition: none;
+}
+
+#hardware #battery.charging {
+  color: @blue-focus;
+  background-color: @blue-blur;
+}
+
+#hardware #battery.warning:not(.charging) {
+  color: @orange-focus;
+  background-color: @orange-blur;
+}
+
+#hardware #battery.critical:not(.charging) {
+  color: @red-focus;
+  background-color: @red-blur;
+
+  animation-name: blink;
+  animation-duration: 0.5s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes blink {
+  to {
+    background-color: @text;
+    color: @base;
+  }
+}

@@ -1,0 +1,79 @@
+# Ignore everything by default.
+
+
+# Root
+!README.md
+
+# Git 
+!.gitconfig
+!.gitignore
+
+# Assets
+!assets/
+assets/**
+!assets/**/*
+
+# Config
+!.config/
+.config/*
+
+## Dunst
+!.config/dunst
+.config/dunst/**
+!.config/dunst/dunstrc
+
+## Fish
+!.config/fish
+.config/fish/**
+!.config/fish/config.fish
+
+## Hyprland
+!.config/hypr
+.config/hypr/**
+!.config/hypr/**/*
+
+## Neovim
+!.config/nvim
+.config/nvim/**
+!.config/nvim/**/*
+
+## Rofi
+!.config/rofi
+.config/rofi/**
+!.config/rofi/**/*
+
+# Waybar
+!.config/waybar
+.config/waybar/**
+!.config/waybar/**/*
+.config/waybar/.*
+
+# Zellij
+!.config/zellij
+.config/zellij/**
+!.config/zellij/config.kdl
+
+# Darkman
+!.config/darkman
+.config/darkman/**
+!.config/darkman/**/*
+
+# Skhd
+!.config/skhd
+.config/skhd/*
+!.config/skhd/skhdrc
+
+# Yabai
+!.config/yabai
+.config/yabai/*
+!.config/yabai/yabairc
+
+## Alacritty
+!.config/alacritty
+.config/alacritty/**
+!.config/alacritty/**/*
+
+## XDG desktop portal
+!.config/xdg-desktop-portal
+.config/xdg-desktop-portal/**
+!.config/xdg-desktop-portal/**/*
