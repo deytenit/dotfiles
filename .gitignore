@@ -77,3 +77,20 @@ assets/**
 !.config/xdg-desktop-portal
 .config/xdg-desktop-portal/**
 !.config/xdg-desktop-portal/**/*
+
+# Hammerspoon
+!.hammerspoon
+.hammerspoon/**
+!.hammerspoon/**/*
+
+# .local
+!.local
+.local/**
+!.local/**/*
+
+# bootstrap
+!bootstrap.py
+!**/.strap
+
+# Still to Ignore
+__pycache__

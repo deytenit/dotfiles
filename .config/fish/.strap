@@ -1,0 +1,17 @@
+import os
+from dotfiles import utils
+
+strap_dir = os.path.dirname(__file__)
+
+config = {
+    'name': 'fish',
+    'link': [
+        [os.path.join(strap_dir, 'config.fish'), '~/.config/fish/config.fish', utils.PLATFORM_ANY],
+        [os.path.join(strap_dir, 'aliases.fish'), '~/.config/fish/aliases.fish', utils.PLATFORM_ANY],
+        [os.path.join(strap_dir, 'functions.fish'), '~/.config/fish/functions.fish', utils.PLATFORM_ANY],
+    ],
+    'copy': []
+}
+
+utils.process_config(config)
+

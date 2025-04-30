@@ -1,0 +1,28 @@
+import os
+from dotfiles import utils
+
+strap_dir = os.path.dirname(__file__)
+
+config = {
+    'name': 'rofi/config',
+    'link': [
+      [os.path.join(strap_dir, 'askpass.rasi'), '~/.config/rofi/config/askpass.rasi', utils.PLATFORM_LINUX],
+      [os.path.join(strap_dir, 'bluetooth.rasi'), '~/.config/rofi/config/bluetooth.rasi', utils.PLATFORM_LINUX],
+      [os.path.join(strap_dir, 'confirm.rasi'), '~/.config/rofi/config/confirm.rasi', utils.PLATFORM_LINUX],
+      [os.path.join(strap_dir, 'dark.rasi'), '~/.config/rofi/config/dark.rasi', utils.PLATFORM_LINUX],
+      [os.path.join(strap_dir, 'font.rasi'), '~/.config/rofi/config/font.rasi', utils.PLATFORM_LINUX],
+      [os.path.join(strap_dir, 'launcher.rasi'), '~/.config/rofi/config/launcher.rasi', utils.PLATFORM_LINUX],
+      [os.path.join(strap_dir, 'light.rasi'), '~/.config/rofi/config/light.rasi', utils.PLATFORM_LINUX],
+      [os.path.join(strap_dir, 'mpd.rasi'), '~/.config/rofi/config/mpd.rasi', utils.PLATFORM_LINUX],
+      [os.path.join(strap_dir, 'network.rasi'), '~/.config/rofi/config/network.rasi', utils.PLATFORM_LINUX],
+      [os.path.join(strap_dir, 'networkmenu.rasi'), '~/.config/rofi/config/networkmenu.rasi', utils.PLATFORM_LINUX],
+      [os.path.join(strap_dir, 'powermenu.rasi'), '~/.config/rofi/config/powermenu.rasi', utils.PLATFORM_LINUX],
+      [os.path.join(strap_dir, 'runner.rasi'), '~/.config/rofi/config/runner.rasi', utils.PLATFORM_LINUX],
+      [os.path.join(strap_dir, 'screenshot.rasi'), '~/.config/rofi/config/screenshot.rasi', utils.PLATFORM_LINUX],
+    ],
+    'copy': [
+        [os.path.join(strap_dir, '.theme.rasi'), '~/.config/rofi/config/.theme.rasi', utils.PLATFORM_LINUX],
+    ]
+}
+
+utils.process_config(config)

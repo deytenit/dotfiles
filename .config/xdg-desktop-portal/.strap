@@ -1,0 +1,15 @@
+import os
+from dotfiles import utils
+
+strap_dir = os.path.dirname(__file__)
+
+config = {
+    'name': 'xdg-desktop-portal', # Matching the target directory
+    'link': [
+        [os.path.join(strap_dir, 'portals.conf'), '~/.config/xdg-desktop-portal/portals.conf', utils.PLATFORM_LINUX],
+    ],
+    'copy': []
+}
+
+utils.process_config(config)
+

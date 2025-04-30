@@ -1,0 +1,15 @@
+import os
+from dotfiles import utils
+
+strap_dir = os.path.dirname(__file__)
+
+config = {
+    'name': 'yabai',
+    'link': [
+        [os.path.join(strap_dir, 'yabairc'), '~/.config/yabai/yabairc', utils.PLATFORM_DARWIN],
+    ],
+    'copy': []
+}
+
+utils.process_config(config)
+

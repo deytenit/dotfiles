@@ -1,0 +1,18 @@
+import os
+from dotfiles import utils
+
+strap_dir = os.path.dirname(__file__) # This represents the source directory PWD
+
+# Although the script had no suffix, Hammerspoon is macOS only.
+# Using PLATFORM_DARWIN makes the intent clearer.
+config = {
+    'name': 'hammerspoon',
+    'link': [
+        # Link the entire directory this .strap file is in
+        [strap_dir, '~/.hammerspoon', utils.PLATFORM_DARWIN],
+    ],
+    'copy': []
+}
+
+utils.process_config(config)
+

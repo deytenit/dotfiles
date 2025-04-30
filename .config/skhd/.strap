@@ -1,0 +1,15 @@
+import os
+from dotfiles import utils
+
+strap_dir = os.path.dirname(__file__)
+
+config = {
+    'name': 'skhd',
+    'link': [
+        [os.path.join(strap_dir, 'skhdrc'), '~/.config/skhd/skhdrc', utils.PLATFORM_DARWIN],
+    ],
+    'copy': []
+}
+
+utils.process_config(config)
+

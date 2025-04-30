@@ -1,0 +1,15 @@
+import os
+from dotfiles import utils
+
+strap_dir = os.path.dirname(__file__)
+
+config = {
+    'name': 'dunst',
+    'link': [
+        [os.path.join(strap_dir, 'dunstrc'), '~/.config/dunst/dunstrc', utils.PLATFORM_LINUX],
+    ],
+    'copy': []
+}
+
+utils.process_config(config)
+

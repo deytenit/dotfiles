@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Define the conventional commit types and their descriptions
+declare -A types=(
+  [1]="feat:     A new feature"
+  [2]="fix:      A bug fix"
+  [3]="docs:     Documentation only changes"
+  [4]="style:    Changes that do not affect the meaning of the code (white-space, formatting, etc)"
+  [5]="refactor: A code change that neither fixes a bug nor adds a feature"
+  [6]="perf:     A code change that improves performance"
+  [7]="test:     Adding missing tests or correcting existing tests"
+  [8]="build:    Changes that affect the build system or external dependencies"
+  [9]="ci:       Changes to our CI configuration files and scripts"
+  [10]="chore:   Other changes that don’t modify src or test files"
+)
+
+# 1. Ask for commit type
+echo "Select the type of commit:"
+for idx in "${!types[@]}"; do
+  printf "  %2d) %s\n" "$idx" "${types[$idx]}"
+done
+
+while true; do
+  read -rp "Enter number [1-${#types[@]}]: " type_idx
+  if [[ ${types[$type_idx]+_} ]]; then
+    # extract only the key (e.g. "feat")
+    type="${types[$type_idx]%%:*}"
+    break
+  else
+    echo "Invalid choice. Please enter a number between 1 and ${#types[@]}."
+  fi
+done
+
+# 2. Ask for the short commit message (required)
+while true; do
+  read -rp "Commit message (short, imperative tense) (required): " short_msg
+  if [[ -n "${short_msg// /}" ]]; then
+    break
+  else
+    echo "Short message cannot be empty."
+  fi
+done
+
+# 3. Ask for detailed body (optional)
+read -rp "Detailed description / commit body (optional, press Enter to skip): " body_msg
+
+# 4. Ask for breaking changes (optional)
+read -rp "Breaking changes (optional, press Enter to skip): " breaking_msg
+
+# Assemble the full commit message
+full_msg="${type}: ${short_msg}"
+
+if [[ -n "${body_msg// /}" ]]; then
+  full_msg+=$'\n\n'"${body_msg}"
+fi
+
+if [[ -n "${breaking_msg// /}" ]]; then
+  full_msg+=$'\n\n'"BREAKING CHANGE: ${breaking_msg}"
+fi
+
+# Execute git commit with the generated message and any passed-through arguments
+git commit -m "$full_msg" "$@"

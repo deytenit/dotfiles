@@ -1,0 +1,36 @@
+#!/bin/bash
+
+local os_name
+os_name=$(uname -s)
+
+case "$os_name" in
+  Darwin)
+    if command -v pbcopy &> /dev/null; then
+      pbcopy
+    else
+      echo "Error: 'pbcopy' command not found on macOS (reported as Darwin by uname)." >&2
+      return 1
+    fi
+    ;;
+
+  Linux)
+    if command -v wl-copy &> /dev/null; then
+      wl-copy
+    elif command -v xclip &> /dev/null; then
+      xclip -selection clipboard
+    elif command -v xsel &> /dev/null; then
+      xsel --clipboard --input
+    else
+      echo "Error: No suitable clipboard command found on Linux." >&2
+      echo "Please install 'wl-copy' (for Wayland) or 'xclip'/'xsel' (for X11)." >&2
+      return 1
+    fi
+    ;;
+
+  *)
+    echo "Error: Unsupported operating system '$os_name' (reported by uname) for clipboard copy." >&2
+    return 1
+    ;;
+esac
+
+return $?

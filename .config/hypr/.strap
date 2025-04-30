@@ -1,0 +1,16 @@
+import os
+from dotfiles import utils
+
+strap_dir = os.path.dirname(__file__) # This represents the source directory PWD
+
+config = {
+    'name': 'hypr',
+    'link': [
+        # Link the entire directory this .strap file is in
+        [strap_dir, '~/.config/hypr', utils.PLATFORM_LINUX],
+    ],
+    'copy': []
+}
+
+utils.process_config(config)
+

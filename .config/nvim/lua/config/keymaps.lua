@@ -22,6 +22,8 @@ keymap.set("n", "<C-M-k>", "<C-w>-")
 keymap.set("n", "<C-M-l>", "<C-w>>")
 
 -- sixty.nvim
-local sixty = require("sixty")
-sixty.set("n", "<Up>")
-sixty.set("n", "<Down>")
+local sixty_status, sixty = pcall(require, "sixty")
+if sixty_status then
+  sixty.set("n", "<Up>")
+  sixty.set("n", "<Down>")
+end

@@ -187,9 +187,7 @@ default_mode "normal"
 mouse_mode true
 scroll_buffer_size 10000
 
-// copy_command "xclip -selection clipboard"  // x11
-copy_command "wl-copy"                       // wayland
-// copy_command "pbcopy"                    // osx
+copy_command "copy"
 
 copy_clipboard "system"
 copy_on_select true

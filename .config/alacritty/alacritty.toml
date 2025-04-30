@@ -4,22 +4,3 @@ general.import = [
 
 [env]
 TERM = "xterm-256color"
-
-[font]
-size = 10.0
-offset.y = 20
-offset.x = 1
-glyph_offset.y = 10
-
-[font.normal]
-family = "CaskaydiaCove NFM"
-style = "Regular"
-
-[window]
-opacity = 0.8
-blur = true
-option_as_alt = "Both"
-
-[window.padding]
-x = 8
-y = 8

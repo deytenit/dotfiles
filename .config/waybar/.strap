@@ -1,0 +1,21 @@
+import os
+from dotfiles import utils
+
+strap_dir = os.path.dirname(__file__)
+
+config = {
+    'name': 'waybar',
+    'link': [
+        [os.path.join(strap_dir, 'scripts'), '~/.config/waybar/scripts', utils.PLATFORM_LINUX],
+        [os.path.join(strap_dir, 'config.jsonc'), '~/.config/waybar/config.jsonc', utils.PLATFORM_LINUX],
+        [os.path.join(strap_dir, 'dark.css'), '~/.config/waybar/dark.css', utils.PLATFORM_LINUX],
+        [os.path.join(strap_dir, 'light.css'), '~/.config/waybar/light.css', utils.PLATFORM_LINUX],
+        [os.path.join(strap_dir, 'style.css'), '~/.config/waybar/style.css', utils.PLATFORM_LINUX]
+    ],
+    'copy': [
+        [os.path.join(strap_dir, '.theme.css'), '~/.config/waybar/.theme.css', utils.PLATFORM_LINUX]
+    ]
+}
+
+utils.process_config(config)
+
