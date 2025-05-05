@@ -26,6 +26,8 @@ assets/**
 !.config/fish
 .config/fish/**
 !.config/fish/config.fish
+!.config/fish/functions.fish
+!.config/fish/aliases.fish
 
 ## Hyprland
 !.config/hypr
