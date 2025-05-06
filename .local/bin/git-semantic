@@ -1,41 +1,72 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Define the conventional commit types and their descriptions
-declare -A types=(
-  [1]="feat:     A new feature"
-  [2]="fix:      A bug fix"
-  [3]="docs:     Documentation only changes"
-  [4]="style:    Changes that do not affect the meaning of the code (white-space, formatting, etc)"
-  [5]="refactor: A code change that neither fixes a bug nor adds a feature"
-  [6]="perf:     A code change that improves performance"
-  [7]="test:     Adding missing tests or correcting existing tests"
-  [8]="build:    Changes that affect the build system or external dependencies"
-  [9]="ci:       Changes to our CI configuration files and scripts"
-  [10]="chore:   Other changes that don’t modify src or test files"
+# --- Bash 3 Compatible Array Definitions ---
+# Define the conventional commit type keys (used for the commit message)
+type_keys=(
+  "feat"
+  "fix"
+  "docs"
+  "style"
+  "refactor"
+  "perf"
+  "test"
+  "build"
+  "ci"
+  "chore"
 )
+
+# Define the descriptions corresponding to the keys (for display)
+type_descs=(
+  "A new feature"
+  "A bug fix"
+  "Documentation only changes"
+  "Changes that do not affect the meaning of the code (white-space, formatting, etc)"
+  "A code change that neither fixes a bug nor adds a feature"
+  "A code change that improves performance"
+  "Adding missing tests or correcting existing tests"
+  "Changes that affect the build system or external dependencies"
+  "Changes to our CI configuration files and scripts"
+  "Other changes that don’t modify src or test files"
+)
+# --- End Bash 3 Compatibility Change ---
+
 
 # 1. Ask for commit type
 echo "Select the type of commit:"
-for idx in "${!types[@]}"; do
-  printf "  %2d) %s\n" "$idx" "${types[$idx]}"
+# --- Bash 3 Compatibility Change: Loop using indices ---
+num_types=${#type_keys[@]} # Get total number of types
+
+for i in "${!type_keys[@]}"; do
+  # Display user-friendly index (1-based) along with key and description
+  printf "  %2d) %s: %s\n" "$((i + 1))" "${type_keys[i]}" "${type_descs[i]}"
 done
+# --- End Bash 3 Compatibility Change ---
 
 while true; do
-  read -rp "Enter number [1-${#types[@]}]: " type_idx
-  if [[ ${types[$type_idx]+_} ]]; then
-    # extract only the key (e.g. "feat")
-    type="${types[$type_idx]%%:*}"
+  # --- Bash 3 Compatibility Change: Adjust prompt and validation ---
+  read -rp "Enter number [1-${num_types}]: " type_idx
+
+  # Input validation: Check if it's a number and within the valid range
+  if [[ "$type_idx" =~ ^[0-9]+$ ]] && \
+     (( type_idx >= 1 )) && \
+     (( type_idx <= num_types )); then
+    # Calculate the array index (0-based)
+    array_idx=$((type_idx - 1))
+    # Get the selected type key from the array
+    type="${type_keys[$array_idx]}"
     break
   else
-    echo "Invalid choice. Please enter a number between 1 and ${#types[@]}."
+    echo "Invalid choice. Please enter a number between 1 and ${num_types}."
   fi
+  # --- End Bash 3 Compatibility Change ---
 done
 
 # 2. Ask for the short commit message (required)
 while true; do
   read -rp "Commit message (short, imperative tense) (required): " short_msg
-  if [[ -n "${short_msg// /}" ]]; then
+  # Trim whitespace for validation (Bash 3 doesn't have ${var// /})
+  if [[ -n "$(echo "$short_msg" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')" ]]; then
     break
   else
     echo "Short message cannot be empty."
@@ -51,13 +82,20 @@ read -rp "Breaking changes (optional, press Enter to skip): " breaking_msg
 # Assemble the full commit message
 full_msg="${type}: ${short_msg}"
 
-if [[ -n "${body_msg// /}" ]]; then
-  full_msg+=$'\n\n'"${body_msg}"
+# Trim whitespace for validation (Bash 3 doesn't have ${var// /})
+body_msg_trimmed="$(echo "$body_msg" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+if [[ -n "$body_msg_trimmed" ]]; then
+  full_msg+=$'\n\n'"${body_msg}" # Use original body_msg here to preserve potential internal spacing
 fi
 
-if [[ -n "${breaking_msg// /}" ]]; then
-  full_msg+=$'\n\n'"BREAKING CHANGE: ${breaking_msg}"
+# Trim whitespace for validation (Bash 3 doesn't have ${var// /})
+breaking_msg_trimmed="$(echo "$breaking_msg" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+if [[ -n "$breaking_msg_trimmed" ]]; then
+  full_msg+=$'\n\n'"BREAKING CHANGE: ${breaking_msg}" # Use original breaking_msg
 fi
 
 # Execute git commit with the generated message and any passed-through arguments
+# Quote "$full_msg" correctly
 git commit -m "$full_msg" "$@"
+
+echo "Commit created successfully." # Optional success message

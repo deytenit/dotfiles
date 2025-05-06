@@ -6,8 +6,8 @@ strap_dir = os.path.dirname(__file__)
 config = {
     'name': 'waybar',
     'link': [
-        [os.path.join(strap_dir, 'copy'), '~/.local/bin/copy', utils.PLATFORM_LINUX],
-        [os.path.join(strap_dir, 'git-semantic'), '~/.local/bin/git-semantic', utils.PLATFORM_LINUX],
+        [os.path.join(strap_dir, 'copy'), '~/.local/bin/copy', utils.PLATFORM_ANY],
+        [os.path.join(strap_dir, 'git-semantic'), '~/.local/bin/git-semantic', utils.PLATFORM_ANY],
     ],
     'copy': []
 }
