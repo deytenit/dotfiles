@@ -2,8 +2,29 @@ return {
   {
     "olimorris/codecompanion.nvim",
     dependencies = {
-      "nvim-lua/plenary.nvim",
+      {
+        "j-hui/fidget.nvim",
+        opts = {
+          notification = {
+            window = {
+              winblend = 0,
+            },
+          },
+        },
+      },
       "nvim-treesitter/nvim-treesitter",
+      {
+        "ravitemer/mcphub.nvim",
+        cmd = "MCPHub",
+        build = "npm install -g mcp-hub@latest",
+        config = true,
+      },
+      {
+        "Davidyz/VectorCode",
+        version = "*",
+        build = "pipx upgrade vectorcode",
+        dependencies = { "nvim-lua/plenary.nvim" },
+      },
       {
         "saghen/blink.cmp",
         opts = {
@@ -203,12 +224,28 @@ return {
           provider = "default",
         },
         chat = {
-          show_references = true,
-          show_header_separator = true,
-          show_settings = true,
+          -- show_references = true,
+          -- show_header_separator = true,
+          -- show_settings = true,
         },
         diff = {
           provider = "mini_diff",
+        },
+      }
+
+      local extensions = {
+        mcphub = {
+          callback = "mcphub.extensions.codecompanion",
+          opts = {
+            make_vars = true,
+            make_slash_commands = true,
+            show_result_in_chat = true,
+          },
+        },
+        vectorcode = {
+          opts = {
+            add_tool = true,
+          },
         },
       }
 
@@ -216,7 +253,11 @@ return {
         adapters = adapters,
         strategies = strategies,
         display = display,
+        extensions = extensions,
       }
+    end,
+    init = function ()
+      require("plugins.custom.spinner"):init()
     end,
     keys = {
       {
