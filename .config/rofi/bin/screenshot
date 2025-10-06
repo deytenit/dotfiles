@@ -50,11 +50,11 @@ shot10 () {
 }
 
 shotwin () {
-	grimblast --notify copysave active "$file"
+	sleep 0.5 && grimblast --notify copysave active "$file"
 }
 
 shotarea () {
-	grimblast --notify copysave area "$file"
+  sleep 0.5 && grimblast --notify copysave area "$file"
 }
 
 if [[ ! -d "$dir" ]]; then

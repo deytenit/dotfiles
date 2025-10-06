@@ -249,7 +249,7 @@ return {
         adapters.opts = {
           allow_insecure = true,
           -- xray proxy
-          proxy = "socks5://127.0.0.1:2080",
+          proxy = "socks5://127.0.0.1:10808",
         }
       end
 
