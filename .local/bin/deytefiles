@@ -2,298 +2,24 @@
 """
 deytefiles - Main control script for dotfiles repository management.
 
-Commands:
-    sync    Sync dotfiles repository with remote (commit, pull/rebase, push)
+This is the entry point that delegates to modular command implementations.
 """
 
 import sys
-import os
-import subprocess
 import argparse
-import platform
-from datetime import datetime
 from pathlib import Path
 
+# Add dotfiles lib to Python path
+SCRIPT_DIR = Path(__file__).parent.resolve()
+DOTFILES_LIB = SCRIPT_DIR.parent / 'share' / 'dotfiles'
+if str(DOTFILES_LIB) not in sys.path:
+    sys.path.insert(0, str(DOTFILES_LIB))
 
-class Colors:
-    """ANSI color codes for terminal output."""
-    RESET = '\033[0m'
-    RED = '\033[91m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[94m'
-    BOLD = '\033[1m'
+from cli.commands import BootstrapCommand, SyncCommand
 
 
-def log_info(message):
-    """Log an informational message."""
-    print(f"{Colors.BLUE}[INFO]{Colors.RESET} {message}")
-
-
-def log_success(message):
-    """Log a success message."""
-    print(f"{Colors.GREEN}[SUCCESS]{Colors.RESET} {message}")
-
-
-def log_warning(message):
-    """Log a warning message."""
-    print(f"{Colors.YELLOW}[WARNING]{Colors.RESET} {message}")
-
-
-def log_error(message):
-    """Log an error message."""
-    print(f"{Colors.RED}[ERROR]{Colors.RESET} {message}", file=sys.stderr)
-
-
-def send_notification(title, message, success=True):
-    """
-    Send a native notification to the user.
-    
-    Args:
-        title (str): Notification title
-        message (str): Notification message
-        success (bool): Whether this is a success (True) or error (False) notification
-    """
-    system = platform.system().lower()
-    
-    try:
-        if system == 'darwin':
-            # macOS notification using osascript
-            urgency = "normal" if success else "critical"
-            script = f'display notification "{message}" with title "{title}" sound name "{"Glass" if success else "Basso"}"'
-            subprocess.run(
-                ['osascript', '-e', script],
-                check=False,
-                capture_output=True
-            )
-        elif system == 'linux':
-            # Linux notification using notify-send (works with dunst, mako, etc.)
-            urgency = "normal" if success else "critical"
-            icon = "dialog-information" if success else "dialog-error"
-            subprocess.run(
-                ['notify-send', '-u', urgency, '-i', icon, title, message],
-                check=False,
-                capture_output=True
-            )
-    except FileNotFoundError:
-        log_warning("Notification system not available")
-    except Exception as e:
-        log_warning(f"Failed to send notification: {e}")
-
-
-def run_command(cmd, error_message=None, capture=False, check=True):
-    """
-    Run a shell command and handle errors.
-    
-    Args:
-        cmd (list): Command and arguments as a list
-        error_message (str): Custom error message to display on failure
-        capture (bool): Whether to capture and return output
-        check (bool): Whether to raise exception on non-zero exit
-    
-    Returns:
-        subprocess.CompletedProcess or None
-    """
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=capture,
-            text=True,
-            check=check
-        )
-        return result if capture else None
-    except subprocess.CalledProcessError as e:
-        if error_message:
-            log_error(error_message)
-        if capture:
-            log_error(f"Output: {e.stderr}")
-        raise
-    except FileNotFoundError:
-        log_error(f"Command not found: {cmd[0]}")
-        raise
-
-
-def get_repo_root():
-    """
-    Get the root directory of the git repository.
-    
-    Returns:
-        Path: Absolute path to repository root
-    """
-    try:
-        result = run_command(
-            ['git', 'rev-parse', '--show-toplevel'],
-            error_message="Not in a git repository",
-            capture=True
-        )
-        return Path(result.stdout.strip())
-    except subprocess.CalledProcessError:
-        log_error("Could not determine repository root")
-        sys.exit(1)
-
-
-def check_git_status():
-    """
-    Check if there are any changes in the repository.
-    
-    Returns:
-        bool: True if there are changes, False otherwise
-    """
-    try:
-        result = run_command(
-            ['git', 'status', '--porcelain'],
-            capture=True
-        )
-        return bool(result.stdout.strip())
-    except subprocess.CalledProcessError:
-        return False
-
-
-def get_current_branch():
-    """
-    Get the current git branch name.
-    
-    Returns:
-        str: Current branch name
-    """
-    try:
-        result = run_command(
-            ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-            capture=True
-        )
-        return result.stdout.strip()
-    except subprocess.CalledProcessError:
-        return "unknown"
-
-
-def sync_command(args):
-    """
-    Sync dotfiles repository with remote.
-    
-    This command:
-    1. Adds all changes
-    2. Commits with timestamp
-    3. Pulls with rebase
-    4. Pushes to remote
-    5. Sends notification about the result
-    """
-    log_info("Starting dotfiles sync...")
-    
-    # Navigate to repo root
-    repo_root = get_repo_root()
-    os.chdir(repo_root)
-    log_info(f"Repository: {repo_root}")
-    
-    # Get current branch
-    branch = get_current_branch()
-    log_info(f"Current branch: {branch}")
-    
-    try:
-        # Check for changes
-        if not check_git_status():
-            log_info("No changes to sync")
-            if not args.quiet:
-                send_notification(
-                    "Deytefiles Sync",
-                    "No changes to sync",
-                    success=True
-                )
-            return 0
-        
-        # Stage all changes
-        log_info("Staging changes...")
-        run_command(
-            ['git', 'add', '-A'],
-            error_message="Failed to stage changes"
-        )
-        
-        # Create commit message with timestamp
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        commit_message = args.message or f"Auto-sync: {timestamp}"
-        
-        log_info(f"Committing with message: {commit_message}")
-        run_command(
-            ['git', 'commit', '-m', commit_message],
-            error_message="Failed to commit changes"
-        )
-        
-        # Pull with rebase if not in detached HEAD or initial commit
-        if branch != "HEAD":
-            log_info(f"Pulling changes from origin/{branch} with rebase...")
-            result = run_command(
-                ['git', 'pull', '--rebase', 'origin', branch],
-                check=False,
-                capture=True
-            )
-            
-            if result.returncode != 0:
-                # Check if it's a rebase conflict
-                if 'conflict' in result.stderr.lower() or 'conflict' in result.stdout.lower():
-                    log_error("Rebase conflict detected!")
-                    log_info("Aborting rebase...")
-                    run_command(['git', 'rebase', '--abort'], check=False)
-                    
-                    error_msg = "Rebase conflict detected. Manual intervention required."
-                    log_error(error_msg)
-                    send_notification(
-                        "Deytefiles Sync Failed",
-                        error_msg,
-                        success=False
-                    )
-                    return 1
-                
-                # If not a conflict but still failed
-                log_warning("Pull failed, but continuing with push...")
-        
-        # Push changes
-        log_info(f"Pushing changes to origin/{branch}...")
-        push_args = ['git', 'push']
-        
-        if args.force:
-            push_args.append('--force-with-lease')
-        
-        push_args.extend(['origin', branch])
-        
-        run_command(
-            push_args,
-            error_message="Failed to push changes"
-        )
-        
-        log_success("Dotfiles synced successfully!")
-        
-        if not args.quiet:
-            send_notification(
-                "Deytefiles Sync Complete",
-                f"Successfully synced dotfiles on branch '{branch}'",
-                success=True
-            )
-        
-        return 0
-        
-    except subprocess.CalledProcessError as e:
-        error_msg = "Sync failed. Check the logs for details."
-        log_error(error_msg)
-        send_notification(
-            "Deytefiles Sync Failed",
-            error_msg,
-            success=False
-        )
-        return 1
-    except KeyboardInterrupt:
-        log_warning("\nSync interrupted by user")
-        return 130
-    except Exception as e:
-        log_error(f"Unexpected error: {e}")
-        send_notification(
-            "Deytefiles Sync Failed",
-            f"Unexpected error: {str(e)}",
-            success=False
-        )
-        return 1
-
-
-def main():
-    """Main entry point for the deytefiles script."""
+def create_parser():
+    """Create and configure argument parser."""
     parser = argparse.ArgumentParser(
         description="Deytefiles - Dotfiles repository management tool",
         formatter_class=argparse.RawDescriptionHelpFormatter
@@ -302,6 +28,17 @@ def main():
     subparsers = parser.add_subparsers(
         dest='command',
         help='Available commands'
+    )
+    
+    # Bootstrap command
+    bootstrap_parser = subparsers.add_parser(
+        'bootstrap',
+        help='Run bootstrap process to set up dotfiles'
+    )
+    bootstrap_parser.add_argument(
+        '-q', '--quiet',
+        action='store_true',
+        help='Suppress notifications'
     )
     
     # Sync command
@@ -324,9 +61,13 @@ def main():
         action='store_true',
         help='Suppress notifications'
     )
-    sync_parser.set_defaults(func=sync_command)
     
-    # Parse arguments
+    return parser
+
+
+def main():
+    """Main entry point for the deytefiles script."""
+    parser = create_parser()
     args = parser.parse_args()
     
     # Show help if no command provided
@@ -334,10 +75,22 @@ def main():
         parser.print_help()
         return 1
     
-    # Execute command
-    return args.func(args)
+    # Command mapping
+    commands = {
+        'bootstrap': BootstrapCommand,
+        'sync': SyncCommand,
+    }
+    
+    # Get and execute command
+    command_class = commands.get(args.command)
+    if command_class:
+        command = command_class(args)
+        return command.execute()
+    
+    # Unknown command (shouldn't happen due to argparse)
+    parser.print_help()
+    return 1
 
 
 if __name__ == '__main__':
     sys.exit(main())
-

@@ -8,6 +8,7 @@ config = {
     'link': [
         [os.path.join(strap_dir, 'copy'), '~/.local/bin/copy', utils.PLATFORM_ANY],
         [os.path.join(strap_dir, 'git-semantic'), '~/.local/bin/git-semantic', utils.PLATFORM_ANY],
+        [os.path.join(strap_dir, 'deytefiles'), '~/.local/bin/deytefiles', utils.PLATFORM_ANY],
     ],
     'copy': []
 }
