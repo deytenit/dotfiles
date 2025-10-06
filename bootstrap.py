@@ -89,6 +89,27 @@ def main():
     sys.path = original_sys_path
     # log("Restored original sys.path") # Optional: uncomment for debug
 
+    # --- Apply collected cron jobs ---
+    # After all .strap files have been processed, apply the collected cron entries
+    try:
+        # Import utils to access COLLECTED_CRON_ENTRIES and apply_cron_jobs
+        if utils_base_path not in sys.path:
+            sys.path.insert(0, utils_base_path)
+        
+        from dotfiles import utils
+        
+        if utils.COLLECTED_CRON_ENTRIES:
+            log(f"Applying {len(utils.COLLECTED_CRON_ENTRIES)} collected cron job(s)...")
+            utils.apply_cron_jobs(utils.COLLECTED_CRON_ENTRIES)
+        else:
+            log("No cron jobs to apply.")
+        
+        # Restore sys.path again
+        sys.path = original_sys_path
+    except ImportError as e:
+        log(f"WARNING: Could not import utils to apply cron jobs: {e}")
+    except Exception as e:
+        log(f"WARNING: Error applying cron jobs: {e}")
 
     log(f"Bootstrap finished. Found {strap_files_found} '{STRAP_FILENAME}' files, executed {strap_files_executed}.")
 
