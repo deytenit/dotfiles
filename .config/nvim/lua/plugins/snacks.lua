@@ -38,7 +38,7 @@ return {
       {
         "<leader>sg",
         LazyVim.pick("live_grep", { root = false }),
-        desc = "Grep (cwd)"
+        desc = "Grep (cfd)"
       },
       {
         "<leader>sG",
@@ -48,16 +48,16 @@ return {
       {
         "<leader>ff",
         LazyVim.pick("files", { root = false }),
-        desc = "Find Files (cwd)"
+        desc = "Find Files (cfd)"
       },
       {
         "<leader>fF",
         LazyVim.pick("files", { cwd = vim.fn.expand("%:p:h") }),
-        desc = "Find Files (Directory of Current File)"
+        desc = "Find Files (cwd)"
       },
       {
         "<leader><space>",
-        LazyVim.pick("files", { root = false }),
+        LazyVim.pick("files", { cwd = vim.fn.expand("%:p:h") }),
         desc = "Find Files (cwd)"
       },
     },

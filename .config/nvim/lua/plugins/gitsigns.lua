@@ -7,7 +7,7 @@ return {
     end,
   },
   {
-    dir = "~/Source/arcadia/contrib/tier1/gitsigns.arc.nvim",
+    dir = "~/Source/arcadia/a/contrib/tier1/gitsigns.arc.nvim",
     event = "LazyFile",
     opts = {
       signs = {

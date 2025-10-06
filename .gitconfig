@@ -10,14 +10,11 @@
   smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
   required = true
-[credential]
-  helper = /home/deytenit/.dotnet/tools/git-credential-manager
-  credentialStore = gpg
-[credential "https://dev.azure.com"]
-  useHttpPath = true
 [commit]
   gpgsign = true
 [init]
   defaultBranch = main
 [include]
   path = ~/.gitconfig.local
+[credential "https://dev.azure.com"]
+	useHttpPath = true
