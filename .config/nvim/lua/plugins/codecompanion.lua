@@ -31,7 +31,7 @@ return {
       {
         "Davidyz/VectorCode",
         version = "*",
-        build = "pipx upgrade vectorcode",
+        build = "uv tool upgrade vectorcode",
         dependencies = { "nvim-lua/plenary.nvim" },
       },
     },
@@ -186,12 +186,37 @@ return {
         inline = { adapter = inline_adapter },
       }
 
+      local memory = {
+        default = {
+          description = "My default group",
+          files = {
+            "AGENTS.md",
+          },
+        },
+        direct = {
+          description = "Group for developing in yandex adv monorepository",
+          files = {
+            "packages/direct-modules/AGENTS.md",
+          },
+          enabled = function ()
+            return use_yalm
+          end
+        },
+        opts = {
+          chat = {
+            enabled = true,
+            default_memory = { "default", "direct" },
+          },
+        },
+      }
+
       return {
         adapters = adapters,
         strategies = strategies,
         display = display,
         extensions = extensions,
         prompt_library = prompt_library,
+        memory = memory,
       }
     end,
     init = function()
