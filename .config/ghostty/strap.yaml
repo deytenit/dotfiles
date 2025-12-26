@@ -1,0 +1,7 @@
+name: ghostty
+link:
+  - config
+  - themes
+copy:
+  - [.theme, ~/.config/ghostty/.theme]
+

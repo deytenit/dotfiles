@@ -1,0 +1,6 @@
+name: fish
+link:
+  - config.fish
+  - aliases.fish
+  - functions.fish
+

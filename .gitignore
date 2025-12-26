@@ -75,6 +75,10 @@ assets/**
 .config/alacritty/**
 !.config/alacritty/**/*
 
+!.config/ghostty
+.config/ghostty/**
+!.config/ghostty/**/*
+
 ## XDG desktop portal
 !.config/xdg-desktop-portal
 .config/xdg-desktop-portal/**
@@ -92,7 +96,7 @@ assets/**
 
 # bootstrap
 !bootstrap.py
-!**/.strap
+!**/strap*.yaml
 
-# Still to Ignore
+# Still to ignore
 __pycache__

@@ -1,0 +1,19 @@
+theme = light:rainby-light,dark:rainby-dark
+
+env = TERM=xterm-256color
+
+font-family = CaskaydiaMono Nerd Font
+font-size = 13
+font-feature=-liga
+font-thicken=true
+
+adjust-cell-height = 50%
+
+window-theme = system
+window-padding-x = 8
+window-padding-y = 8
+
+background-opacity = 0.9
+background-blur = 20
+
+macos-option-as-alt = true
