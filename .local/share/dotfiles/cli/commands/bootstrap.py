@@ -29,7 +29,7 @@ class BootstrapCommand(BaseCommand):
         
         try:
             # Navigate to repo root
-            repo = GitRepository()
+            repo = GitRepository(self.args.repo_root)
             repo_root = repo.repo_root
             os.chdir(repo_root)
             

@@ -28,8 +28,8 @@ class SyncCommand(BaseCommand):
         log_info("Starting dotfiles sync...")
         
         try:
-            # Initialize git repository
-            repo = GitRepository()
+            # Initialize git repository with explicit path
+            repo = GitRepository(self.args.repo_root)
             os.chdir(repo.repo_root)
             log_info(f"Repository: {repo.repo_root}")
             
@@ -53,7 +53,7 @@ class SyncCommand(BaseCommand):
             
             # Create commit message with timestamp
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            commit_message = getattr(self.args, 'message', None) or f"Auto-sync: {timestamp}"
+            commit_message = getattr(self.args, 'message', None) or f"auto-sync: {timestamp}"
             
             log_info(f"Committing with message: {commit_message}")
             repo.commit(commit_message)

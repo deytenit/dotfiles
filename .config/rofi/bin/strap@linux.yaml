@@ -1,0 +1,4 @@
+name: rofi/bin
+link:
+  - [., ~/.config/rofi/bin]
+

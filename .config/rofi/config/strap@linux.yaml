@@ -1,0 +1,18 @@
+name: rofi/config
+link:
+  - askpass.rasi
+  - bluetooth.rasi
+  - confirm.rasi
+  - dark.rasi
+  - font.rasi
+  - launcher.rasi
+  - light.rasi
+  - mpd.rasi
+  - network.rasi
+  - networkmenu.rasi
+  - powermenu.rasi
+  - runner.rasi
+  - screenshot.rasi
+copy:
+  - [.theme.rasi, ~/.config/rofi/config/.theme.rasi]
+

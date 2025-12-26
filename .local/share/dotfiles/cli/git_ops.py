@@ -15,7 +15,10 @@ class GitRepository:
         Args:
             repo_path (Path, optional): Path to repository. If None, auto-detect.
         """
-        self.repo_root = repo_path or self._get_root()
+        if repo_path:
+            self.repo_root = Path(repo_path) if not isinstance(repo_path, Path) else repo_path
+        else:
+            self.repo_root = self._get_root()
     
     def _get_root(self):
         """
@@ -48,7 +51,8 @@ class GitRepository:
                 ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
+                cwd=self.repo_root
             )
             return result.stdout.strip()
         except subprocess.CalledProcessError:
@@ -66,7 +70,8 @@ class GitRepository:
                 ['git', 'status', '--porcelain'],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
+                cwd=self.repo_root
             )
             return bool(result.stdout.strip())
         except subprocess.CalledProcessError:
@@ -74,7 +79,7 @@ class GitRepository:
     
     def add_all(self):
         """Stage all changes."""
-        subprocess.run(['git', 'add', '-A'], check=True)
+        subprocess.run(['git', 'add', '-A'], check=True, cwd=self.repo_root)
     
     def commit(self, message):
         """
@@ -83,7 +88,7 @@ class GitRepository:
         Args:
             message (str): Commit message
         """
-        subprocess.run(['git', 'commit', '-m', message], check=True)
+        subprocess.run(['git', 'commit', '-m', message], check=True, cwd=self.repo_root)
     
     def pull_rebase(self, remote='origin', branch=None):
         """
@@ -103,7 +108,8 @@ class GitRepository:
             ['git', 'pull', '--rebase', remote, branch],
             capture_output=True,
             text=True,
-            check=False
+            check=False,
+            cwd=self.repo_root
         )
     
     def push(self, remote='origin', branch=None, force=False):
@@ -112,7 +118,7 @@ class GitRepository:
         
         Args:
             remote (str): Remote name (default: 'origin')
-            branch (str): Branch name (default: current branch)
+            branch (str): Branch name (default: 'origin')
             force (bool): Use --force-with-lease if True
         """
         if branch is None:
@@ -123,9 +129,9 @@ class GitRepository:
             cmd.append('--force-with-lease')
         cmd.extend([remote, branch])
         
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, cwd=self.repo_root)
     
     def abort_rebase(self):
         """Abort an ongoing rebase."""
-        subprocess.run(['git', 'rebase', '--abort'], check=False)
+        subprocess.run(['git', 'rebase', '--abort'], check=False, cwd=self.repo_root)
 

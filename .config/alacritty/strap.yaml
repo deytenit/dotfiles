@@ -1,0 +1,8 @@
+name: alacritty
+link:
+  - alacritty.toml
+  - dark.toml
+  - light.toml
+copy:
+  - [.theme.toml, ~/.config/alacritty/.theme.toml]
+

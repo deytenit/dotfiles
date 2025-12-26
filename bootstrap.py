@@ -4,6 +4,21 @@ import sys
 import runpy
 import platform
 
+# Try to import yaml from different sources
+try:
+    import yaml
+except ImportError:
+    # Use vendored YAML parser
+    from pathlib import Path
+    vendor_path = Path(__file__).parent / '.local' / 'share' / 'dotfiles' / 'vendor'
+    sys.path.insert(0, str(vendor_path))
+    try:
+        import yaml_parser as yaml
+    except ImportError as e:
+        print(f"[bootstrap] ERROR: Could not import YAML parser: {e}")
+        print("[bootstrap] Please ensure .local/share/dotfiles/vendor/yaml_parser.py exists")
+        sys.exit(1)
+
 # --- Configuration ---
 # Directory containing the utility script, relative to this bootstrap script
 UTILS_DIR_REL = ".local/share" 
@@ -11,9 +26,76 @@ UTILS_DIR_REL = ".local/share"
 UTILS_MODULE_DIR = "dotfiles" 
 # Name of the utility file (although we mainly need its directory for PYTHONPATH)
 UTILS_FILENAME = "utils.py" 
-# Name of the files to search for in subdirectories
+# Name of the strap files to search for in subdirectories (legacy Python format)
 STRAP_FILENAME = ".strap"
+# YAML strap file patterns
+STRAP_YAML_PATTERNS = ["strap.yaml", "strap@darwin.yaml", "strap@linux.yaml"]
 # --- End Configuration ---
+
+
+def get_platform_from_filename(filename):
+    """
+    Extract platform from strap filename.
+    
+    Args:
+        filename (str): Filename like 'strap.yaml', 'strap@darwin.yaml', etc.
+        
+    Returns:
+        str: Platform name ('any', 'darwin', 'linux') or None if not a strap file
+    """
+    if filename == 'strap.yaml':
+        return 'any'
+    elif filename.startswith('strap@') and filename.endswith('.yaml'):
+        # Extract platform between @ and .yaml
+        platform_name = filename[6:-5]  # Remove 'strap@' and '.yaml'
+        return platform_name
+    return None
+
+
+def should_process_strap_file(filename, current_platform_name):
+    """
+    Determine if a strap file should be processed on the current platform.
+    
+    Args:
+        filename (str): Strap filename
+        current_platform_name (str): Current platform ('darwin' or 'linux')
+        
+    Returns:
+        bool: True if file should be processed
+    """
+    file_platform = get_platform_from_filename(filename)
+    
+    if file_platform is None:
+        return False
+    
+    if file_platform == 'any':
+        return True
+    
+    return file_platform == current_platform_name
+
+
+def get_current_platform_name():
+    """Get current platform name as string."""
+    system = platform.system().lower()
+    if system == 'darwin':
+        return 'darwin'
+    elif system == 'linux':
+        return 'linux'
+    else:
+        return 'unknown'
+
+
+def platform_name_to_code(platform_name):
+    """Convert platform name to platform code constant."""
+    # Import here to avoid circular dependency
+    from dotfiles import utils
+    
+    if platform_name == 'darwin':
+        return utils.PLATFORM_DARWIN
+    elif platform_name == 'linux':
+        return utils.PLATFORM_LINUX
+    else:
+        return utils.PLATFORM_ANY
 
 
 def log(message):
@@ -51,6 +133,10 @@ def main():
     strap_files_found = 0
     strap_files_executed = 0
     
+    # Get current platform
+    current_platform_name = get_current_platform_name()
+    log(f"Current platform: {current_platform_name}")
+    
     # Traverse the directory tree starting from the script's directory
     for root, dirs, files in os.walk(script_dir, topdown=True):
         # Skip the .local directory itself to avoid potential loops or unwanted execution
@@ -63,10 +149,58 @@ def main():
         if '.git' in dirs:
             dirs.remove('.git')
 
+        # Check for YAML strap files first (new format)
+        yaml_strap_files = [f for f in files if f in STRAP_YAML_PATTERNS]
+        
+        for yaml_file in yaml_strap_files:
+            # Check if this file should be processed on current platform
+            if not should_process_strap_file(yaml_file, current_platform_name):
+                log(f"Skipping {yaml_file} in {os.path.relpath(root, script_dir)} (platform mismatch)")
+                continue
+            
+            strap_files_found += 1
+            strap_file_path = os.path.join(root, yaml_file)
+            log(f"Found YAML strap file: {os.path.relpath(strap_file_path, script_dir)}")
+
+            try:
+                log(f"Processing: {strap_file_path}")
+                
+                # Load YAML configuration
+                with open(strap_file_path, 'r') as f:
+                    config = yaml.safe_load(f)
+                
+                if config is None:
+                    log(f"WARNING: Empty YAML file: {strap_file_path}")
+                    continue
+                
+                # Import utils to use process_yaml_config
+                if utils_base_path not in sys.path:
+                    sys.path.insert(0, utils_base_path)
+                
+                from dotfiles import utils
+                
+                # Get platform code
+                file_platform_name = get_platform_from_filename(yaml_file)
+                platform_code = platform_name_to_code(file_platform_name)
+                
+                # Process the YAML config
+                utils.process_yaml_config(config, root, platform_code)
+                
+                strap_files_executed += 1
+                log(f"Finished processing: {strap_file_path}")
+                
+            except yaml.YAMLError as e:
+                log(f"ERROR processing {strap_file_path}: YAML parse error - {e}")
+            except Exception as e:
+                log(f"ERROR processing {strap_file_path}: {e}")
+                import traceback
+                traceback.print_exc()
+
+        # Legacy: Check for old Python .strap files
         if STRAP_FILENAME in files:
             strap_files_found += 1
             strap_file_path = os.path.join(root, STRAP_FILENAME)
-            log(f"Found strap file: {os.path.relpath(strap_file_path, script_dir)}")
+            log(f"Found legacy .strap file: {os.path.relpath(strap_file_path, script_dir)}")
 
             try:
                 log(f"Executing: {strap_file_path}")
@@ -81,9 +215,6 @@ def main():
                  log(f" -> Current sys.path includes: {sys.path}") # Help debugging
             except Exception as e:
                 log(f"ERROR executing {strap_file_path}: {e}")
-                # Optionally, print traceback for more detailed debugging
-                # import traceback
-                # traceback.print_exc()
 
     # --- Restore original sys.path ---
     sys.path = original_sys_path
@@ -111,7 +242,7 @@ def main():
     except Exception as e:
         log(f"WARNING: Error applying cron jobs: {e}")
 
-    log(f"Bootstrap finished. Found {strap_files_found} '{STRAP_FILENAME}' files, executed {strap_files_executed}.")
+    log(f"Bootstrap finished. Found {strap_files_found} strap files, executed {strap_files_executed}.")
 
 if __name__ == "__main__":
     main()

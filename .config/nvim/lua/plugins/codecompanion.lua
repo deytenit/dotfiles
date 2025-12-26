@@ -193,19 +193,10 @@ return {
             "AGENTS.md",
           },
         },
-        direct = {
-          description = "Group for developing in yandex adv monorepository",
-          files = {
-            "packages/direct-modules/AGENTS.md",
-          },
-          enabled = function ()
-            return use_yalm
-          end
-        },
         opts = {
           chat = {
             enabled = true,
-            default_memory = { "default", "direct" },
+            default_memory = { "default" },
           },
         },
       }

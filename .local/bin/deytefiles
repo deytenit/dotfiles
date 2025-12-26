@@ -75,6 +75,12 @@ def main():
         parser.print_help()
         return 1
     
+    # Calculate repository root based on script location
+    # The script is at .local/bin/deytefiles, so repo root is 2 levels up
+    script_path = Path(__file__).resolve()
+    repo_root = script_path.parent.parent.parent
+    args.repo_root = repo_root
+    
     # Command mapping
     commands = {
         'bootstrap': BootstrapCommand,

@@ -1,0 +1,6 @@
+name: darkman
+link:
+  - [config.yaml, ~/.config/darkman/config.yaml]
+  - [dark-mode.d, ~/.local/share/dark-mode.d]
+  - [light-mode.d, ~/.local/share/light-mode.d]
+

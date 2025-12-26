@@ -1,0 +1,10 @@
+name: waybar
+link:
+  - scripts
+  - config.jsonc
+  - dark.css
+  - light.css
+  - style.css
+copy:
+  - [.theme.css, ~/.config/waybar/.theme.css]
+

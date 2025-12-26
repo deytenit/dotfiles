@@ -1,0 +1,6 @@
+name: local-bin
+link:
+  - copy
+  - git-semantic
+  - deytefiles
+

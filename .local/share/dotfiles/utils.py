@@ -6,6 +6,21 @@ import subprocess
 import tempfile
 import re
 
+# Try to import yaml from different sources
+try:
+    import yaml
+except ImportError:
+    # Use vendored YAML parser
+    from pathlib import Path
+    vendor_path = Path(__file__).parent / 'vendor'
+    sys.path.insert(0, str(vendor_path))
+    try:
+        import yaml_parser as yaml
+    except ImportError as e:
+        print(f"[utils] WARNING: Could not import YAML parser: {e}")
+        print("[utils] YAML config files will not be supported")
+        yaml = None
+
 # Platform constants
 PLATFORM_DARWIN = 1
 PLATFORM_LINUX = 2
@@ -539,6 +554,204 @@ def process_config(config):
             _log(name, f"ERROR: Invalid cron entry format: {entry}. Must be a list/tuple of 3 elements.")
 
     _log(name, "Processing finished.")
+
+
+def process_yaml_config(config, strap_dir, platform):
+    """
+    Process YAML-based configuration with smart path resolution.
+    
+    This function takes a simplified YAML config and converts it to the full
+    format expected by process_config(), handling path normalization and
+    platform specification automatically.
+    
+    Args:
+        config (dict): Configuration dictionary loaded from YAML with structure:
+            {
+                'name': str,
+                'link': [entries],
+                'copy': [entries],
+                'cron': [entries]  # optional
+            }
+        strap_dir (str): Absolute path to the directory containing the strap file
+        platform (int): Platform code (PLATFORM_DARWIN, PLATFORM_LINUX, or PLATFORM_ANY)
+    
+    Entry formats supported:
+        - String: 'file.txt' → [strap_dir/file.txt, same_path_as_strap_dir/file.txt, platform]
+        - List[2]: ['file.txt', '~/.config/target.txt'] → [strap_dir/file.txt, target, platform]
+        - List[3]: ['file.txt', '~/.config/target.txt', PLATFORM_LINUX] → used as-is
+        - Dot: '.' → [strap_dir, inferred_target, platform]
+    """
+    if not isinstance(config, dict):
+        print(f"[bootstrap/yaml] ERROR: Invalid config format - must be a dictionary.")
+        return
+    
+    name = config.get('name', 'unknown')
+    _log(name, f"Processing YAML config from {strap_dir}")
+    
+    # Normalize tasks
+    normalized_config = {
+        'name': name,
+        'link': _normalize_yaml_entries(config.get('link', []), strap_dir, platform, name),
+        'copy': _normalize_yaml_entries(config.get('copy', []), strap_dir, platform, name),
+        'cron': _normalize_yaml_cron_entries(config.get('cron', []), strap_dir, platform, name)
+    }
+    
+    # Process using the existing function
+    process_config(normalized_config)
+
+
+def _normalize_yaml_entries(entries, strap_dir, platform, name):
+    """
+    Normalize YAML entries to full [source, target, platform] format.
+    
+    Args:
+        entries (list): List of entries in various formats
+        strap_dir (str): Directory containing the strap file
+        platform (int): Platform code
+        name (str): Config name for logging
+        
+    Returns:
+        list: Normalized entries in [source, target, platform] format
+    """
+    if not isinstance(entries, list):
+        return []
+    
+    normalized = []
+    strap_dir_path = os.path.abspath(strap_dir)
+    
+    for entry in entries:
+        try:
+            if isinstance(entry, str):
+                # String format: 'file.txt' or '.'
+                if entry == '.':
+                    # Special case: link entire directory
+                    # Infer target from directory structure
+                    # e.g., /path/.config/fish → ~/.config/fish
+                    rel_path = _infer_target_from_path(strap_dir_path)
+                    source = strap_dir_path
+                    target = rel_path
+                else:
+                    # Regular file: resolve source and keep same relative structure
+                    source = os.path.join(strap_dir_path, entry)
+                    # For simple files, assume target mirrors the source structure
+                    # e.g., config.fish in .config/fish/ → ~/.config/fish/config.fish
+                    rel_path = _infer_target_from_path(strap_dir_path)
+                    target = os.path.join(rel_path, entry)
+                
+                normalized.append([source, target, platform])
+                
+            elif isinstance(entry, (list, tuple)):
+                if len(entry) == 2:
+                    # [source, target] format
+                    source_rel, target = entry
+                    if source_rel == '.':
+                        source = strap_dir_path
+                    else:
+                        source = os.path.join(strap_dir_path, source_rel)
+                    normalized.append([source, target, platform])
+                    
+                elif len(entry) == 3:
+                    # [source, target, platform] - full format
+                    source_rel, target, entry_platform = entry
+                    if source_rel == '.':
+                        source = strap_dir_path
+                    else:
+                        source = os.path.join(strap_dir_path, source_rel)
+                    normalized.append([source, target, entry_platform])
+                    
+                else:
+                    _log(name, f"WARNING: Invalid entry format (wrong length): {entry}")
+            else:
+                _log(name, f"WARNING: Invalid entry format (wrong type): {entry}")
+                
+        except Exception as e:
+            _log(name, f"ERROR: Failed to normalize entry {entry}: {e}")
+    
+    return normalized
+
+
+def _normalize_yaml_cron_entries(entries, strap_dir, platform, name):
+    """
+    Normalize YAML cron entries to full [time_expr, command, platform] format.
+    
+    Args:
+        entries (list): List of cron entries
+        strap_dir (str): Directory containing the strap file
+        platform (int): Platform code
+        name (str): Config name for logging
+        
+    Returns:
+        list: Normalized cron entries in [time_expr, command, platform] format
+    """
+    if not isinstance(entries, list):
+        return []
+    
+    normalized = []
+    
+    for entry in entries:
+        try:
+            if isinstance(entry, (list, tuple)):
+                if len(entry) == 2:
+                    # [time_expr, command] format
+                    time_expr, command = entry
+                    normalized.append([time_expr, command, platform])
+                    
+                elif len(entry) == 3:
+                    # [time_expr, command, platform] - full format
+                    normalized.append(list(entry))
+                    
+                else:
+                    _log(name, f"WARNING: Invalid cron entry format: {entry}")
+            else:
+                _log(name, f"WARNING: Invalid cron entry format: {entry}")
+                
+        except Exception as e:
+            _log(name, f"ERROR: Failed to normalize cron entry {entry}: {e}")
+    
+    return normalized
+
+
+def _infer_target_from_path(strap_dir_path):
+    """
+    Infer the target path from the strap directory path.
+    
+    Examples:
+        /path/to/.dotfiles/.config/fish → ~/.config/fish
+        /path/to/.dotfiles/.hammerspoon → ~/.hammerspoon
+        /path/to/.dotfiles/.local/bin → ~/.local/bin
+        /path/to/.dotfiles → ~  (repository root)
+    
+    Args:
+        strap_dir_path (str): Absolute path to strap directory
+        
+    Returns:
+        str: Inferred target path starting with ~
+    """
+    # Get just the path components we care about
+    parts = strap_dir_path.split(os.sep)
+    
+    # Find the last occurrence of common root directories
+    # Look for .config, .local, .hammerspoon, or other dot-directories
+    # BUT skip repository root directories like 'dotfiles' or '.dotfiles'
+    repo_names = {'dotfiles', '.dotfiles'}
+    
+    for i in range(len(parts) - 1, -1, -1):
+        part = parts[i]
+        
+        # Skip if this is likely the repository root
+        if part in repo_names:
+            continue
+            
+        # Found a dot-directory that's not the repo root
+        if part.startswith('.'):
+            # Use everything from here
+            relevant_parts = parts[i:]
+            return os.path.join('~', *relevant_parts)
+    
+    # If we didn't find any dot-directories, we're at repo root
+    # Files in repo root should go directly to ~/
+    return '~'
+
 
 # --- Example Usage (for testing utils.py directly) ---
 if __name__ == "__main__":
