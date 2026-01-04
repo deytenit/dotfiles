@@ -1,3 +1,5 @@
+[include]
+  path = ~/.gitconfig.local
 [core]
   editor = nvim
   ignorecase = false
@@ -14,7 +16,5 @@
   gpgsign = true
 [init]
   defaultBranch = main
-[include]
-  path = ~/.gitconfig.local
 [credential "https://dev.azure.com"]
 	useHttpPath = true
