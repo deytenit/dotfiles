@@ -17,3 +17,6 @@ background-opacity = 0.9
 background-blur = 20
 
 macos-option-as-alt = true
+
+# Local overrides
+config-file = .config.local
