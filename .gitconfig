@@ -3,7 +3,7 @@
   ignorecase = false
 [user]
   name = Vladimir Eremin
-  email = personal@ermnvldmr.com 
+  email = personal@ermnvldmr.com
   signingkey = A823B39D0A24B37E
 [filter "lfs"]
   clean = git-lfs clean -- %f
