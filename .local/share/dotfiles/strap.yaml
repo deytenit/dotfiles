@@ -1,0 +1,4 @@
+name: local-share-dotfiles
+link:
+  - [., ~/.local/share/dotfiles]
+

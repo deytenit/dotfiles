@@ -139,12 +139,6 @@ def main():
     
     # Traverse the directory tree starting from the script's directory
     for root, dirs, files in os.walk(script_dir, topdown=True):
-        # Skip the .local directory itself to avoid potential loops or unwanted execution
-        if os.path.commonpath([utils_base_path, root]) == utils_base_path:
-             log(f"Skipping utils directory: {root}")
-             dirs[:] = [] # Don't descend into subdirectories of .local/share
-             continue
-             
         # Skip .git directories
         if '.git' in dirs:
             dirs.remove('.git')
