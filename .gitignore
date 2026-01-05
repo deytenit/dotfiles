@@ -38,6 +38,7 @@ assets/**
 !.config/nvim
 .config/nvim/**
 !.config/nvim/**/*
+.config/nvim/lazy-lock.json
 
 ## Rofi
 !.config/rofi
@@ -53,7 +54,7 @@ assets/**
 # Zellij
 !.config/zellij
 .config/zellij/**
-!.config/zellij/config.kdl
+!.config/zellij/**/*
 
 # Darkman
 !.config/darkman

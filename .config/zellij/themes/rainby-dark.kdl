@@ -1,0 +1,121 @@
+themes {
+  rainby-dark {
+    text_unselected {
+      base "#f6f6f6"
+      background "#262626"
+      emphasis_0 "#fdec47"
+      emphasis_1 "#81d3e0"
+      emphasis_2 "#c4dc7a"
+      emphasis_3 "#a3a8fe"
+    }
+    text_selected {
+      base "#f6f6f6"
+      background "#4f4f4f"
+      emphasis_0 "#fdec47"
+      emphasis_1 "#81d3e0"
+      emphasis_2 "#c4dc7a"
+      emphasis_3 "#a3a8fe"
+    }
+    ribbon_selected {
+      base "#454545"
+      background "#c4dc7a"
+      emphasis_0 "#ffb4a3"
+      emphasis_1 "#fdec47"
+      emphasis_2 "#a3a8fe"
+      emphasis_3 "#a2c9fe"
+    }
+    ribbon_unselected {
+      base "#454545"
+      background "#f6f6f6"
+      emphasis_0 "#ffb4a3"
+      emphasis_1 "#f6f6f6"
+      emphasis_2 "#a2c9fe"
+      emphasis_3 "#a3a8fe"
+    }
+    table_title {
+      base "#c4dc7a"
+      background 0
+      emphasis_0 "#fdec47"
+      emphasis_1 "#81d3e0"
+      emphasis_2 "#c4dc7a"
+      emphasis_3 "#a3a8fe"
+    }
+    table_cell_selected {
+      base "#f6f6f6"
+      background "#4f4f4f"
+      emphasis_0 "#fdec47"
+      emphasis_1 "#81d3e0"
+      emphasis_2 "#c4dc7a"
+      emphasis_3 "#a3a8fe"
+    }
+    table_cell_unselected {
+      base "#f6f6f6"
+      background "#454545"
+      emphasis_0 "#fdec47"
+      emphasis_1 "#81d3e0"
+      emphasis_2 "#c4dc7a"
+      emphasis_3 "#a3a8fe"
+    }
+    list_selected {
+      base "#f6f6f6"
+      background "#4f4f4f"
+      emphasis_0 "#fdec47"
+      emphasis_1 "#81d3e0"
+      emphasis_2 "#c4dc7a"
+      emphasis_3 "#a3a8fe"
+    }
+    list_unselected {
+      base "#f6f6f6"
+      background "#454545"
+      emphasis_0 "#fdec47"
+      emphasis_1 "#81d3e0"
+      emphasis_2 "#c4dc7a"
+      emphasis_3 "#a3a8fe"
+    }
+    frame_selected {
+      base "#c4dc7a"
+      background 0
+      emphasis_0 "#fdec47"
+      emphasis_1 "#81d3e0"
+      emphasis_2 "#a3a8fe"
+      emphasis_3 0
+    }
+    frame_highlight {
+      base "#fdec47"
+      background 0
+      emphasis_0 "#a3a8fe"
+      emphasis_1 "#fdec47"
+      emphasis_2 "#fdec47"
+      emphasis_3 "#fdec47"
+    }
+    exit_code_success {
+      base "#c4dc7a"
+      background 0
+      emphasis_0 "#81d3e0"
+      emphasis_1 "#454545"
+      emphasis_2 "#a3a8fe"
+      emphasis_3 "#a2c9fe"
+    }
+    exit_code_error {
+      base "#ffb4a3"
+      background 0
+      emphasis_0 "#fcd88b"
+      emphasis_1 0
+      emphasis_2 0
+      emphasis_3 0
+    }
+    multiplayer_user_colors {
+      player_1 "#a3a8fe"
+      player_2 "#a2c9fe"
+      player_3 0
+      player_4 "#fcd88b"
+      player_5 "#81d3e0"
+      player_6 0
+      player_7 "#ffb4a3"
+      player_8 0
+      player_9 0
+      player_10 0
+    }
+  }
+}
+

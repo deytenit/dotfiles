@@ -22,7 +22,7 @@ return {
       {
         "ravitemer/mcphub.nvim",
         cmd = "MCPHub",
-        build = "npm install -g mcp-hub@latest",
+        build = "pnpm install -g mcp-hub@latest",
         config = true,
         opts = {
           make_vars = true,
@@ -31,7 +31,7 @@ return {
       {
         "Davidyz/VectorCode",
         version = "*",
-        build = "uv tool upgrade vectorcode",
+        build = "uv tool upgrade vectorcode || uv tool install vectorcode",
         dependencies = { "nvim-lua/plenary.nvim" },
       },
     },
@@ -42,60 +42,48 @@ return {
       local use_yalm = vim.v.shell_error == 0
 
       local adapters = {
-        yalm_deepseek_v3 = function()
-          return require("codecompanion.adapters").extend("openai_compatible", {
-            env = {
-              url = "http://zeliboba.yandex-team.ru/balance/communal-deepseek-v3-0324-in-yt",
-              api_key = "cmd:cat ~/.yalm_token",
-              chat_url = "/v1/chat/completions",
-            },
-            schema = vim.tbl_extend("force", {
-              model = {
-                default = "deepseek",
+        http = {
+          yalm_deepseek_v3 = function()
+            return require("codecompanion.adapters.http").extend("openai_compatible", {
+              env = {
+                url = "http://zeliboba.yandex-team.ru/balance/communal-deepseek-v3-0324-in-yt",
+                api_key = "cmd:cat ~/.yalm_token",
+                chat_url = "/v1/chat/completions",
               },
-            }, shared_adapter_shema),
-          })
-        end,
-        yalm_anthropic = function()
-          return require("codecompanion.adapters").extend("anthropic", {
-            url = "https://api.eliza.yandex.net/raw/anthropic/v1/messages",
-            env = {
-              api_key = "cmd:cat ~/.eliza_token",
-            },
-          })
-        end,
-        yalm_deepseek_r1 = function()
-          return require("codecompanion.adapters").extend("openai_compatible", {
-            env = {
-              url = "http://zeliboba.yandex-team.ru/balance/deepseek_r1",
-              api_key = "cmd:cat ~/.yalm_token",
-              chat_url = "/v1/chat/completions",
-            },
-            schema = vim.tbl_extend("force", {
-              model = {
-                default = "deepseek",
+              schema = vim.tbl_extend("force", {
+                model = {
+                  default = "deepseek",
+                },
+              }, shared_adapter_shema),
+            })
+          end,
+          yalm_anthropic = function()
+            return require("codecompanion.adapters.http").extend("anthropic", {
+              url = "https://api.eliza.yandex.net/raw/anthropic/v1/messages",
+              env = {
+                api_key = "cmd:cat ~/.eliza_token",
               },
-            }, shared_adapter_shema),
-          })
-        end,
-        copilot_gemini_pro = function()
-          return require("codecompanion.adapters").extend("copilot", {
-            schema = {
-              model = {
-                default = "gemini-2.5-pro",
+            })
+          end,
+          copilot_claude_sonnet = function()
+            return require("codecompanion.adapters.http").extend("copilot", {
+              schema = {
+                model = {
+                  default = "claude-sonnet-4",
+                },
               },
-            },
-          })
-        end,
-        copilot_gemini_flash = function()
-          return require("codecompanion.adapters").extend("copilot", {
-            schema = {
-              model = {
-                default = "gemini-2.0-flash-001",
+            })
+          end,
+          copilot_gemini_flash = function()
+            return require("codecompanion.adapters.http").extend("copilot", {
+              schema = {
+                model = {
+                  default = "gemini-2.0-flash-001",
+                },
               },
-            },
-          })
-        end,
+            })
+          end,
+        }
       }
 
       local main_adapter
@@ -106,7 +94,7 @@ return {
         inline_adapter = "yalm_deepseek_v3"
       else
         vim.notify("CodeCompanion: Using 'copilot' adapter", vim.log.levels.INFO)
-        main_adapter = "copilot_gemini_pro"
+        main_adapter = "copilot_claude_sonnet"
         inline_adapter = "copilot_gemini_flash"
         adapters.opts = {
           allow_insecure = true,
