@@ -1,7 +1,6 @@
 name: ghostty
 link:
   - config
-  - themes
-copy:
-  - [.theme, ~/.config/ghostty/.theme]
+  - [../../themes/rainby/powering/ghostty/rainby-dark, ~/.config/ghostty/themes/rainby-dark]
+  - [../../themes/rainby/powering/ghostty/rainby-light, ~/.config/ghostty/themes/rainby-light]
 

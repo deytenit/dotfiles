@@ -2,8 +2,8 @@ name: waybar
 link:
   - scripts
   - config.jsonc
-  - dark.css
-  - light.css
+  - [../../themes/rainby/powering/waybar/rainby-dark.css, ~/.config/waybar/dark.css]
+  - [../../themes/rainby/powering/waybar/rainby-light.css, ~/.config/waybar/light.css]
   - style.css
 copy:
   - [.theme.css, ~/.config/waybar/.theme.css]

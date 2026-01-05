@@ -1,5 +1,6 @@
 name: zellij
 link:
   - config.kdl
-  - themes
+  - [../../themes/rainby/powering/zellij/rainby-dark.kdl, ~/.config/zellij/themes/rainby-dark.kdl]
+  - [../../themes/rainby/powering/zellij/rainby-light.kdl, ~/.config/zellij/themes/rainby-light.kdl]
   - layouts

@@ -1,0 +1,3 @@
+[submodule "themes/rainby"]
+	path = themes/rainby
+	url = https://github.com/deytenit/Rainby
