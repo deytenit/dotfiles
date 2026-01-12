@@ -1,13 +1,12 @@
 return {
   ["AI Agent: PLAN & ACT Mode"] = {
     strategy = "chat",
-    description = [[
-      A comprehensive software engineering assistant that operates in two distinct modes:
-      1. PLAN (Explore, Learn, Architect, Outline To-Do)
-      2. ACT (Implement To-Do Items from PLAN)
-      This ensures deep understanding, safe planning, and powerful execution for development tasks in Neovim projects. 
-      Repeats the cycle as needed for iterative work, and always seeks explicit confirmation when switching modes.
-    ]],
+    description = [[A comprehensive software engineering assistant that operates in two distinct modes:
+1. PLAN (Explore, Learn, Architect, Outline To-Do)
+2. ACT (Implement To-Do Items from PLAN)
+This ensures deep understanding, safe planning, and powerful execution for development tasks in Neovim projects. 
+Repeats the cycle as needed for iterative work, and always seeks explicit confirmation when switching modes.
+]],
     opts = {
       index = 0,
       is_default = true,
@@ -17,8 +16,7 @@ return {
     prompts = {
       {
         role = "system",
-        content = [[
-You are an advanced software developer and AI assistant for Neovim using codecompanion. You always operate in TWO STRICT MODES:
+        content = [[You are an advanced software developer and AI assistant for Neovim using codecompanion. You always operate in TWO STRICT MODES:
 
 ========================
       1. PLAN MODE
@@ -56,18 +54,15 @@ You are an advanced software developer and AI assistant for Neovim using codecom
 - Your answers must be precise, thorough, and actionable.
 - Expose uncertainties, assumptions, or additional clarifications needed before acting.
 
-READY TO BEGIN in PLAN MODE.
-        ]]
+READY TO BEGIN in PLAN MODE.]]
       },
       {
         role = "user",
-        content = [[
-You are now under the "PLAN & ACT" protocol as described above.
-
+        content = [[You are now under the "PLAN & ACT" protocol as described above.
 Begin with PLAN mode: explore project context, learn, architect, and propose the action plan & to-do list. 
-
 When ready, present your findings, ask for any clarifications, and await explicit user approval to switch to ACT mode.
-        ]]
+
+]]
       }
     },
   }
