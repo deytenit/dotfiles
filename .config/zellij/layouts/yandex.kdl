@@ -1,0 +1,13 @@
+layout {
+    default_tab_template {
+        children
+        pane size=1 borderless=true {
+            plugin location="zellij:compact-bar"
+        }
+    }
+    
+    tab name="direct-modules (a)" cwd="~/Source/arcadia/a/adv/frontend/packages/direct-modules"
+    tab name="uac (a)" cwd="~/Source/arcadia/a/adv/frontend/services/uac"
+    tab name="direct-modules (b)" cwd="~/Source/arcadia/b/adv/frontend/packages/direct-modules"
+    tab name="uac (b)" cwd="~/Source/arcadia/b/adv/frontend/services/uac"
+}
