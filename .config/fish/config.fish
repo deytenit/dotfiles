@@ -9,7 +9,9 @@ end
 source $HOME/.config/fish/aliases.fish
 source $HOME/.config/fish/functions.fish
 
-set -gx PNPM_HOME "/home/deytenit/.local/share/pnpm"
-if type -q nvim && not string match -q -- $PNPM_HOME $PATH
+# pnpm
+set -gx PNPM_HOME "$HOME/.local/share/pnpm"
+if not string match -q -- $PNPM_HOME $PATH
   set -gx PATH "$PNPM_HOME" $PATH
 end
+# pnpm end

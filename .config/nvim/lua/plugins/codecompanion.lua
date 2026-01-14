@@ -38,8 +38,7 @@ return {
     opts = function()
       vim.env["CODECOMPANION_TOKEN_PATH"] = vim.fn.expand("~/.config")
 
-      vim.fn.systemlist("arc root 2>/dev/null")
-      local use_yalm = vim.v.shell_error == 0
+      local use_yalm = vim.fn.filereadable("~/.yalm_token") == 0
 
       local adapters = {
         http = {
@@ -174,7 +173,7 @@ return {
         inline = { adapter = inline_adapter },
       }
 
-      local memory = {
+      local rules = {
         default = {
           description = "My default group",
           files = {
@@ -184,7 +183,7 @@ return {
         opts = {
           chat = {
             enabled = true,
-            default_memory = { "default" },
+            autoload = "default",
           },
         },
       }
@@ -195,7 +194,7 @@ return {
         display = display,
         extensions = extensions,
         prompt_library = prompt_library,
-        memory = memory,
+        rules = rules,
       }
     end,
     init = function()
