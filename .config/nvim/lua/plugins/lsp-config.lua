@@ -37,6 +37,7 @@ return {
     opts = {
       servers = {
         vtsls = vtsls,
+        tsgo = false,
       },
     },
   },
