@@ -36,8 +36,8 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        vtsls = vtsls,
-        tsgo = false,
+        vtsls = false,
+        tsgo = vtsls,
       },
     },
   },
