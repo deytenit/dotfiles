@@ -21,3 +21,17 @@ end
 if type -q bat
   alias cat bat
 end
+
+function __opencode_inline_config --description "Запуск opencode с инлайн-конфигом"
+  set -l config_path "$HOME/.config/opencode/opencode.jsonc"
+
+  if not test -f $config_path
+    command opencode $argv
+    return $status
+  end
+
+  set -l inline_config (string collect < $config_path)
+  env OPENCODE_CONFIG_CONTENT="$inline_config" command opencode $argv
+end
+
+alias opencode __opencode_inline_config
