@@ -1,0 +1,13 @@
+{
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  },
+  "ui": {
+    "theme": "Google Code"
+  },
+  "experimental": {
+    "autoMemory": true
+  }
+}

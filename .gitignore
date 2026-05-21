@@ -1,10 +1,9 @@
 # Ignore everything by default.
 
-
 # Root
 !README.md
 
-# Git 
+# Git
 !.gitconfig
 !.gitignore
 
@@ -98,6 +97,17 @@ assets/**
 # bootstrap
 !bootstrap.py
 !**/strap*.yaml
+
+# opencode
+!.config/opencode
+.config/opencode/**
+!.config/opencode/**/*
+
+# gemini
+!.gemini
+.gemini/**
+!.gemini/settings.json
+!.gemini/skills
 
 # Still to ignore
 __pycache__

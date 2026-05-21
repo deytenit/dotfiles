@@ -1,0 +1,36 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "enabled_providers": ["glm", "anthropic", "openai"],
+  "provider": {
+    "glm": {
+      "name": "Eliza GLM (Internal)",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "apiKey": "{env:ELIZA_API_TOKEN}",
+        "baseURL": "{env:ELIZA_API_BASE_URL}/raw/internal/glm-4-7/v1",
+      },
+      "models": {
+        "glm-4.7": {
+          "name": "GLM 4.7",
+        },
+      }
+    },
+    "anthropic": {
+      "name": "Eliza Anthropic",
+      "npm": "@ai-sdk/anthropic",
+      "options": {
+        "apiKey": "{env:ELIZA_API_TOKEN}",
+        "baseURL": "{env:ELIZA_API_BASE_URL}/raw/anthropic/v1",
+      }
+    },
+    "openai": {
+      "name": "Eliza OpenAI",
+      "npm": "@ai-sdk/openai",
+      "options": {
+        "apiKey": "{env:ELIZA_API_TOKEN}",
+        "baseURL": "{env:ELIZA_API_BASE_URL}/raw/openai/v1",
+      }
+    },
+  },
+  "plugin": []
+}

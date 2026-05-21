@@ -36,6 +36,10 @@ end
 
 local tsgo_settings = {
   typescript = {
+    preferences = {
+      importModuleSpecifierEnding = "minimal",
+      importModuleSpecifierPreference = "non-relative",
+    },
     inlayHints = {
       parameterNames = {
         enabled = "literals",
