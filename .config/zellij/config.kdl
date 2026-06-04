@@ -189,7 +189,7 @@ scroll_buffer_size 10000
 
 copy_command "copy"
 
-copy_clipboard "system"
+// copy_clipboard "system" -- use command instead
 copy_on_select true
 
 scrollback_editor "$EDITOR"

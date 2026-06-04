@@ -11,9 +11,24 @@ source $HOME/.config/fish/functions.fish
 
 # pnpm
 set -gx PNPM_HOME "$HOME/.local/share/pnpm"
-if not string match -q -- $PNPM_HOME $PATH
+if test -d $PNPM_HOME
   set -gx PATH "$PNPM_HOME" $PATH
 end
 # pnpm end
+
+# fnm
+set -gx FNM_HOME "$HOME/.local/share/fnm"
+if test -d $FNM_HOME
+  set -gx PATH "$FNM_HOME" $PATH
+  fnm env --shell fish | source
+end
+# fnm end
+
+# local
+if not contains $HOME/.local/bin $PATH
+    set -gx PATH $HOME/.local/bin $PATH
+end
+# local end
+
 
 source $HOME/.config/fish/.config.local.fish

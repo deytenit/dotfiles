@@ -18,5 +18,9 @@ background-blur = 20
 
 macos-option-as-alt = true
 
+clipboard-read = allow
+clipboard-write = allow
+clipboard-paste-protection = false
+
 # Local overrides
 config-file = .config.local

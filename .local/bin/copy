@@ -1,36 +1,39 @@
 #!/bin/bash
 
-local os_name
-os_name=$(uname -s)
+# read -d '' reads until EOF, preserving trailing newlines
+# Unlike $(), it does NOT strip them
+IFS= read -r -d '' input
 
-case "$os_name" in
+copy_osc52() {
+    local data
+    data=$(printf '%s' "$1" | base64 | tr -d '\n')
+    local tty_device="${SSH_TTY:-/dev/tty}"
+    printf "\033]52;c;%s\a" "$data" > "$tty_device"
+}
+
+if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" || -n "$SSH_CONNECTION" ]]; then
+    copy_osc52 "$input"
+    exit $?
+fi
+
+case "$(uname -s)" in
   Darwin)
-    if command -v pbcopy &> /dev/null; then
-      pbcopy
-    else
-      echo "Error: 'pbcopy' command not found on macOS (reported as Darwin by uname)." >&2
-      return 1
-    fi
+    command -v pbcopy &>/dev/null \
+        || { echo "Error: pbcopy not found" >&2; exit 1; }
+    printf '%s' "$input" | pbcopy
     ;;
-
   Linux)
-    if command -v wl-copy &> /dev/null; then
-      wl-copy
-    elif command -v xclip &> /dev/null; then
-      xclip -selection clipboard
-    elif command -v xsel &> /dev/null; then
-      xsel --clipboard --input
+    if command -v wl-copy &>/dev/null; then
+        printf '%s' "$input" | wl-copy
+    elif command -v xclip &>/dev/null; then
+        printf '%s' "$input" | xclip -selection clipboard
+    elif command -v xsel &>/dev/null; then
+        printf '%s' "$input" | xsel --clipboard --input
     else
-      echo "Error: No suitable clipboard command found on Linux." >&2
-      echo "Please install 'wl-copy' (for Wayland) or 'xclip'/'xsel' (for X11)." >&2
-      return 1
+        copy_osc52 "$input"
     fi
     ;;
-
   *)
-    echo "Error: Unsupported operating system '$os_name' (reported by uname) for clipboard copy." >&2
-    return 1
+    echo "Error: Unsupported OS '$(uname -s)'" >&2; exit 1
     ;;
 esac
-
-return $?

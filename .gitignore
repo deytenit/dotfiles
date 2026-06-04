@@ -16,30 +16,30 @@ assets/**
 !.config/
 .config/*
 
-## Dunst
+# Dunst
 !.config/dunst
 .config/dunst/**
 !.config/dunst/dunstrc
 
-## Fish
+# Fish
 !.config/fish
 .config/fish/**
 !.config/fish/config.fish
 !.config/fish/functions.fish
 !.config/fish/aliases.fish
 
-## Hyprland
+# Hyprland
 !.config/hypr
 .config/hypr/**
 !.config/hypr/**/*
 
-## Neovim
+# Neovim
 !.config/nvim
 .config/nvim/**
 !.config/nvim/**/*
 .config/nvim/lazy-lock.json
 
-## Rofi
+# Rofi
 !.config/rofi
 .config/rofi/**
 !.config/rofi/**/*
@@ -53,7 +53,10 @@ assets/**
 # Zellij
 !.config/zellij
 .config/zellij/**
-!.config/zellij/**/*
+!.config/zellij/config.kdl
+!.config/zellij/layouts/*.kdl
+## Ignore local (private) layouts
+.config/zellij/layouts/*-local.kdl
 
 # Darkman
 !.config/darkman

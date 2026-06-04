@@ -8,6 +8,42 @@ end
 
 local ARC_ROOT = get_arc_root()
 
+--- Detect total system RAM in GB.
+--- Supports Linux (/proc/meminfo) and macOS (sysctl).
+local function get_total_ram_gb()
+  local f = io.open("/proc/meminfo", "r")
+  if f then
+    local content = f:read("*a")
+    f:close()
+    local kb = content:match("MemTotal:%s+(%d+)")
+    if kb then
+      return math.floor(tonumber(kb) / 1024 / 1024)
+    end
+  end
+
+  local result = vim.system({ "sysctl", "-n", "hw.memsize" }, { text = true }):wait()
+  if result.code == 0 and result.stdout then
+    local bytes = tonumber(vim.trim(result.stdout))
+    if bytes then
+      return math.floor(bytes / 1024 / 1024 / 1024)
+    end
+  end
+
+  return nil
+end
+
+--- min(max(4, total/2), 32) GB — diminishing returns, hard cap at 32 GB.
+local function tsgo_memory_bytes()
+  local total_gb = get_total_ram_gb()
+  if not total_gb or total_gb == 0 then
+    return 8 * 1024 * 1024 * 1024 -- 8 GB fallback
+  end
+  local limit_gb = math.max(4, math.min(math.floor(total_gb / 2), 32))
+  return limit_gb * 1024 * 1024 * 1024
+end
+
+local TSGO_MEMORY_BYTES = tsgo_memory_bytes()
+
 local function resolve_tsgo_cmd(root_dir)
   local candidates = {}
 
@@ -56,7 +92,9 @@ local tsgo_settings = {
 
 local function tsgo_cmd(dispatchers, config)
   local cmd = resolve_tsgo_cmd(config and config.root_dir)
-  return vim.lsp.rpc.start({ cmd, "--lsp", "--stdio" }, dispatchers)
+  return vim.lsp.rpc.start({ cmd, "--lsp", "--stdio" }, dispatchers, {
+    env = { GOMEMLIMIT = tostring(TSGO_MEMORY_BYTES) },
+  })
 end
 
 local function tsgo_root_dir(bufnr, on_dir)
@@ -88,6 +126,7 @@ local function tsgo_root_dir(bufnr, on_dir)
 end
 
 local tsgo_config = {
+  enabled = true,
   cmd = tsgo_cmd,
   filetypes = {
     "javascript",
