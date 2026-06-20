@@ -30,5 +30,6 @@ if not contains $HOME/.local/bin $PATH
 end
 # local end
 
-
-source $HOME/.config/fish/.config.local.fish
+if test -f $HOME/.config/fish/.config.local.fish
+  source $HOME/.config/fish/.config.local.fish
+end
