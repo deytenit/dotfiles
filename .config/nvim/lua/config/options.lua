@@ -21,11 +21,17 @@ local function is_ssh()
   return os.getenv("SSH_TTY") ~= nil or os.getenv("SSH_CLIENT") ~= nil
 end
 
+local function in_zellij()
+  return os.getenv("ZELLIJ") ~= nil
+end
+
 local function is_wsl()
   return os.getenv("WSL_DISTRO_NAME") ~= nil
 end
 
 if is_ssh() then
+  local paste_fn = function() return {} end
+  local osc52_paste = not in_zellij() and require("vim.ui.clipboard.osc52").paste("+") or paste_fn
   vim.g.clipboard = {
     name = "OSC 52",
     copy = {
@@ -33,8 +39,8 @@ if is_ssh() then
       ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
     },
     paste = {
-      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+      ["+"] = osc52_paste,
+      ["*"] = osc52_paste,
     },
   }
 elseif is_wsl() then
