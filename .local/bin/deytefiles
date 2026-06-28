@@ -15,7 +15,7 @@ DOTFILES_LIB = SCRIPT_DIR.parent / 'share' / 'dotfiles'
 if str(DOTFILES_LIB) not in sys.path:
     sys.path.insert(0, str(DOTFILES_LIB))
 
-from cli.commands import BootstrapCommand, SyncCommand
+from cli.commands import BootstrapCommand, PullCommand, SyncCommand
 
 
 def create_parser():
@@ -41,6 +41,12 @@ def create_parser():
         help='Suppress notifications'
     )
     
+    # Pull command
+    subparsers.add_parser(
+        'pull',
+        help='Pull dotfiles from remote (no commit or push)'
+    )
+
     # Sync command
     sync_parser = subparsers.add_parser(
         'sync',
@@ -84,6 +90,7 @@ def main():
     # Command mapping
     commands = {
         'bootstrap': BootstrapCommand,
+        'pull': PullCommand,
         'sync': SyncCommand,
     }
     
