@@ -1,55 +1,11 @@
 #!/bin/bash
 
-paste_osc52() {
-  local tty_device=/dev/tty
-
-  local old_stty
-  old_stty=$(stty -g <"$tty_device") || {
-    echo "Error: Cannot access tty" >&2
-    return 1
-  }
-
-  stty raw -echo <"$tty_device"
-  printf "\033]52;c;?\007" >"$tty_device"
-
-  local response
-  IFS= read -r -d $'\a' -t 2 response <"$tty_device"
-
-  stty "$old_stty" <"$tty_device"
-
-  # Sanity-check: must look like an actual OSC52 response
-  if [[ "$response" != *"52;c;"* ]]; then
-    echo "Error: No OSC52 response (terminal may not support paste)" >&2
-    return 1
-  fi
-
-  # ## strips the longest prefix up to the last ";"
-  # e.g. ESC]52;c;SGVsbG8= → SGVsbG8=
-  # Safe because base64 alphabet (A-Za-z0-9+/=) never contains ";"
-  local b64="${response##*;}"
-
-  # Scrub any stray non-base64 bytes (ESC, CR, etc.)
-  b64="${b64//[^A-Za-z0-9+\/=]/}"
-
-  if [[ -z "$b64" ]]; then
-    echo "Error: Empty clipboard response" >&2
-    return 1
-  fi
-
-  printf '%s' "$b64" | base64 -d
-}
-
-if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" || -n "$SSH_CONNECTION" ]]; then
-    paste_osc52
-    exit $?
-fi
-
 case "$(uname -s)" in
 Darwin)
   command -v pbpaste &>/dev/null ||
     {
       echo "Error: pbpaste not found" >&2
-      return 1
+      exit 1
     }
   pbpaste
   ;;
@@ -63,11 +19,11 @@ Linux)
   elif command -v xsel &>/dev/null; then
     xsel --clipboard --output
   else
-    paste_osc52
+    echo "Error: No clipboard tool found (wl-paste, xclip, xsel)" >&2; exit 1
   fi
   ;;
 *)
   echo "Error: Unsupported OS '$(uname -s)'" >&2
-  return 1
+  exit 1
   ;;
 esac

@@ -17,28 +17,11 @@ end
 
 vim.o.clipboard = "unnamedplus"
 
-local function is_ssh()
-  return os.getenv("SSH_TTY") ~= nil or os.getenv("SSH_CLIENT") ~= nil
-end
-
 local function is_wsl()
   return os.getenv("WSL_DISTRO_NAME") ~= nil
 end
 
-if is_ssh() then
-  -- remote: use OSC 52 to send to local machine
-  vim.g.clipboard = {
-    name = "OSC 52",
-    copy = {
-      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
-    },
-    paste = {
-      ["+"] = { "paste" },
-      ["*"] = { "paste" },
-    },
-  }
-elseif is_wsl() then
+if is_wsl() then
   vim.g.clipboard = {
     name = "wsl",
     copy = {
@@ -50,9 +33,4 @@ elseif is_wsl() then
       ["*"] = { "powershell.exe", "-noprofile", "-command", "Get-Clipboard" },
     },
   }
-else
-  -- local: let nvim auto-detect (xclip, xsel, pbcopy, wl-copy etc)
-  -- just leaving clipboard=unnamedplus is enough
-  -- but you can be explicit:
-  vim.g.clipboard = nil -- let nvim pick automatically
 end

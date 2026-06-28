@@ -4,18 +4,6 @@
 # Unlike $(), it does NOT strip them
 IFS= read -r -d '' input
 
-copy_osc52() {
-    local data
-    data=$(printf '%s' "$1" | base64 | tr -d '\n')
-    local tty_device=/dev/tty
-    printf "\033]52;c;%s\a" "$data" > "$tty_device"
-}
-
-if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" || -n "$SSH_CONNECTION" ]]; then
-    copy_osc52 "$input"
-    exit $?
-fi
-
 case "$(uname -s)" in
   Darwin)
     command -v pbcopy &>/dev/null \
@@ -30,7 +18,7 @@ case "$(uname -s)" in
     elif command -v xsel &>/dev/null; then
         printf '%s' "$input" | xsel --clipboard --input
     else
-        copy_osc52 "$input"
+        echo "Error: No clipboard tool found (wl-copy, xclip, xsel)" >&2; exit 1
     fi
     ;;
   *)
