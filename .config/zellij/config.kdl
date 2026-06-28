@@ -205,5 +205,7 @@ disable_session_metadata false
 show_startup_tips false
 
 // BEGIN_ZELLIJ_THEME
-theme "rainby-dark"
+theme_dark "rainby-dark"
+theme_light "rainby-light"
+theme "rainby-light"
 // END_ZELLIJ_THEME

@@ -1,4 +1,7 @@
 local function get_arc_root()
+  if vim.fn.executable("arc") == 0 then
+    return nil
+  end
   local result = vim.system({ "arc", "root" }, { text = true }):wait()
   if result.code == 0 and result.stdout then
     return vim.trim(result.stdout)
@@ -21,11 +24,13 @@ local function get_total_ram_gb()
     end
   end
 
-  local result = vim.system({ "sysctl", "-n", "hw.memsize" }, { text = true }):wait()
-  if result.code == 0 and result.stdout then
-    local bytes = tonumber(vim.trim(result.stdout))
-    if bytes then
-      return math.floor(bytes / 1024 / 1024 / 1024)
+  if vim.fn.executable("sysctl") == 1 then
+    local result = vim.system({ "sysctl", "-n", "hw.memsize" }, { text = true }):wait()
+    if result.code == 0 and result.stdout then
+      local bytes = tonumber(vim.trim(result.stdout))
+      if bytes then
+        return math.floor(bytes / 1024 / 1024 / 1024)
+      end
     end
   end
 

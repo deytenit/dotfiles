@@ -8,9 +8,11 @@ vim.opt.mouse = ""
 
 vim.g.autoformat = false
 
-local obj = vim.system({ "arc", "root" }, { text = true }):wait()
-if obj.code == 0 then
-  vim.o.fsync = false
+if vim.fn.executable("arc") == 1 then
+  local obj = vim.system({ "arc", "root" }, { text = true }):wait()
+  if obj.code == 0 then
+    vim.o.fsync = false
+  end
 end
 
 vim.o.clipboard = "unnamedplus"
