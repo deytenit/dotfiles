@@ -1,7 +1,7 @@
 #!/bin/bash
 
 paste_osc52() {
-  local tty_device="${SSH_TTY:-/dev/tty}"
+  local tty_device=/dev/tty
 
   local old_stty
   old_stty=$(stty -g <"$tty_device") || {
