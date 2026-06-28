@@ -1,15 +1,4 @@
-local function get_arc_root()
-  if vim.fn.executable("arc") == 0 then
-    return nil
-  end
-  local result = vim.system({ "arc", "root" }, { text = true }):wait()
-  if result.code == 0 and result.stdout then
-    return vim.trim(result.stdout)
-  end
-  return nil
-end
-
-local ARC_ROOT = get_arc_root()
+local ARC_ROOT = require("util.arc").root()
 
 --- Detect total system RAM in GB.
 --- Supports Linux (/proc/meminfo) and macOS (sysctl).

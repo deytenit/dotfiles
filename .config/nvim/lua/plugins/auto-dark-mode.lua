@@ -39,9 +39,10 @@ function TerminalThemeSync.setup()
     callback = TerminalThemeSync.query_terminal,
   })
 
-  -- 3. Set up a periodic background timer (every 3 seconds) for runtime shifts
+  -- 3. Low-frequency safety net for theme switches that happen while focused
+  --    (e.g. a scheduled OS sunset). FocusGained covers the common cases.
   local timer = vim.uv.new_timer()
-  timer:start(1000, 3000, vim.schedule_wrap(TerminalThemeSync.query_terminal))
+  timer:start(1000, 60000, vim.schedule_wrap(TerminalThemeSync.query_terminal))
 
   -- Clean up timer on exit
   vim.api.nvim_create_autocmd("VimLeavePre", {
@@ -56,5 +57,5 @@ end
 -- Initialize the sync module
 vim.schedule(TerminalThemeSync.setup)
 
--- Return empty table to signal lazy.nvim to disable the old f-person plugin
+-- This file only registers autocmds/timer above; it contributes no plugin spec.
 return {}

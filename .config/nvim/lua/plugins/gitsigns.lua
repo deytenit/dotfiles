@@ -1,9 +1,10 @@
+local arc = require("util.arc")
+
 return {
   {
     "lewis6991/gitsigns.nvim",
     cond = function()
-      vim.fn.system("arc root 2>/dev/null")
-      return vim.v.shell_error ~= 0
+      return not arc.is_repo()
     end,
   },
   {
@@ -56,12 +57,7 @@ return {
       end,
     },
     cond = function()
-      vim.fn.system("arc root 2>/dev/null")
-      return vim.v.shell_error == 0
+      return arc.is_repo()
     end
-  },
-  {
-    "nvim-neo-tree/neo-tree.nvim",
-    enabled = false,
   },
 }

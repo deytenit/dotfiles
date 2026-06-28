@@ -6,20 +6,20 @@ local keymap = vim.keymap
 local opts = { noremap = true, silent = true }
 
 -- base
-keymap.set("n", "x", '"_x')
+keymap.set("n", "x", '"_x', opts)
 
 -- (inc/dec)rement
-keymap.set("n", "+", "<C-a>")
-keymap.set("n", "-", "<C-x>")
+keymap.set("n", "+", "<C-a>", opts)
+keymap.set("n", "-", "<C-x>", opts)
 
 -- windows
 keymap.set("n", "<Leader>-", "<cmd>split<CR><C-w>j", opts)
 keymap.set("n", "<Leader>\\", "<cmd>vsplit<CR><C-w>l", opts)
 
-keymap.set("n", "<C-M-h>", "<C-w><")
-keymap.set("n", "<C-M-j>", "<C-w>+")
-keymap.set("n", "<C-M-k>", "<C-w>-")
-keymap.set("n", "<C-M-l>", "<C-w>>")
+keymap.set("n", "<C-M-h>", "<C-w><", opts)
+keymap.set("n", "<C-M-j>", "<C-w>+", opts)
+keymap.set("n", "<C-M-k>", "<C-w>-", opts)
+keymap.set("n", "<C-M-l>", "<C-w>>", opts)
 
 -- sixty.nvim
 local sixty_status, sixty = pcall(require, "sixty")
