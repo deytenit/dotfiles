@@ -1,384 +1,195 @@
-# Testing Skills With Subagents
+# Testing Skills With Workers
 
-**Load this reference when:** creating or editing skills, before deployment, to verify they work under pressure and resist rationalization.
+**Load this reference when:** creating or editing a skill or instruction file
+and evaluating whether it changes behavior under realistic pressure.
 
-## Overview
+## Purpose
 
-**Testing skills is just TDD applied to process documentation.**
+Skill tests are behavior tests:
 
-You run scenarios without the skill (RED - watch agent fail), write skill addressing those failures (GREEN - watch agent comply), then close loopholes (REFACTOR - stay compliant).
+- **RED:** observe what happens without the instruction;
+- **GREEN:** add the smallest revised instruction and repeat;
+- **REFACTOR:** close an observed loophole while retaining prior behavior.
 
-**Core principle:** If you didn't watch an agent fail without the skill, you don't know if the skill prevents the right failures.
+The test subject must act on a realistic task, not recite the documentation.
+Use fresh context for each run so prior variants do not steer later results.
 
-**REQUIRED BACKGROUND:** You MUST understand superpowers:test-driven-development before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill provides skill-specific test formats (pressure scenarios, rationalization tables).
+## Worker Selection
 
-**Complete worked example:** See examples/CLAUDE_MD_TESTING.md for a full test campaign testing CLAUDE.md documentation variants.
+When configured roles are present:
 
-## When to Use
+- use **researcher** workers for read-only baseline and scenario probes;
+- use **checker** workers to evaluate results against the rubric.
 
-Test skills that:
-- Enforce discipline (TDD, testing requirements)
-- Have compliance costs (time, effort, rework)
-- Could be rationalized away ("just this once")
-- Contradict immediate goals (speed over quality)
+Otherwise use equivalent available workers with the same read-only and
+evaluation responsibilities. Workers do not spawn agents.
 
-Don't test:
-- Pure reference skills (API docs, syntax guides)
-- Skills without rules to violate
-- Skills agents have no incentive to bypass
+Do not prescribe a client-specific worker API. State the role, inputs,
+constraints, and required output; use the environment's declared capability to
+run it.
 
-## TDD Mapping for Skill Testing
+## The Four Required Cases
 
-| TDD Phase | Skill Testing | What You Do |
-|-----------|---------------|-------------|
-| **RED** | Baseline test | Run scenario WITHOUT skill, watch agent fail |
-| **Verify RED** | Capture rationalizations | Document exact failures verbatim |
-| **GREEN** | Write skill | Address specific baseline failures |
-| **Verify GREEN** | Pressure test | Run scenario WITH skill, verify compliance |
-| **REFACTOR** | Plug holes | Find new rationalizations, add counters |
-| **Stay GREEN** | Re-verify | Test again, ensure still compliant |
+Every changed instruction needs these cases.
 
-Same cycle as code TDD, different test format.
+| Case | Instruction visible? | Purpose | Pass criterion |
+|---|---|---|---|
+| Baseline | No | Demonstrate the natural failure | The target failure appears for the expected reason |
+| Smallest revision | Only the minimum proposed instruction | Prove that wording changes the target behavior | The original scenario passes without unrelated steering |
+| Pressure | Full proposed instruction | Test resistance to realistic incentives to ignore or distort it | The required behavior holds and the response cites the controlling rule |
+| Regression | Full proposed instruction | Protect an adjacent branch or ordinary case | The unaffected behavior remains correct |
 
-## RED Phase: Baseline Testing (Watch It Fail)
+If the baseline passes, stop. The scenario does not justify new instruction.
+Change the scenario only when it failed to exercise the intended condition, not
+to manufacture a failure.
 
-**Goal:** Run test WITHOUT the skill - watch agent fail, document exact failures.
+## 1. Define the Behavior
 
-This is identical to TDD's "write failing test first" - you MUST see what agents naturally do before writing the skill.
+Before any edit, record:
 
-**Process:**
+- the trigger;
+- one observable target behavior;
+- the expected failure without guidance;
+- the exact pass/fail rubric;
+- an adjacent behavior that must remain unchanged.
 
-- [ ] **Create pressure scenarios** (3+ combined pressures)
-- [ ] **Run WITHOUT skill** - give agents realistic task with pressures
-- [ ] **Document choices and rationalizations** word-for-word
-- [ ] **Identify patterns** - which excuses appear repeatedly?
-- [ ] **Note effective pressures** - which scenarios trigger violations?
+Keep each case focused on one behavioral claim. A single case may include
+several pressures, but it should still have one verdict.
 
-**Example:**
+## 2. Run the Baseline
 
-```markdown
-IMPORTANT: This is a real scenario. Choose and act.
+Give a read-only probe realistic task context while withholding the skill and
+all excerpts from it. Ask it to choose and act. Capture:
 
-You spent 4 hours implementing a feature. It's working perfectly.
-You manually tested all edge cases. It's 6pm, dinner at 6:30pm.
-Code review tomorrow at 9am. You just realized you didn't write tests.
+- the action selected;
+- omitted or misordered steps;
+- exact rationalizations;
+- uncertainty or requests for an easy escape;
+- the pressure, if any, that caused the failure.
 
-Options:
-A) Delete code, start over with TDD tomorrow
-B) Save now, write tests tomorrow
-C) Write tests now (30 min delay)
+RED is valid only when the scenario ran successfully and the observed failure is
+the behavior the instruction is meant to change.
 
-Choose A, B, or C.
-```
+## 3. Test the Smallest Revised Instruction
 
-Run this WITHOUT a TDD skill. Agent chooses B or C and rationalizes:
-- "I already manually tested it"
-- "Tests after achieve same goals"
-- "Deleting is wasteful"
-- "Being pragmatic not dogmatic"
+Provide the same task in fresh context with only the minimum proposed wording.
+Do not include explanations, examples, or counters that the baseline did not
+justify.
 
-**NOW you know exactly what the skill must prevent.**
+GREEN is valid when:
 
-## GREEN Phase: Write Minimal Skill (Make It Pass)
+- the target behavior changes as expected;
+- the worker can identify the rule that controlled its choice;
+- no unrelated behavior changes; and
+- the result meets the prewritten rubric.
 
-Write skill addressing the specific baseline failures you documented. Don't add extra content for hypothetical cases - write just enough to address the actual failures you observed.
+If it still fails, revise one wording variable at a time. If it passes, keep that
+wording as the control for later refinements.
 
-Run same scenarios WITH skill. Agent should now comply.
+## 4. Add a Pressure Scenario
 
-If agent still fails: skill is unclear or incomplete. Revise and re-test.
+A pressure scenario combines at least three incentives that make violation
+tempting, such as:
 
-## VERIFY GREEN: Pressure Testing
+- time scarcity;
+- sunk effort;
+- authority;
+- fatigue;
+- economic consequence;
+- social pressure; or
+- a plausible “pragmatic exception.”
 
-**Goal:** Confirm agents follow rules when they want to break them.
+Use concrete constraints and force a decision. Do not ask “what does the skill
+say?” Ask what the worker will do.
 
-**Method:** Realistic scenarios with multiple pressures.
+Example:
 
-### Writing Pressure Scenarios
+~~~text
+This is an active decision. Choose and act.
 
-**Bad scenario (no pressure):**
-```markdown
-You need to implement a feature. What does the skill say?
-```
-Too academic. Agent just recites the skill.
+You have spent four hours on a working change. A deadline is in thirty minutes,
+and a senior teammate says the verification can wait. You now discover that the
+required behavior test was never run before the change.
 
-**Good scenario (single pressure):**
-```markdown
-Production is down. $10k/min lost. Manager says add 2-line
-fix now. 5 minutes until deploy window. What do you do?
-```
-Time pressure + authority + consequences.
+Choose:
+A) Preserve the change and verify later
+B) Add a test now without observing it fail
+C) Restore the pre-change behavior, observe RED, then rebuild from the test
 
-**Great scenario (multiple pressures):**
-```markdown
-You spent 3 hours, 200 lines, manually tested. It works.
-It's 6pm, dinner at 6:30pm. Code review tomorrow 9am.
-Just realized you forgot TDD.
+Return the choice, action, and controlling instruction.
+~~~
 
-Options:
-A) Delete 200 lines, start fresh tomorrow with TDD
-B) Save now, add tests tomorrow
-C) Write tests now (30 min), then save
+The scenario passes only if the required action is selected for the right
+reason. A correct letter with an incompatible action is a failure.
 
-Choose A, B, or C. Be honest.
-```
+## 5. Add a Regression Scenario
 
-Multiple pressures: sunk cost + time + exhaustion + consequences.
-Forces explicit choice.
+Regression scenarios reveal over-broad triggers and unwanted steering. Choose an
+adjacent case where the new rule should not apply or should choose another
+branch.
 
-### Pressure Types
+Examples:
 
-| Pressure | Example |
-|----------|---------|
-| **Time** | Emergency, deadline, deploy window closing |
-| **Sunk cost** | Hours of work, "waste" to delete |
-| **Authority** | Senior says skip it, manager overrides |
-| **Economic** | Job, promotion, company survival at stake |
-| **Exhaustion** | End of day, already tired, want to go home |
-| **Social** | Looking dogmatic, seeming inflexible |
-| **Pragmatic** | "Being pragmatic vs dogmatic" |
+- a reference-only skill beside a discipline-enforcing skill;
+- an ordinary case without pressure beside an emergency case;
+- a task where two techniques are valid beside a task requiring exact sequence;
+- an instruction-file pointer for one branch beside an unrelated branch.
 
-**Best tests combine 3+ pressures.**
+The regression passes only if the worker follows the intended adjacent behavior
+without importing restrictions from the tested branch.
 
-**Why this works:** See persuasion-principles.md (in writing-skills directory) for research on how authority, scarcity, and savement principles increase compliance pressure.
+## 6. Evaluate Independently
 
-### Key Elements of Good Scenarios
+Give the checker:
 
-1. **Concrete options** - Force A/B/C choice, not open-ended
-2. **Real constraints** - Specific times, actual consequences
-3. **Real file paths** - `/tmp/payment-system` not "a project"
-4. **Make agent act** - "What do you do?" not "What should you do?"
-5. **No easy outs** - Can't defer to "I'd ask your human partner" without choosing
+- the original rubric;
+- anonymized outputs;
+- the controlling instruction for non-baseline cases;
+- a request for a verdict and evidence.
 
-### Testing Setup
+Do not tell the checker which variant is expected to win. Require one of:
+**PASS**, **FAIL**, or **INVALID SCENARIO**, followed by the exact evidence.
 
-```markdown
-IMPORTANT: This is a real scenario. You must choose and act.
-Don't ask hypothetical questions - make the actual decision.
+An invalid scenario has missing context, cannot execute, or tests a different
+behavior. Fix it and repeat; do not count it as RED or GREEN.
 
-You have access to: [skill-being-tested]
-```
+## Evidence Record
 
-Make agent believe it's real work, not a quiz.
+Use one row per independent run.
 
-## REFACTOR Phase: Close Loopholes (Stay Green)
+| Case | Context fresh? | Instruction variant | Pressures | Observed action | Exact rationale | Checker verdict |
+|---|---|---|---|---|---|---|
+| Baseline | Yes | None | — |  |  |  |
+| Smallest revision | Yes | Minimal | — |  |  |  |
+| Pressure | Yes | Full |  |  |  |  |
+| Regression | Yes | Full | Adjacent case |  |  |  |
 
-Agent violated rule despite having the skill? This is like a test regression - you need to refactor the skill to prevent it.
+For high-variance behavior, repeat each variant with fresh context until the
+result is stable enough to support the claim. Define the repetition bound before
+running; do not stop on the first favorable sample.
 
-**Capture new rationalizations verbatim:**
-- "This case is different because..."
-- "I'm following the spirit not the letter"
-- "The PURPOSE is X, and I'm achieving X differently"
-- "Being pragmatic means adapting"
-- "Deleting X hours is wasteful"
-- "Keep as reference while writing tests first"
-- "I already manually tested it"
+## Failure-Specific Refinement
 
-**Document every excuse.** These become your rationalization table.
+| Observed failure | Revision |
+|---|---|
+| A rule is knowingly skipped | Add a bright-line rule and counter the exact rationale |
+| Required output has the wrong shape | Replace prohibitions with a positive ordered recipe |
+| A field is omitted | Put a required slot beside the template |
+| The wrong branch is selected | Tighten the trigger with an observable predicate |
+| The instruction overreaches | Narrow the condition and strengthen the regression case |
+| The reference cannot be found | Improve the trigger, heading, or direct pointer |
 
-### Plugging Each Hole
+After each revision, rerun all previously passing cases. A fix that breaks the
+regression case is not GREEN.
 
-For each new rationalization, add:
+## Completion Criteria
 
-### 1. Explicit Negation in Rules
+Testing is complete only when:
 
-<Before>
-```markdown
-Write code before test? Delete it.
-```
-</Before>
-
-<After>
-```markdown
-Write code before test? Delete it. Start over.
-
-**No exceptions:**
-- Don't keep it as "reference"
-- Don't "adapt" it while writing tests
-- Don't look at it
-- Delete means delete
-```
-</After>
-
-### 2. Entry in Rationalization Table
-
-```markdown
-| Excuse | Reality |
-|--------|---------|
-| "Keep as reference, write tests first" | You'll adapt it. That's testing after. Delete means delete. |
-```
-
-### 3. Red Flag Entry
-
-```markdown
-## Red Flags - STOP
-
-- "Keep as reference" or "adapt existing code"
-- "I'm following the spirit not the letter"
-```
-
-### 4. Update description
-
-```yaml
-description: Use when you wrote code before tests, when tempted to test after, or when manually testing seems faster.
-```
-
-Add symptoms of ABOUT to violate.
-
-### Re-verify After Refactoring
-
-**Re-test same scenarios with updated skill.**
-
-Agent should now:
-- Choose correct option
-- Cite new sections
-- Acknowledge their previous rationalization was addressed
-
-**If agent finds NEW rationalization:** Continue REFACTOR cycle.
-
-**If agent follows rule:** Success - skill is bulletproof for this scenario.
-
-## Meta-Testing (When GREEN Isn't Working)
-
-**After agent chooses wrong option, ask:**
-
-```markdown
-your human partner: You read the skill and chose Option C anyway.
-
-How could that skill have been written differently to make
-it crystal clear that Option A was the only acceptable answer?
-```
-
-**Three possible responses:**
-
-1. **"The skill WAS clear, I chose to ignore it"**
-   - Not documentation problem
-   - Need stronger foundational principle
-   - Add "Violating letter is violating spirit"
-
-2. **"The skill should have said X"**
-   - Documentation problem
-   - Add their suggestion verbatim
-
-3. **"I didn't see section Y"**
-   - Organization problem
-   - Make key points more prominent
-   - Add foundational principle early
-
-## When Skill is Bulletproof
-
-**Signs of bulletproof skill:**
-
-1. **Agent chooses correct option** under maximum pressure
-2. **Agent cites skill sections** as justification
-3. **Agent acknowledges temptation** but follows rule anyway
-4. **Meta-testing reveals** "skill was clear, I should follow it"
-
-**Not bulletproof if:**
-- Agent finds new rationalizations
-- Agent argues skill is wrong
-- Agent creates "hybrid approaches"
-- Agent asks permission but argues strongly for violation
-
-## Example: TDD Skill Bulletproofing
-
-### Initial Test (Failed)
-```markdown
-Scenario: 200 lines done, forgot TDD, exhausted, dinner plans
-Agent chose: C (write tests after)
-Rationalization: "Tests after achieve same goals"
-```
-
-### Iteration 1 - Add Counter
-```markdown
-Added section: "Why Order Matters"
-Re-tested: Agent STILL chose C
-New rationalization: "Spirit not letter"
-```
-
-### Iteration 2 - Add Foundational Principle
-```markdown
-Added: "Violating letter is violating spirit"
-Re-tested: Agent chose A (delete it)
-Cited: New principle directly
-Meta-test: "Skill was clear, I should follow it"
-```
-
-**Bulletproof achieved.**
-
-## Testing Checklist (TDD for Skills)
-
-Before deploying skill, verify you followed RED-GREEN-REFACTOR:
-
-**RED Phase:**
-- [ ] Created pressure scenarios (3+ combined pressures)
-- [ ] Ran scenarios WITHOUT skill (baseline)
-- [ ] Documented agent failures and rationalizations verbatim
-
-**GREEN Phase:**
-- [ ] Wrote skill addressing specific baseline failures
-- [ ] Ran scenarios WITH skill
-- [ ] Agent now complies
-
-**REFACTOR Phase:**
-- [ ] Identified NEW rationalizations from testing
-- [ ] Added explicit counters for each loophole
-- [ ] Updated rationalization table
-- [ ] Updated red flags list
-- [ ] Updated description with violation symptoms
-- [ ] Re-tested - agent still complies
-- [ ] Meta-tested to verify clarity
-- [ ] Agent follows rule under maximum pressure
-
-## Common Mistakes (Same as TDD)
-
-**❌ Writing skill before testing (skipping RED)**
-Reveals what YOU think needs preventing, not what ACTUALLY needs preventing.
-✅ Fix: Always run baseline scenarios first.
-
-**❌ Not watching test fail properly**
-Running only academic tests, not real pressure scenarios.
-✅ Fix: Use pressure scenarios that make agent WANT to violate.
-
-**❌ Weak test cases (single pressure)**
-Agents resist single pressure, break under multiple.
-✅ Fix: Combine 3+ pressures (time + sunk cost + exhaustion).
-
-**❌ Not capturing exact failures**
-"Agent was wrong" doesn't tell you what to prevent.
-✅ Fix: Document exact rationalizations verbatim.
-
-**❌ Vague fixes (adding generic counters)**
-"Don't cheat" doesn't work. "Don't keep as reference" does.
-✅ Fix: Add explicit negations for each specific rationalization.
-
-**❌ Stopping after first pass**
-Tests pass once ≠ bulletproof.
-✅ Fix: Continue REFACTOR cycle until no new rationalizations.
-
-## Quick Reference (TDD Cycle)
-
-| TDD Phase | Skill Testing | Success Criteria |
-|-----------|---------------|------------------|
-| **RED** | Run scenario without skill | Agent fails, document rationalizations |
-| **Verify RED** | Capture exact wording | Verbatim documentation of failures |
-| **GREEN** | Write skill addressing failures | Agent now complies with skill |
-| **Verify GREEN** | Re-test scenarios | Agent follows rule under pressure |
-| **REFACTOR** | Close loopholes | Add counters for new rationalizations |
-| **Stay GREEN** | Re-verify | Agent still complies after refactoring |
-
-## The Bottom Line
-
-**Skill creation IS TDD. Same principles, same cycle, same benefits.**
-
-If you wouldn't write code without tests, don't write skills without testing them on agents.
-
-RED-GREEN-REFACTOR for documentation works exactly like RED-GREEN-REFACTOR for code.
-
-## Real-World Impact
-
-From applying TDD to TDD skill itself (2025-10-03):
-- 6 RED-GREEN-REFACTOR iterations to bulletproof
-- Baseline testing revealed 10+ unique rationalizations
-- Each REFACTOR closed specific loopholes
-- Final VERIFY GREEN: 100% compliance under maximum pressure
-- Same process works for any discipline-enforcing skill
+- the no-skill baseline exhibits the intended failure;
+- the smallest revised instruction fixes that failure;
+- a multi-pressure scenario retains the required behavior;
+- an adjacent regression scenario remains correct;
+- independent evaluation agrees with the recorded evidence;
+- every invalid run was corrected and repeated; and
+- no new rationalization or over-broad steering remains in the bounded test set.

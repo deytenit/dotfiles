@@ -1,5 +1,3 @@
-local ARC_ROOT = require("util.arc").root()
-
 --- Detect total system RAM in GB.
 --- Supports Linux (/proc/meminfo) and macOS (sysctl).
 local function get_total_ram_gb()
@@ -43,16 +41,6 @@ local function resolve_tsgo_cmd(root_dir)
 
   if root_dir then
     table.insert(candidates, vim.fs.joinpath(root_dir, "node_modules/.bin", "tsgo"))
-  end
-
-  if ARC_ROOT then
-    table.insert(
-      candidates,
-      vim.fs.joinpath(
-        ARC_ROOT,
-        "adv/frontend/packages/direct-modules/node_modules/.bin/tsgo"
-      )
-    )
   end
 
   table.insert(candidates, "tsgo")

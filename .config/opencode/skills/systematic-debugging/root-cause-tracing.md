@@ -1,94 +1,80 @@
 ---
 name: root-cause-tracing
-description: Use when encountering side-effects or state changes that shouldn't happen (file creation in wrong location, env pollution, etc.) - requires tracing execution back to the original trigger
+description: Use when an error, side effect, or invalid state appears far from the code that originally triggered it
 ---
 
 # Root-Cause Tracing
 
 ## Overview
 
-Bugs often manifest deep in the call stack (file created in wrong location, database opened with wrong path, environment variable overwritten). Your instinct is to fix where the error appears, but that's treating a symptom.
+Failures often appear deep in an execution path. Fixing the line where the symptom becomes visible can leave the original trigger intact.
 
-**Core principle:** Trace the "bad value" back to its source.
+**Core principle:** Trace backward through the call and data chain until you find where the incorrect value, state, or action first originated; fix that source.
 
-## The Strategy
+## The Backward-Tracing Process
 
-### 1. Identify the Symptom
-Specifically what is wrong?
-- File `config.json` created in `/tmp` instead of `/Users/user/project/.config`
-- Environment variable `API_KEY` is empty
+### 1. Describe the Symptom Precisely
 
-### 2. Identify the Immediate Execution Point
-Which line of code actually performed the action?
-- Use grep to find the call: `grep -r "fs.writeFile" .`
-- Use stack trace if an error was thrown
+Record the incorrect value, state transition, side effect, location, and the smallest known reproduction. Avoid labels such as "broken" that do not identify an observable fact.
 
-### 3. Trace the Parameters Backwards
-How did the function get that specific value?
-- Add trace logging at the execution point
-- Rerun and look at the stack trace
-- Follow the value up the call stack to the previous caller
+### 2. Find the Immediate Execution Point
 
-### 4. Find the Original Trigger
-Where was the value first defined or derived?
-- Often a configuration load, an environment variable read, or a default value used when a parameter was missing.
+Identify the operation that directly produced the symptom. Use project-discovered search, diagnostics, traces, or logs. At this point you have found where the failure surfaced, not necessarily its cause.
 
-## Example: Accidental File Creation
+### 3. Ask What Supplied This Input
 
-**Symptom:** `config.json` created in the project root instead of `.config/`.
+For each argument or piece of state involved:
 
-**Tracing:**
-
-1. **Find execution point:**
-   ```typescript
-   // src/utils/fs.ts
-   await fs.writeFile(path, content);
-   ```
-
-2. **Add logging:**
-   ```typescript
-   console.error('DEBUG writeFile:', { path, stack: new Error().stack });
-   await fs.writeFile(path, content);
-   ```
-
-3. **Rerun tests and check logs:**
-   ```bash
-   npm test 2>&1 | grep 'DEBUG writeFile'
-   ```
-   *Output shows `path` is `config.json` and stack trace points to `ConfigManager.save()`.*
-
-4. **Follow up the stack:**
-   ```typescript
-   // src/config.ts
-   class ConfigManager {
-     save() {
-       const dir = this.getDir() || process.cwd(); // BAD DEFAULT
-       return fs.writeFile(path.join(dir, 'config.json'), data);
-     }
-   }
-   ```
-
-**Root cause found:** Empty return from `getDir()` caused it to fall back to `process.cwd()`.
-
-## Tools for Tracing
-
-### Polluter Finding
-If you don't know which test file is causing the side-effect, use `find-polluter.sh`:
-```bash
-./find-polluter.sh 'config.json' 'src/**/*.test.ts'
+```
+current operation received bad_value
+    <- which caller supplied it?
+    <- where did that caller obtain or derive it?
+    <- which earlier transition first made it incorrect?
 ```
 
-### Trace Logging
-Always include the stack trace when logging for root-cause analysis:
-```typescript
-console.log('TRACE:', { value, stack: new Error().stack });
+Record the value and relevant context at each boundary. Compare with a successful path when available.
+
+### 4. Continue Until the Original Trigger
+
+Do not stop at an intermediate default, adapter, or fallback. Continue until you find the first incorrect assumption, input, initialization, ordering decision, or state transition.
+
+Evidence that you reached the source:
+
+- The earlier state is correct and the identified transition makes it incorrect.
+- Changing only that source produces the predicted downstream result.
+- The explanation accounts for the entire observed call or data chain.
+
+### 5. Fix and Protect the Source
+
+Add regression protection for the original trigger, implement the smallest source fix, and consider [defense-in-depth.md](defense-in-depth.md) for independent validation at downstream boundaries.
+
+## Capability-Neutral Example
+
+```
+symptom: output written to unexpected_location
+
+write(output_location, data)
+    <- save() passed output_location
+    <- configuration lookup returned empty_value
+    <- initialization read configuration before it was ready
+
+root cause: initialization order exposed empty_value
+symptom-only patch: change the write operation's fallback
+source fix: prevent access before configuration is ready
 ```
 
-## Implementation Checklist
+When static inspection is insufficient, add temporary diagnostic output immediately before the problematic operation. Include the value, caller context, and available execution trace. Use only the diagnostics supported by the current project, and remove temporary instrumentation after the cause is understood unless it provides lasting operational value.
 
-- [ ] Define the symptom clearly
-- [ ] Find the line that performs the action
-- [ ] Add stack trace logging
-- [ ] Identify the caller that provided the bad value
-- [ ] Repeat until you find where the value was first defined
-- [ ] Fix the source, not the symptom
+## When the Trigger Is One of Many Tests or Actions
+
+Use the project's declared focused-check capability to narrow the suspect set. Split the set, run the smallest group that still reproduces the side effect, and repeat until one trigger remains. Preserve isolation and cleanup rules declared by the project.
+
+## Checklist
+
+- Define the symptom as an observable fact.
+- Find the operation that directly produces it.
+- Trace every relevant value or state one caller backward.
+- Repeat until the first incorrect transition or assumption.
+- Confirm the source with one minimal prediction.
+- Fix at the source and add regression protection.
+- Add layered validation when downstream boundaries also need protection.

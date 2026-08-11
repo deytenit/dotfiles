@@ -1,4 +1,5 @@
 local arc = require("util.arc")
+local ARC_ROOT = arc.root()
 
 return {
   {
@@ -8,7 +9,7 @@ return {
     end,
   },
   {
-    dir = "~/Source/arcadia/a/contrib/tier1/gitsigns.arc.nvim",
+    dir = vim.fs.joinpath(ARC_ROOT, "contrib/tier1/gitsigns.arc.nvim"),
     event = "LazyFile",
     opts = {
       signs = {
@@ -58,6 +59,6 @@ return {
     },
     cond = function()
       return arc.is_repo()
-    end
+    end,
   },
 }

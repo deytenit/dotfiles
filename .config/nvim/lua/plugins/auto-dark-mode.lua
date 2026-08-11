@@ -42,7 +42,7 @@ function TerminalThemeSync.setup()
   -- 3. Low-frequency safety net for theme switches that happen while focused
   --    (e.g. a scheduled OS sunset). FocusGained covers the common cases.
   local timer = vim.uv.new_timer()
-  timer:start(1000, 60000, vim.schedule_wrap(TerminalThemeSync.query_terminal))
+  if timer ~= nil then timer:start(1000, 60000, vim.schedule_wrap(TerminalThemeSync.query_terminal)) end
 
   -- Clean up timer on exit
   vim.api.nvim_create_autocmd("VimLeavePre", {

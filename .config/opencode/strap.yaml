@@ -1,6 +1,10 @@
 name: opencode
 link:
   - opencode.jsonc
-  - commands
   - skills
   - AGENTS.md
+  - [AGENTS.md, ~/.codex/AGENTS.md]
+  - [skills, ~/.codex/skills/skills]
+  - [agents/codex, ~/.codex/agents]
+  - [AGENTS.md, ~/.gemini/GEMINI.md]
+  - [skills, ~/.gemini/skills]

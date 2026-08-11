@@ -1,563 +1,228 @@
 ---
 name: writing-skills
-description: Use when creating new skills, editing existing skills, or verifying skills work before deployment
+description: Use when creating or editing reusable skills or instruction files, or when evaluating whether instructions reliably change agent behavior
 ---
 
 # Writing Skills
 
 ## Overview
 
-**Writing skills IS Test-Driven Development applied to process documentation.**
+Writing skills is test-driven development for reusable instructions. Define the
+behavior, observe the failure without the instruction, add the smallest useful
+guidance, and verify both the intended behavior and nearby behavior.
 
-**Personal skills live in agent-specific directories (`~/.gemini/skills`)** 
+**Core principle:** If the baseline never showed the failure, the instruction
+has not proved that it teaches the right thing.
 
-You write test cases (pressure scenarios with subagents), watch them fail (baseline behavior), write the skill (documentation), watch tests pass (agents comply), and refactor (close loopholes).
+**REQUIRED BACKGROUND:** Understand **test-driven-development** before using
+this skill.
 
-**Core principle:** If you didn't watch an agent fail without the skill, you don't know if the skill teaches the right thing.
+## What Belongs in a Skill
 
-**REQUIRED BACKGROUND:** You MUST understand superpowers:test-driven-development before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill adapts TDD to documentation.
+A skill captures a reusable technique, pattern, or reference that applies across
+tasks. Put project-only conventions in the closest project instruction file.
+Automate rules that can be checked mechanically; reserve instructions for
+judgment, sequencing, and decisions.
 
-**Official guidance:** For Anthropic's official skill authoring best practices, see anthropic-best-practices.md. This document provides additional patterns and guidelines that complement the TDD-focused approach in this skill.
+Create or extend a skill when:
 
-## What is a Skill?
+- the behavior is useful across multiple tasks;
+- the correct approach is not reliably obvious;
+- a distinct trigger should make the guidance discoverable; or
+- agents repeatedly omit, misorder, or rationalize away an important action.
 
-A **skill** is a reference guide for proven techniques, patterns, or tools. Skills help future Gemini instances find and apply effective approaches.
+Do not create a skill for a one-off solution, a narrative of past work, or a
+standard fact already documented at the point of use.
 
-**Skills are:** Reusable techniques, patterns, tools, reference guides
+## Instruction Architecture
 
-**Skills are NOT:** Narratives about how you solved a problem once
+- Treat a skill description or an instruction-file pointer as a trigger: name the job and every genuinely distinct branch that should load it.
+- Budget always-loaded text aggressively; put branch-specific reference behind a precise pointer.
+- Separate ordered actions from reference material and keep definitions beside the rules that use them.
+- Give every step a checkable completion criterion. Prefer a clear bound over motivational prose.
+- Split a document when its branches force unrelated readers to load irrelevant instructions.
 
-## TDD Mapping for Skills
+Apply progressive disclosure in three layers:
 
-| TDD Concept | Skill Creation |
-|-------------|----------------|
-| **Test case** | Pressure scenario with subagent |
-| **Production code** | Skill document (SKILL.md) |
-| **Test fails (RED)** | Agent violates rule without skill (baseline) |
-| **Test passes (GREEN)** | Agent complies with skill present |
-| **Refactor** | Close loopholes while maintaining compliance |
-| **Write test first** | Run baseline scenario BEFORE writing skill |
-| **Watch it fail** | Document exact rationalizations agent uses |
-| **Minimal code** | Write skill addressing those specific violations |
-| **Watch it pass** | Verify agent now complies |
-| **Refactor cycle** | Find new rationalizations → plug → re-verify |
+1. **Trigger metadata:** only enough information to decide whether to load the
+   skill.
+2. **Main instructions:** the shared workflow and routing decisions needed for
+   every use.
+3. **References:** branch-specific detail loaded only through an explicit,
+   nearby pointer.
 
-The entire skill creation process follows RED-GREEN-REFACTOR.
+Keep references one level from the main file. A reader should never have to
+follow a chain of references to discover a required rule.
 
-## When to Create a Skill
+## Design the Trigger
 
-**Create when:**
-- Technique wasn't intuitively obvious to you
-- You'd reference this again across projects
-- Pattern applies broadly (not project-specific)
-- Others would benefit
+The frontmatter contains only:
 
-**Don't create for:**
-- One-off solutions
-- Standard practices well-documented elsewhere
-- Project-specific conventions (put in CLAUDE.md)
-- Mechanical constraints (if it's enforceable with regex/validation, automate it—save documentation for judgment calls)
-
-## Skill Types
-
-### Technique
-Concrete method with steps to follow (condition-based-waiting, root-cause-tracing)
-
-### Pattern
-Way of thinking about problems (flatten-with-flags, test-invariants)
-
-### Reference
-API docs, syntax guides, tool documentation (office docs)
-
-## Directory Structure
-
-
-```
-skills/
-  skill-name/
-    SKILL.md              # Main reference (required)
-    supporting-file.*     # Only if needed
-```
-
-**Flat namespace** - all skills in one searchable namespace
-
-**Separate files for:**
-1. **Heavy reference** (100+ lines) - API docs, comprehensive syntax
-2. **Reusable tools** - Scripts, utilities, templates
-
-**Keep inline:**
-- Principles and concepts
-- Code patterns (< 50 lines)
-- Everything else
-
-## SKILL.md Structure
-
-**Frontmatter (YAML):**
-- Two required fields: `name` and `description` (see [agentskills.io/specification](https://agentskills.io/specification) for all supported fields)
-- Max 1024 characters total
-- `name`: Use letters, numbers, and hyphens only (no parentheses, special chars)
-- `description`: Third-person, describes ONLY when to use (NOT what it does)
-  - Start with "Use when..." to focus on triggering conditions
-  - Include specific symptoms, situations, and contexts
-  - **NEVER summarize the skill's process or workflow** (see CSO section for why)
-  - Keep under 500 characters if possible
-
-```markdown
+~~~yaml
 ---
-name: Skill-Name-With-Hyphens
-description: Use when [specific triggering conditions and symptoms]
+name: writing-skills
+description: Use when creating or editing reusable skills or instruction files
 ---
+~~~
 
-# Skill Name
+For a new skill:
 
-## Overview
-What is this? Core principle in 1-2 sentences.
+- use a lowercase, hyphenated, action-oriented name;
+- start the description with “Use when...”;
+- describe observable situations, symptoms, and distinct branches;
+- use third-person trigger wording;
+- keep process steps out of the description; and
+- include terms a user or agent would naturally use for the problem.
 
-## When to Use
-[Small inline flowchart IF decision non-obvious]
+The description is a routing contract, not a summary. If it describes the
+workflow, an agent may act from the metadata without reading the instructions.
 
-Bullet list with SYMPTOMS and use cases
-When NOT to use
+## Match the Form to the Failure
 
-## Core Pattern (for techniques/patterns)
-Before/after code comparison
+Classify the baseline failure before choosing the instruction form.
+
+| Baseline behavior | Best instruction form | Completion criterion |
+|---|---|---|
+| A known rule is skipped under pressure | Bright-line rule plus counters for observed rationalizations | The pressure scenario follows the rule |
+| Output has the wrong shape | Positive recipe that names the parts and their order | Every required part appears in order |
+| A required element is omitted | A required field or slot beside the template | The field is present and populated |
+| Behavior depends on context | Conditional keyed to an observable predicate | Each branch chooses the expected action |
+| A technique is applied incorrectly | Worked example plus boundary conditions | A fresh application produces the expected result |
+| Reference information cannot be found | Searchable headings, terms, and direct routing | A retrieval probe finds and applies the fact |
+
+Do not use prohibitions to shape an output. State what the output is. Use
+prohibitions only when the baseline shows a discipline failure and record the
+specific workaround they close.
+
+Match specificity to risk:
+
+- use flexible guidance when several approaches are valid;
+- use ordered steps when sequence matters;
+- use an exact template or reusable tool only when variation is unsafe.
+
+## Test Before Editing
+
+~~~text
+NO NEW OR CHANGED INSTRUCTION WITHOUT A FAILING BEHAVIOR TEST FIRST
+~~~
+
+Before editing instruction text:
+
+1. Define one observable behavior and its pass/fail criterion.
+2. Run a baseline without the skill or proposed instruction.
+3. Record the exact failure, omission, or rationalization.
+4. Add the smallest instruction that addresses that evidence.
+5. Re-run the behavior test with the instruction.
+6. Add realistic pressure and verify the behavior still holds.
+7. Run a regression scenario for an adjacent branch or ordinary case.
+8. Refactor wording only while every scenario remains green.
+
+For the complete worker protocol, scenario templates, and evidence table, read
+[testing-skills-with-subagents.md](testing-skills-with-subagents.md).
+
+For discipline-enforcing language, read
+[persuasion-principles.md](persuasion-principles.md) before adding emphatic
+rules. Persuasion must serve the user's stated interests, not manufacture
+urgency.
+
+## Write the Smallest Skill
+
+A useful main file normally contains:
+
+~~~text
+skill-name/
+  SKILL.md
+  branch-reference.md
+~~~
+
+Only add a reference when a branch has enough independent detail that readers
+outside that branch should not pay its context cost. Only add a reusable tool
+when deterministic execution is materially safer than prose.
+
+Prefer:
+
+- one strong example over several variants;
+- tables for repeated mappings;
+- numbered lists for ordered actions;
+- definitions next to the rules that depend on them;
+- concrete predicates and bounds;
+- consistent terms throughout the bundle.
+
+Remove:
+
+- facts an agent can already infer;
+- repeated explanations;
+- client-specific tool names or fixed invocation syntax;
+- vendor, model, shell, package-manager, or version-control assumptions;
+- time-sensitive setup details;
+- narrative history; and
+- choices that do not change behavior.
+
+## RED–GREEN–REFACTOR for Instructions
+
+### RED: Observe the Missing Behavior
+
+Run the smallest realistic scenario without the instruction. Confirm the
+scenario executes, the intended failure is visible, and the failure is not
+caused by missing context or an invalid setup.
+
+### GREEN: Add Only What the Failure Requires
+
+Write the minimum trigger, rule, recipe, example, or reference pointer that
+addresses the observed failure. Re-run the same scenario with fresh context.
+
+### REFACTOR: Close Evidence-Based Gaps
+
+If pressure reveals a new rationalization, add a precise counter. If a normal
+case regresses, narrow the trigger or conditional. Remove duplicated text and
+re-run the full scenario set after each meaningful change.
+
+Do not add hypothetical defenses that no test exposed. More instruction can
+create more steering and more ambiguity.
 
 ## Quick Reference
-Table or bullets for scanning common operations
 
-## Implementation
-Inline code for simple patterns
-Link to file for heavy reference or reusable tools
+| Need | Action | Done when |
+|---|---|---|
+| Discovery | Write trigger-only metadata with all distinct branches | Each intended request selects the skill |
+| Progressive disclosure | Route branch detail through a direct pointer | Unrelated branches do not load it |
+| Ordered behavior | Number actions and state a check for each | Every step has observable evidence |
+| Discipline | Baseline, then pressure-test the smallest rule | The rule survives realistic pressure |
+| Output shape | Give a positive ordered recipe | The output matches the recipe |
+| Safety against overreach | Run an adjacent regression scenario | Ordinary behavior remains unchanged |
+| Concision | Remove repetition and obvious background | Every retained section changes a decision |
 
 ## Common Mistakes
-What goes wrong + fixes
 
-## Real-World Impact (optional)
-Concrete results
-```
-
-
-## Gemini Search Optimization (GSO)
-
-**Critical for discovery:** Future Gemini needs to FIND your skill
-
-### 1. Rich Description Field
-
-**Purpose:** Gemini reads description to decide which skills to load for a given task. Make it answer: "Should I read this skill right now?"
-
-**Format:** Start with "Use when..." to focus on triggering conditions
-
-**CRITICAL: Description = When to Use, NOT What the Skill Does**
-
-The description should ONLY describe triggering conditions. Do NOT summarize the skill's process or workflow in the description.
-
-**Why this matters:** Testing revealed that when a description summarizes the skill's workflow, Gemini may follow the description instead of reading the full skill content. A description saying "code review between tasks" caused Gemini to do ONE review, even though the skill's flowchart clearly showed TWO reviews (spec compliance then code quality).
-
-When the description was changed to just "Use when executing implementation plans with independent tasks" (no workflow summary), Gemini correctly read the flowchart and followed the two-stage review process.
-
-**The trap:** Descriptions that summarize workflow create a shortcut Gemini will take. The skill body becomes documentation Gemini skips.
-
-```yaml
-# ❌ BAD: Summarizes workflow - Gemini may follow this instead of reading skill
-description: Use when executing plans - dispatches subagent per task with code review between tasks
-
-# ❌ BAD: Too much process detail
-description: Use for TDD - write test first, watch it fail, write minimal code, refactor
-
-# ✅ GOOD: Just triggering conditions, no workflow summary
-description: Use when executing implementation plans with independent tasks in the current session
-
-# ✅ GOOD: Triggering conditions only
-description: Use when implementing any feature or bugfix, before writing implementation code
-```
-
-**Content:**
-- Use concrete triggers, symptoms, and situations that signal this skill applies
-- Describe the *problem* (race conditions, inconsistent behavior) not *language-specific symptoms* (setTimeout, sleep)
-- Keep triggers technology-agnostic unless the skill itself is technology-specific
-- If skill is technology-specific, make that explicit in the trigger
-- Write in third person (injected into system prompt)
-- **NEVER summarize the skill's process or workflow**
-
-```yaml
-# ❌ BAD: Too abstract, vague, doesn't include when to use
-description: For async testing
-
-# ❌ BAD: First person
-description: I can help you with async tests when they're flaky
-
-# ❌ BAD: Mentions technology but skill isn't specific to it
-description: Use when tests use setTimeout/sleep and are flaky
-
-# ✅ GOOD: Starts with "Use when", describes problem, no workflow
-description: Use when tests have race conditions, timing dependencies, or pass/fail inconsistently
-
-# ✅ GOOD: Technology-specific skill with explicit trigger
-description: Use when using React Router and handling authentication redirects
-```
-
-### 2. Keyword Coverage
-
-Use words Gemini would search for:
-- Error messages: "Hook timed out", "ENOTEMPTY", "race condition"
-- Symptoms: "flaky", "hanging", "zombie", "pollution"
-- Synonyms: "timeout/hang/freeze", "cleanup/teardown/afterEach"
-- Tools: Actual commands, library names, file types
-
-### 3. Descriptive Naming
-
-**Use active voice, verb-first:**
-- ✅ `creating-skills` not `skill-creation`
-- ✅ `condition-based-waiting` not `async-test-helpers`
-
-### 4. Token Efficiency (Critical)
-
-**Target word counts:**
-- getting-started workflows: <150 words each
-- Frequently-referenced skills: <200 words total
-- Other skills: <500 words (still be concise)
-
-**Techniques:**
-
-**Move details to tool help:**
-```bash
-# ❌ BAD: Document all flags in SKILL.md
-search-conversations supports --text, --both, --after DATE, --before DATE, --limit N
-
-# ✅ GOOD: Reference --help
-search-conversations supports multiple modes and filters. Run --help for details.
-```
-
-**Use cross-references:**
-```markdown
-# ❌ BAD: Repeat workflow details
-When searching, dispatch subagent with template...
-[20 lines of repeated instructions]
-
-# ✅ GOOD: Reference other skill
-Always use subagents (50-100x context savings). REQUIRED: Use [other-skill-name] for workflow.
-```
-
-**Eliminate redundancy:**
-- Don't repeat what's in cross-referenced skills
-- Don't explain what's obvious from command
-- Don't include multiple examples of same pattern
-
-**Name by what you DO or core insight:**
-- ✅ `condition-based-waiting` > `async-test-helpers`
-- ✅ `using-skills` not `skill-usage`
-- ✅ `flatten-with-flags` > `data-structure-refactoring`
-- ✅ `root-cause-tracing` > `debugging-techniques`
-
-**Gerunds (-ing) work well for processes:**
-- `creating-skills`, `testing-skills`, `debugging-with-logs`
-- Active, describes the action you're taking
-
-### 4. Cross-Referencing Other Skills
-
-**When writing documentation that references other skills:**
-
-Use skill name only, with explicit requirement markers:
-- ✅ Good: `**REQUIRED SUB-SKILL:** Use superpowers:test-driven-development`
-- ✅ Good: `**REQUIRED BACKGROUND:** You MUST understand superpowers:systematic-debugging`
-- ❌ Bad: `See skills/testing/test-driven-development` (unclear if required)
-- ❌ Bad: `@skills/testing/test-driven-development/SKILL.md` (force-loads, burns context)
-
-**Why no @ links:** `@` syntax force-loads files immediately, consuming 200k+ context before you need them.
-
-## Flowchart Usage
-
-**Use flowcharts ONLY for:**
-- Non-obvious decision points
-- Process loops where you might stop too early
-- "When to use A vs B" decisions
-
-**Never use flowcharts for:**
-- Reference material → Tables, lists
-- Code examples → Markdown blocks
-- Linear instructions → Numbered lists
-- Labels without semantic meaning (step1, helper2)
-
-See @graphviz-conventions.dot for graphviz style rules.
-
-**Visualizing for your human partner:** Use `render-graphs.js` in this directory to render a skill's flowcharts to SVG:
-```bash
-./render-graphs.js ../some-skill           # Each diagram separately
-./render-graphs.js ../some-skill --combine # All diagrams in one SVG
-```
-
-## Code Examples
-
-**One excellent example beats many mediocre ones**
-
-**Don't:**
-- Implement in 5+ languages
-- Create fill-in-the-blank templates
-- Write contrived examples
-
-## File Organization
-
-### Self-Contained Skill
-```
-defense-in-depth/
-  SKILL.md    # Everything inline
-```
-When: All content fits, no heavy reference needed
-
-### Skill with Reusable Tool
-```
-condition-based-waiting/
-  SKILL.md    # Overview + patterns
-  example.ts  # Working helpers to adapt
-```
-When: Tool is reusable code, not just narrative
-
-### Skill with Heavy Reference
-```
-pptx/
-  SKILL.md       # Overview + workflows
-  pptxgenjs.md   # 600 lines API reference
-  ooxml.md       # 500 lines XML structure
-  scripts/       # Executable tools
-```
-When: Reference material too large for inline
-
-## The Iron Law (Same as TDD)
-
-```
-NO SKILL WITHOUT A FAILING TEST FIRST
-```
-
-This applies to NEW skills AND EDITS to existing skills.
-
-Write skill before testing? Delete it. Start over.
-Edit skill without testing? Same violation.
-
-**No exceptions:**
-- Not for "simple additions"
-- Not for "just adding a section"
-- Not for "documentation updates"
-- Don't keep untested changes as "reference"
-- Don't "adapt" while running tests
-- Delete means delete
-
-**REQUIRED BACKGROUND:** The superpowers:test-driven-development skill explains why this matters. Same principles apply to documentation.
-
-## Testing All Skill Types
-
-Different skill types need different test approaches:
-
-### Discipline-Enforcing Skills (rules/requirements)
-
-**Examples:** TDD, verification-before-completion, designing-before-coding
-
-**Success criteria:** Agent follows rule under maximum pressure
-
-### Technique Skills (how-to guides)
-
-**Examples:** condition-based-waiting, root-cause-tracing, defensive-programming
-
-**Success criteria:** Agent successfully applies technique to new scenario
-
-### Pattern Skills (mental models)
-
-**Examples:** reducing-complexity, information-hiding concepts
-
-**Success criteria:** Agent correctly identifies when/how to apply pattern
-
-### Reference Skills (documentation/APIs)
-
-**Examples:** API documentation, command references, library guides
-
-**Success criteria:** Agent finds and correctly applies reference information
-
-## Common Rationalizations for Skipping Testing
-
-| Excuse | Reality |
-|--------|---------|
-| "Skill is obviously clear" | Clear to you ≠ clear to other agents. Test it. |
-| "It's just a reference" | References can have gaps, unclear sections. Test retrieval. |
-| "Testing is overkill" | Untested skills have issues. Always. 15 min testing saves hours. |
-| "I'll test if problems emerge" | Problems = agents can't use skill. Test BEFORE deploying. |
-| "Too tedious to test" | Testing is less tedious than debugging bad skill in production. |
-| "I'm confident it's good" | Overconfidence guarantees issues. Test anyway. |
-| "Academic review is enough" | Reading ≠ using. Test application scenarios. |
-| "No time to test" | Deploying untested skill wastes more time fixing it later. |
-
-**All of these mean: Test before deploying. No exceptions.**
-
-## Bulletproofing Skills Against Rationalization
-
-Skills that enforce discipline (like TDD) need to resist rationalization. Agents are smart and will find loopholes when under pressure.
-
-### Close Every Loophole Explicitly
-
-Don't just state the rule - forbid specific workarounds:
-
-<Bad>
-```markdown
-Write code before test? Delete it.
-```
-</Bad>
-
-<Good>
-```markdown
-Write code before test? Delete it. Start over.
-
-**No exceptions:**
-- Don't keep it as "reference"
-- Don't "adapt" it while writing tests
-- Don't look at it
-- Delete means delete
-```
-</Good>
-
-### Address "Spirit vs Letter" Arguments
-
-Add foundational principle early:
-
-```markdown
-**Violating the letter of the rules is violating the spirit of the rules.**
-```
-
-### Build Rationalization Table
-
-Capture rationalizations from baseline testing (see Testing section below). Every excuse agents make goes in the table:
-
-```markdown
-| Excuse | Reality |
-|--------|---------|
-| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
-| "I'll test after" | Tests passing immediately prove nothing. |
-| "Tests after achieve same goals" | Tests-after = "what does this do?" Tests-first = "what should this do?" |
-```
-
-### Create Red Flags List
-
-Make it easy for agents to self-check when rationalizing:
-
-```markdown
-## Red Flags - STOP and Start Over
-
-- Code before test
-- "I already manually tested it"
-- "Tests after achieve the same purpose"
-- "It's about spirit not ritual"
-- "This is different because..."
-
-**All of these mean: Delete code. Start over with TDD.**
-```
-
-### Update GSO for Violation Symptoms
-
-Add to description: symptoms of when you're ABOUT to violate the rule:
-
-```yaml
-description: use when implementing any feature or bugfix, before writing implementation code
-```
-
-## RED-GREEN-REFACTOR for Skills
-
-Follow the TDD cycle:
-
-### RED: Write Failing Test (Baseline)
-
-Run pressure scenario with subagent WITHOUT the skill. Document exact behavior.
-
-### GREEN: Write Minimal Skill
-
-Write skill that addresses those specific rationalizations. Don't add extra content for hypothetical cases.
-
-Run same scenarios WITH skill. Agent should now comply.
-
-### REFACTOR: Close Loopholes
-
-Agent found new rationalization? Add explicit counter. Re-test until bulletproof.
-
-## Anti-Patterns
-
-### ❌ Narrative Example
-"In session 2025-10-03, we found empty projectDir caused..."
-**Why bad:** Too specific, not reusable
-
-### ❌ Multi-Language Dilution
-example-js.js, example-py.py, example-go.go
-**Why bad:** Mediocre quality, maintenance burden
-
-### ❌ Code in Flowcharts
-```dot
-step1 [label="import fs"];
-step2 [label="read file"];
-```
-**Why bad:** Can't copy-paste, hard to read
-
-### ❌ Generic Labels
-helper1, helper2, step3, pattern4
-**Why bad:** Labels should have semantic meaning
-
-## STOP: Before Moving to Next Skill
-
-**After writing ANY skill, you MUST STOP and complete the deployment process.**
-
-**Do NOT:**
-- Create multiple skills in batch without testing each
-- Move to next skill before current one is verified
-- Skip testing because "batching is more efficient"
-
-**The deployment checklist below is MANDATORY for EACH skill.**
-
-## Skill Creation Checklist (TDD Adapted)
-
-**RED Phase - Write Failing Test:**
-- [ ] Create pressure scenarios (3+ combined pressures for discipline skills)
-- [ ] Run scenarios WITHOUT skill - document baseline behavior verbatim
-- [ ] Identify patterns in rationalizations/failures
-
-**GREEN Phase - Write Minimal Skill:**
-- [ ] Name uses only letters, numbers, hyphens (no parentheses/special chars)
-- [ ] YAML frontmatter with required `name` and `description` fields (max 1024 chars; see [spec](https://agentskills.io/specification))
-- [ ] Description starts with "Use when..." and includes specific triggers/symptoms
-- [ ] Description written in third person
-- [ ] Keywords throughout for search (errors, symptoms, tools)
-- [ ] Clear overview with core principle
-- [ ] Address specific baseline failures identified in RED
-- [ ] Code inline OR link to separate file
-- [ ] One excellent example (not multi-language)
-- [ ] Run scenarios WITH skill - verify agents now comply
-
-**REFACTOR Phase - Close Loopholes:**
-- [ ] Identify NEW rationalizations from testing
-- [ ] Add explicit counters (if discipline skill)
-- [ ] Build rationalization table from all test iterations
-- [ ] Create red flags list
-- [ ] Re-test until bulletproof
-
-**Quality Checks:**
-- [ ] Small flowchart only if decision non-obvious
-- [ ] Quick reference table
-- [ ] Common mistakes section
-- [ ] No narrative storytelling
-- [ ] Supporting files only for tools or heavy reference
-
-**Deployment:**
-- [ ] Save skill to workspace
-
-## Discovery Workflow
-
-How future Gemini finds your skill:
-
-1. **Encounters problem** ("tests are flaky")
-3. **Finds SKILL** (description matches)
-4. **Scans overview** (is this relevant?)
-5. **Reads patterns** (quick reference table)
-6. **Loads example** (only when implementing)
-
-## The Bottom Line
-
-**Creating skills IS TDD for process documentation.**
-
-Same Iron Law: No skill without failing test first.
-Same cycle: RED (baseline) → GREEN (write skill) → REFACTOR (close loopholes).
-Same benefits: Better quality, fewer surprises, bulletproof results.
-
-If you follow TDD for code, follow it for skills. It's the same discipline applied to documentation.
+| Mistake | Correction |
+|---|---|
+| Writing before observing a baseline | Restore the old instruction and run RED first |
+| Describing the workflow in metadata | Keep only trigger conditions in the description |
+| Putting every branch in the main file | Move branch-only detail behind a precise pointer |
+| Adding vague advice | Replace it with an observable predicate and completion check |
+| Using “do not” language to shape output | State the required output parts in order |
+| Testing only the happy path | Add pressure and adjacent regression scenarios |
+| Assuming a fixed runtime capability | Describe worker outcomes and discover available roles |
+| Expanding after a passing test | Stop at the smallest instruction justified by evidence |
+
+## Completion Checklist
+
+- [ ] Frontmatter has only **name** and **description**.
+- [ ] The description names the job and every genuinely distinct trigger branch.
+- [ ] The main file contains only shared workflow and routing.
+- [ ] Branch-specific detail is behind a direct pointer.
+- [ ] Ordered actions and reference material are separate.
+- [ ] Every required step has a checkable completion criterion.
+- [ ] A baseline without the instruction exposed the intended failure.
+- [ ] The smallest revised instruction passed the original scenario.
+- [ ] A realistic pressure scenario passed.
+- [ ] An adjacent regression scenario passed.
+- [ ] The bundle contains no fixed client, vendor, command, or repository assumptions.
+- [ ] Every changed file was re-read and the relevant structural checks are green.
+
+## Final Rule
+
+~~~text
+No observed failure -> no justified instruction change.
+No pressure and regression evidence -> behavior is not verified.
+~~~

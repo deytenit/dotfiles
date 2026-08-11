@@ -1,79 +1,81 @@
 ---
 name: defense-in-depth
-description: Use when building critical systems, security-sensitive features, or preventing destructive side-effects - requires layering multiple independent checks at different levels
+description: Use after tracing invalid data or a dangerous side effect through multiple system layers where one check could be bypassed
 ---
 
-# Defense-in-Depth
+# Defense-in-Depth Validation
 
 ## Overview
 
-A single failure shouldn't cause a disaster.
+A root-cause fix removes the original trigger. Independent validation at meaningful boundaries prevents another path from recreating the same dangerous outcome and leaves evidence if a guard is reached.
 
-**Core principle:** Multiple independent layers of protection.
+**Core principle:** Validate the same invariant at each layer that owns enough context to enforce it, with each layer protecting against a different failure mode.
 
-## The Strategy
+Do not use extra guards as a substitute for root-cause investigation. Apply this technique after the source is understood.
 
-Instead of one complex check, use several simple checks at different layers. If one fails, others catch it.
+## Map the Data Flow
 
-### Layer 1: Input Validation
-Validate parameters at the entry point.
+List every boundary crossed by the invalid value or dangerous action:
 
-### Layer 2: Business Logic
-Check invariants before executing the core logic.
-
-### Layer 3: Environment Guards
-Refuse to perform dangerous operations in sensitive environments (e.g., tests, production).
-
-### Layer 4: Monitoring/Logging
-Log what you're about to do so you can trace what happened if things go wrong.
-
-## Example: Preventing Accidental Directory Creation
-
-**Problem:** A bug caused `mkdir -p` to run in the wrong directory during tests.
-
-**Layered Protection:**
-
-```typescript
-// Layer 1: Explicit parameter (no defaults)
-async function setupWorkspace(directory: string) {
-  if (!directory) throw new Error('directory is required');
-
-  // Layer 2: Refuse suspicious locations
-  if (directory.startsWith('/etc') || directory === '/') {
-    throw new Error(`Refusing to setup workspace in sensitive directory: ${directory}`);
-  }
-
-  // Layer 3: In tests, refuse operations outside temp directories
-  if (process.env.NODE_ENV === 'test' && !directory.includes('/tmp')) {
-    throw new Error(`Refusing to create directory outside temp dir during tests: ${directory}`);
-  }
-
-  // Layer 4: Traceability
-  logger.debug('About to mkdir -p', { directory });
-  
-  await fs.mkdir(directory, { recursive: true });
-}
+```
+external input
+    -> domain operation
+    -> environment-sensitive boundary
+    -> irreversible or costly side effect
 ```
 
-## Why This Works
+For each boundary, record the invariant it can verify and the failure it can prevent.
 
-If someone passes an empty string (Layer 1 fails), the parameter check catches it.
-If a relative path resolves to a sensitive location (Layer 1 passes), Layer 2 catches it.
-If logic is correct but environment is wrong (Layers 1 & 2 pass), Layer 3 catches it.
-If all checks fail, Layer 4 provides the breadcrumbs to find the root cause.
+## Four Complementary Layers
+
+### 1. Entry Validation
+
+Reject malformed, absent, unauthorized, or out-of-range input at the public boundary. Return an error that identifies the invalid contract.
+
+### 2. Domain Invariants
+
+Validate that the value is meaningful for the operation before state changes. This catches internal callers that bypass the public boundary or combine individually valid values into an invalid state.
+
+### 3. Environment and Side-Effect Guards
+
+Immediately before a destructive, external, or environment-sensitive operation, confirm that the resolved target and current context are safe. Refuse the action when the invariant cannot be proven.
+
+### 4. Diagnostic Evidence
+
+Record the target, relevant state, and caller context before the risky operation so a guard failure or unexpected outcome can be traced. Do not expose secrets or unrelated user data.
+
+## Capability-Neutral Example
+
+```
+function process(requested_target):
+    require requested_target is present              # entry
+
+    resolved_target = resolve(requested_target)
+    require resolved_target belongs to this request  # domain
+
+    require current_context permits resolved_target  # environment
+    record safe diagnostic context                    # evidence
+
+    perform side_effect(resolved_target)
+```
+
+Each check is independent: a caller that bypasses entry validation still meets the domain and environment guards.
+
+## Verification
+
+Test each layer separately with the smallest project-declared check that exercises it:
+
+- Invalid external input is rejected at entry.
+- An internal path that bypasses entry is rejected by the domain invariant.
+- A valid value in an unsafe context is rejected at the side-effect boundary.
+- Diagnostic evidence is useful and does not reveal sensitive data.
 
 ## Red Flags
 
-- Single point of failure
-- Trusting input without validation
-- Hardcoding sensitive paths
-- "It works on my machine"
+- One validation point is expected to protect every path.
+- The same helper and assumptions implement every guard, so one defect bypasses all layers.
+- A guard silently changes invalid input instead of rejecting it.
+- Logging is treated as prevention.
+- Extra checks are added before tracing the root cause.
 
-## Implementation Checklist
-
-- [ ] Identify the most destructive outcome (e.g., data loss, accidental file creation)
-- [ ] Add input validation (Layer 1)
-- [ ] Add invariant checks (Layer 2)
-- [ ] Add environment guards (Layer 3)
-- [ ] Add trace logging (Layer 4)
-- [ ] Verify each layer independently
+The goal is independent protection, not duplicated conditionals.

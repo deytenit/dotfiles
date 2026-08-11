@@ -1,97 +1,46 @@
 ---
 name: requesting-code-review
-description: Use when completing tasks, implementing major features, or before completion to verify work meets requirements
+description: Use when completing a task, implementing a substantial change, or preparing to claim that work meets its requirements
 ---
 
 # Requesting Code Review
 
-Dispatch superpowers:code-reviewer subagent to catch issues before they cascade. The reviewer gets precisely crafted context for evaluation — never your session's history. This keeps the reviewer focused on the work product, not your thought process, and preserves your own context for continued work.
+## Overview
 
-**Core principle:** Review early, review often.
+Use the configured `checker` role, or the client's equivalent, for one read-only review that covers both requirements and quality. Give the reviewer evidence and the smallest useful context, not the session history.
 
-## When to Request Review
+## Reviewer Package
 
-**Mandatory:**
-- After each task in subagent-driven development
-- After completing major feature
-- Before completion of a task or project
+Supply all four inputs:
 
-**Optional but valuable:**
-- When stuck (fresh perspective)
-- Before refactoring (baseline check)
-- After fixing complex bug
+- The requirements or their precise path.
+- The relevant changed paths.
+- Fresh verification evidence for those changes.
+- The smallest useful surrounding context needed to judge concrete risks.
 
-## How to Request
+Use [code-reviewer.md](code-reviewer.md) as the prompt contract.
 
-**1. Identify Changes:**
-Note the files modified and the nature of the changes.
+## Review Loop
 
-**2. Dispatch code-reviewer subagent:**
+1. Dispatch one `checker` after the scoped implementation and verification are complete.
+2. Validate each finding against the requirements, changed files, and evidence.
+3. Correct evidence-backed problems; push back on unsupported findings with technical evidence.
+4. Re-review the correction before claiming completion.
 
-Use Task tool with superpowers:code-reviewer type, fill template at `code-reviewer.md`
+Do not substitute self-review for an independent checker. Do not ignore a failed requirements verdict, a quality verdict that requires changes, or a named verification gap.
 
-**Placeholders:**
-- `{WHAT_WAS_IMPLEMENTED}` - What you just built
-- `{PLAN_OR_REQUIREMENTS}` - What it should do
-- `{CHANGES_MADE}` - Description of changes or list of modified files
-- `{DESCRIPTION}` - Brief summary
+## Required Output
 
-**3. Act on feedback:**
-- Fix Critical issues immediately
-- Fix Important issues before proceeding
-- Note Minor issues for later
-- Push back if reviewer is wrong (with reasoning)
+```markdown
+## Findings
 
-## Example
+- `path:line` — severity — evidence-backed problem and required correction
 
-```
-[Just completed Task 2: Add verification function]
+## Verdicts
 
-You: Let me request code review before proceeding.
-
-[Dispatch superpowers:code-reviewer subagent]
-  WHAT_WAS_IMPLEMENTED: Verification and repair functions for conversation index
-  PLAN_OR_REQUIREMENTS: Task 2 from docs/superpowers/plans/deployment-plan.md
-  CHANGES_MADE: Added verifyIndex() and repairIndex() in src/index.ts
-  DESCRIPTION: Added verifyIndex() and repairIndex() with 4 issue types
-
-[Subagent returns]:
-  Strengths: Clean architecture, real tests
-  Issues:
-    Important: Missing progress indicators
-    Minor: Magic number (100) for reporting interval
-  Assessment: Ready to proceed
-
-You: [Fix progress indicators]
-[Continue to Task 3]
+- Requirements: pass | fail | unable to verify
+- Quality: approved | changes required
+- Verification gaps: none, or a precise list
 ```
 
-## Integration with Workflows
-
-**Subagent-Driven Development:**
-- Review after EACH task
-- Catch issues before they compound
-- Fix before moving to next task
-
-**Executing Plans:**
-- Review after each batch (3 tasks)
-- Get feedback, apply, continue
-
-**Ad-Hoc Development:**
-- Review before completion
-- Review when stuck
-
-## Red Flags
-
-**Never:**
-- Skip review because "it's simple"
-- Ignore Critical issues
-- Proceed with unfixed Important issues
-- Argue with valid technical feedback
-
-**If reviewer wrong:**
-- Push back with technical reasoning
-- Show code/tests that prove it works
-- Request clarification
-
-See template at: requesting-code-review/code-reviewer.md
+An empty review says `No findings.` under `## Findings` and still supplies all three verdict lines.

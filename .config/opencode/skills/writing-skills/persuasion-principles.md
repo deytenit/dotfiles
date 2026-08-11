@@ -1,187 +1,121 @@
-# Persuasion Principles for Skill Design
+# Persuasion Principles for Instruction Design
 
-## Overview
+## Purpose
 
-LLMs respond to the same persuasion principles as humans. Understanding this psychology helps you design more effective skills - not to manipulate, but to ensure critical practices are followed even under pressure.
+Clear instructions must sometimes hold under pressure. Persuasion principles can
+strengthen legitimate, user-serving rules, but they must not manufacture urgency,
+hide trade-offs, or override user authority.
 
-**Research foundation:** Meincke et al. (2025) tested 7 persuasion principles with N=28,000 AI conversations. Persuasion techniques more than doubled compliance rates (33% → 72%, p < .001).
+Use this reference only after a baseline shows that an agent understands a rule
+but rationalizes it away. For output shape, missing fields, or branch selection,
+use a positive recipe, structural slot, or observable conditional instead.
 
-## The Seven Principles
+## Relevant Principles
 
-### 1. Authority
-**What it is:** Deference to expertise, credentials, or official sources.
+### Authority
 
-**How it works in skills:**
-- Imperative language: "YOU MUST", "Never", "Always"
-- Non-negotiable framing: "No exceptions"
-- Eliminates decision fatigue and rationalization
+Use direct, unambiguous language for established safety or quality constraints:
+“must,” “never,” and “no exceptions.” This reduces negotiation where the rule is
+genuinely non-negotiable.
 
-**When to use:**
-- Discipline-enforcing skills (TDD, verification requirements)
-- Safety-critical practices
-- Established best practices
+Avoid authority language when several approaches are valid.
 
-**Example:**
-```markdown
-✅ Write code before test? Delete it. Start over. No exceptions.
-❌ Consider writing tests first when feasible.
-```
+### Consistency
 
-### 2. Commitment
-**What it is:** Consistency with prior actions, statements, or public declarations.
+Ask for an explicit choice, criterion, or evidence record before action. A
+visible decision makes later deviations detectable.
 
-**How it works in skills:**
-- Require announcements: "Announce skill usage"
-- Force explicit choices: "Choose A, B, or C"
-- Use tracking: TodoWrite for checklists
+Useful forms:
 
-**When to use:**
-- Ensuring skills are actually followed
-- Multi-step processes
-- Accountability mechanisms
+- announce which rule governs the task;
+- choose among concrete options;
+- record pass/fail criteria before testing;
+- track required steps in a visible checklist.
 
-**Example:**
-```markdown
-✅ When you find a skill, you MUST announce: "I'm using [Skill Name]"
-❌ Consider letting your partner know which skill you're using.
-```
+### Scarcity
 
-### 3. Scarcity
-**What it is:** Urgency from time limits or limited availability.
+Use sequence boundaries such as “before editing” or “immediately after the
+failure” when delay would invalidate evidence. Do not invent deadlines or
+consequences.
 
-**How it works in skills:**
-- Time-bound requirements: "Before proceeding"
-- Sequential dependencies: "Immediately after X"
-- Prevents procrastination
+### Social Proof
 
-**When to use:**
-- Immediate verification requirements
-- Time-sensitive workflows
-- Preventing "I'll do it later"
+State a universal norm only when it is actually universal. Pair it with the
+failure mode it prevents.
 
-**Example:**
-```markdown
-✅ After completing a task, IMMEDIATELY request code review before proceeding.
-❌ You can review code when convenient.
-```
+### Unity
 
-### 4. Social Proof
-**What it is:** Conformity to what others do or what's considered normal.
+Frame collaboration around shared outcomes and honest technical judgment.
+Unity should support candid disagreement, never liking or flattery.
 
-**How it works in skills:**
-- Universal patterns: "Every time", "Always"
-- Failure modes: "X without Y = failure"
-- Establishes norms
+### Reciprocity and Liking
 
-**When to use:**
-- Documenting universal practices
-- Warning about common failures
-- Reinforcing standards
+Do not use reciprocity or liking to enforce compliance. They add social pressure
+without improving the technical basis of a rule and can encourage sycophancy.
 
-**Example:**
-```markdown
-✅ Checklists without TodoWrite tracking = steps get skipped. Every time.
-❌ Some people find TodoWrite helpful for checklists.
-```
+## Choosing the Form
 
-### 5. Unity
-**What it is:** Shared identity, "we-ness", in-group belonging.
+| Instruction need | Useful principles | Avoid |
+|---|---|---|
+| Discipline under pressure | Authority, consistency, truthful scarcity | Soft suggestions, invented urgency |
+| Collaborative judgment | Unity, explicit criteria | Flattery, status pressure |
+| Technique guidance | Moderate authority, clear conditions | Absolute language |
+| Reference lookup | Clarity only | Persuasive framing |
+| Output shape | Positive recipe | Prohibition-heavy wording |
 
-**How it works in skills:**
-- Collaborative language: "our codebase", "we're colleagues"
-- Shared goals: "we both want quality"
+## Bright-Line Rules
 
-**When to use:**
-- Collaborative workflows
-- Establishing team culture
-- Non-hierarchical practices
+Bright-line wording works when the baseline agent knows the correct rule but
+seeks an exception. It should:
 
-**Example:**
-```markdown
-✅ We're colleagues working together. I need your honest technical judgment.
-❌ You should probably tell me if I'm wrong.
-```
+1. state the required action;
+2. identify the observable trigger;
+3. close only rationalizations seen in testing;
+4. state a checkable completion criterion.
 
-### 6. Reciprocity
-**What it is:** Obligation to return benefits received.
+Example:
 
-**How it works:**
-- Use sparingly - can feel manipulative
-- Rarely needed in skills
+~~~markdown
+If implementation exists before its behavior test, restore the prior behavior
+and begin from a failing test. Keeping the implementation as a reference does
+not satisfy test-first.
+~~~
 
-**When to avoid:**
-- Almost always (other principles more effective)
+This is stronger than “prefer tests first,” but remains scoped to an observable
+condition.
 
-### 7. Liking
-**What it is:** Preference for cooperating with those we like.
+## Ethical Boundary
 
-**How it works:**
-- **DON'T USE for compliance**
-- Conflicts with honest feedback culture
-- Creates sycophancy
+Use persuasive language only when all are true:
 
-**When to avoid:**
-- Always for discipline enforcement
+- the rule serves the user's stated interests;
+- the trigger is factual and observable;
+- the action remains within granted authority;
+- the consequence is not exaggerated;
+- the wording is no stronger than the tested failure requires.
 
-## Principle Combinations by Skill Type
+If any condition fails, use neutral guidance and surface the trade-off.
 
-| Skill Type | Use | Avoid |
-|------------|-----|-------|
-| Discipline-enforcing | Authority + Commitment + Social Proof | Liking, Reciprocity |
-| Guidance/technique | Moderate Authority + Unity | Heavy authority |
-| Collaborative | Unity + Commitment | Authority, Liking |
-| Reference | Clarity only | All persuasion |
+## Research Foundation
 
-## Why This Works: The Psychology
+These principles adapt established work on persuasion and instruction
+compliance:
 
-**Bright-line rules reduce rationalization:**
-- "YOU MUST" removes decision fatigue
-- Absolute language eliminates "is this an exception?" questions
-- Explicit anti-rationalization counters close specific loopholes
+- Cialdini, R. B. (2021), *Influence: The Psychology of Persuasion*.
+- Meincke, L., Shapiro, D., Duckworth, A. L., Mollick, E., Mollick, L., and
+  Cialdini, R. (2025), *Call Me A Jerk: Persuading AI to Comply with
+  Objectionable Requests*.
 
-**Implementation intentions create automatic behavior:**
-- Clear triggers + required actions = automatic execution
-- "When X, do Y" more effective than "generally do Y"
-- Reduces cognitive load on compliance
+Research describes influence, not permission. The user's interests and explicit
+constraints remain the boundary.
 
-**LLMs are parahuman:**
-- Trained on human text containing these patterns
-- Authority language precedes compliance in training data
-- Commitment sequences (statement → action) frequently modeled
-- Social proof patterns (everyone does X) establish norms
+## Quick Check
 
-## Ethical Use
+Before strengthening an instruction, ask:
 
-**Legitimate:**
-- Ensuring critical practices are followed
-- Creating effective documentation
-- Preventing predictable failures
-
-**Illegitimate:**
-- Manipulating for personal gain
-- Creating false urgency
-- Guilt-based compliance
-
-**The test:** Would this technique serve the user's genuine interests if they fully understood it?
-
-## Research Citations
-
-**Cialdini, R. B. (2021).** *Influence: The Psychology of Persuasion (New and Expanded).* Harper Business.
-- Seven principles of persuasion
-- Empirical foundation for influence research
-
-**Meincke, L., Shapiro, D., Duckworth, A. L., Mollick, E., Mollick, L., & Cialdini, R. (2025).** Call Me A Jerk: Persuading AI to Comply with Objectionable Requests. University of Pennsylvania.
-- Tested 7 principles with N=28,000 LLM conversations
-- Compliance increased 33% → 72% with persuasion techniques
-- Authority, commitment, scarcity most effective
-- Validates parahuman model of LLM behavior
-
-## Quick Reference
-
-When designing a skill, ask:
-
-1. **What type is it?** (Discipline vs. guidance vs. reference)
-2. **What behavior am I trying to change?**
-3. **Which principle(s) apply?** (Usually authority + commitment for discipline)
-4. **Am I combining too many?** (Don't use all seven)
-5. **Is this ethical?** (Serves user's genuine interests?)
+1. Did the baseline show rationalization rather than confusion?
+2. Which exact pressure caused the violation?
+3. Is a bright-line rule the right form for that failure?
+4. Is every strong claim true and scoped?
+5. Does a pressure scenario pass?
+6. Does an adjacent regression scenario remain unchanged?

@@ -1,4 +1,5 @@
 local arc = require("util.arc")
+local ARC_ROOT = arc.root()
 
 local opts = {
   windows = { preview = true, width_preview = 30 },
@@ -22,20 +23,30 @@ local keys = {
   },
 }
 
+local dependencies = {
+  {
+    "nvim-mini/mini.icons",
+    opts = {},
+  },
+}
+
 return {
   {
     "nvim-mini/mini.files",
     cond = function()
       return not arc.is_repo()
     end,
+    dependencies = dependencies,
     opts = opts,
     keys = keys,
   },
   {
-    dir = "~/Source/arcadia/a/junk/ermnvldmr/mini-arc-files",
+    dir = vim.fs.joinpath(ARC_ROOT, "junk/ermnvldmr/mini-arc-files"),
+    main = "mini.files",
     cond = function()
       return arc.is_repo()
     end,
+    dependencies = dependencies,
     opts = opts,
     keys = keys,
   },
@@ -44,3 +55,4 @@ return {
     enabled = false,
   },
 }
+
