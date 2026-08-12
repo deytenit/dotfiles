@@ -4,7 +4,7 @@ This directory contains portable, manually maintained skills shared by OpenCode,
 
 ## Codex workflow
 
-Codex uses the primary agent as the controller and exposes three focused roles from `../agents/codex`:
+Codex uses the primary agent as the controller and exposes three focused roles. Their source manifests live in the repository at `.codex/agents`; the **Codex agents** strap deploys them to `~/.codex/agents`:
 
 | Role | Responsibility |
 |---|---|

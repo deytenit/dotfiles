@@ -1,4 +1,4 @@
--- Cached helpers for detecting an Arcadia (arc) repository.
+-- Cached helpers for detecting an arc repository.
 -- `arc root` is a synchronous subprocess and was previously spawned several
 -- times during startup; the result is computed once and reused.
 

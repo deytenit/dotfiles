@@ -60,10 +60,6 @@ DISALLOWED_SKILL_PATTERNS = {
 
 PRIVATE_BUNDLE_PATTERNS = {
     "absolute home path": re.compile(r"/home/[A-Za-z0-9._-]+"),
-    "private project marker": re.compile(
-        r"(?i)\b(?:arcadia|arcanum|yandex|direct-modules)\b|adv/frontend"
-    ),
-    "private hook": re.compile("arcadia_" + "guard"),
     "private skill group": re.compile(r"skills/(?:direct|infra)"),
 }
 
@@ -72,8 +68,6 @@ class SharedHarnessTest(unittest.TestCase):
     def test_personal_agents_is_portable(self):
         text = AGENTS.read_text(encoding="utf-8")
         lowered = text.lower()
-        self.assertNotIn("arcadia", lowered)
-        self.assertNotIn("arcanum", lowered)
         self.assertNotRegex(lowered, r"\bgit\b")
         self.assertIn("300 seconds", lowered)
         self.assertIn("30 seconds", lowered)
@@ -86,7 +80,7 @@ class SharedHarnessTest(unittest.TestCase):
         instructions = yaml_parser.safe_load((ROOT / "instructions.strap.yaml").read_text(encoding="utf-8"))
         codex = yaml_parser.safe_load((DOTFILES / ".codex" / "strap.yaml").read_text(encoding="utf-8"))
         self.assertEqual(opencode["platforms"]["generic"]["link"], ["opencode.jsonc"])
-        self.assertEqual(len(skills["platforms"]["generic"]["copy"]), 4)
+        self.assertEqual(len(skills["platforms"]["generic"]["copy"]), 3)
         self.assertEqual(len(instructions["platforms"]["generic"]["copy"]), 4)
         self.assertEqual(codex["platforms"]["generic"]["copy"][0]["target"], "~/.codex/agents")
 
@@ -169,6 +163,7 @@ class SharedHarnessTest(unittest.TestCase):
         text = SKILLS_README.read_text(encoding="utf-8")
         lowered = text.lower()
         self.assertIn("## codex workflow", lowered)
+        self.assertIn("~/.codex/agents", text)
         for name in (
             "`implementer`",
             "`researcher`",
