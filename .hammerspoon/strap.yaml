@@ -1,0 +1,7 @@
+name: Hammerspoon
+category: Desktop
+description: macOS automation scripts
+platforms:
+  darwin:
+    link:
+      - [., ~/.hammerspoon]

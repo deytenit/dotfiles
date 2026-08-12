@@ -1,0 +1,7 @@
+name: Yabai
+category: Desktop
+description: macOS window manager
+platforms:
+  darwin:
+    link:
+      - yabairc

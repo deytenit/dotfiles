@@ -1,0 +1,9 @@
+name: Darkman
+category: Desktop
+description: Automatic light and dark themes
+platforms:
+  linux:
+    link:
+      - [config.yaml, ~/.config/darkman/config.yaml]
+      - [dark-mode.d, ~/.local/share/dark-mode.d]
+      - [light-mode.d, ~/.local/share/light-mode.d]

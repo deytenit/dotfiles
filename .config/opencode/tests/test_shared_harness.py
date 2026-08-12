@@ -10,7 +10,7 @@ DOTFILES = ROOT.parents[1]
 SKILLS = ROOT / "skills"
 SKILLS_README = SKILLS / "README.md"
 AGENTS = ROOT / "AGENTS.md"
-AGENT_DIR = ROOT / "agents" / "codex"
+AGENT_DIR = DOTFILES / ".codex" / "agents"
 
 sys.path.insert(0, str(DOTFILES / ".local" / "share" / "dotfiles" / "vendor"))
 import yaml_parser  # noqa: E402
@@ -80,21 +80,15 @@ class SharedHarnessTest(unittest.TestCase):
         self.assertIn("closest applicable project instructions", lowered)
         self.assertIn("comments that merely restate the code", lowered)
 
-    def test_strap_declares_all_shared_links(self):
-        config = yaml_parser.safe_load((ROOT / "strap.yaml").read_text(encoding="utf-8"))
-        self.assertEqual(
-            config["link"],
-            [
-                "opencode.jsonc",
-                "skills",
-                "AGENTS.md",
-                ["AGENTS.md", "~/.codex/AGENTS.md"],
-                ["skills", "~/.codex/skills/skills"],
-                ["agents/codex", "~/.codex/agents"],
-                ["AGENTS.md", "~/.gemini/GEMINI.md"],
-                ["skills", "~/.gemini/skills"],
-            ],
-        )
+    def test_straps_declare_split_harness_mappings(self):
+        opencode = yaml_parser.safe_load((ROOT / "strap.yaml").read_text(encoding="utf-8"))
+        skills = yaml_parser.safe_load((ROOT / "skills.strap.yaml").read_text(encoding="utf-8"))
+        instructions = yaml_parser.safe_load((ROOT / "instructions.strap.yaml").read_text(encoding="utf-8"))
+        codex = yaml_parser.safe_load((DOTFILES / ".codex" / "strap.yaml").read_text(encoding="utf-8"))
+        self.assertEqual(opencode["platforms"]["generic"]["link"], ["opencode.jsonc"])
+        self.assertEqual(len(skills["platforms"]["generic"]["copy"]), 4)
+        self.assertEqual(len(instructions["platforms"]["generic"]["copy"]), 4)
+        self.assertEqual(codex["platforms"]["generic"]["copy"][0]["target"], "~/.codex/agents")
 
     def test_skill_entries_are_local_directories(self):
         external = sorted(

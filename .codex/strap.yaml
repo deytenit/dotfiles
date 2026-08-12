@@ -1,0 +1,9 @@
+name: Codex agents
+category: Agent Harness
+description: Codex role definitions
+platforms:
+  generic:
+    copy:
+      - source: agents
+        target: ~/.codex/agents
+        force: true

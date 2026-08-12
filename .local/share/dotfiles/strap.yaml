@@ -1,4 +1,7 @@
-name: local-share-dotfiles
-link:
-  - [., ~/.local/share/dotfiles]
-
+name: Deytefiles runtime
+category: CLI
+description: Bootstrap runtime files
+platforms:
+  generic:
+    link:
+      - [., ~/.local/share/dotfiles]

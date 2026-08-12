@@ -1,6 +1,9 @@
-name: local-bin
-link:
-  - copy
-  - git-semantic
-  - deytefiles
-
+name: Deytefiles command
+category: CLI
+description: Bootstrap and helper commands
+platforms:
+  generic:
+    link:
+      - copy
+      - git-semantic
+      - deytefiles

@@ -1,0 +1,7 @@
+name: Dunst
+category: Desktop
+description: Desktop notifications
+platforms:
+  linux:
+    link:
+      - dunstrc

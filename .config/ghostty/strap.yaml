@@ -1,6 +1,9 @@
-name: ghostty
-link:
-  - config
-  - [../../themes/rainby/powering/ghostty/rainby-dark, ~/.config/ghostty/themes/rainby-dark]
-  - [../../themes/rainby/powering/ghostty/rainby-light, ~/.config/ghostty/themes/rainby-light]
-
+name: Ghostty
+category: Terminal
+description: Terminal profile and themes
+platforms:
+  generic:
+    link:
+      - config
+      - [../../themes/rainby/powering/ghostty/rainby-dark, ~/.config/ghostty/themes/rainby-dark]
+      - [../../themes/rainby/powering/ghostty/rainby-light, ~/.config/ghostty/themes/rainby-light]

@@ -1,0 +1,7 @@
+name: Skhd
+category: Desktop
+description: macOS hotkey bindings
+platforms:
+  darwin:
+    link:
+      - skhdrc

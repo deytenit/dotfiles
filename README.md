@@ -1,37 +1,10 @@
-# ᓭ⍑ᒷꖎꖎ ᒲᔑ⊣╎ᓵ <sup>[1](#footnote-1)</sup>
+# Shell Magic
 
-![Preview](./assets/preview.png)
+Self-contained macOS and Linux dotfiles with a reviewed, declarative bootstrap flow. Python 3.10+ is required; the interactive terminal UI and its pure-Python dependencies are vendored in this repository.
 
-A self-contained, cross-platform dotfiles management system with declarative YAML configuration and automated deployment.
+## Deploy the agent harness
 
-## Overview
-
-This repository contains my personal configuration files (dotfiles) for macOS and Linux systems. The system is built around a custom "strap" framework that makes it easy to deploy, manage, and synchronize configurations across different machines and platforms.
-
-### What's Inside
-
-Configurations for:
-
-- **Terminal**: Fish shell, Ghostty
-- **Editor**: Neovim
-- **macOS**: Yabai (tiling WM), Skhd (hotkey daemon), Hammerspoon
-- **Linux**: Hyprland, Waybar, Rofi, Dunst, Darkman
-- **Multiplexer**: Zellij
-- **Git**: Custom aliases and semantic commit tool
-
-### Key Features
-
-- **No External Dependencies**: Includes vendored YAML parser, works out-of-the-box with Python 3
-- **Platform-Specific Configs**: Separate configurations for macOS and Linux
-- **Declarative YAML Format**: Simple, readable configuration files
-- **Automatic Symlink Management**: No manual linking required
-- **Git Integration**: Built-in sync command with auto-commit and push
-- **Cron Job Management**: Automated scheduling with validation and rollback
-- **Native Notifications**: Desktop notifications on macOS and Linux
-
-## Quick Start
-
-Clone the repository and run the bootstrap script:
+To set up the agent harness on a new machine, clone this repository and start the interactive bootstrap:
 
 ```bash
 git clone <your-repo-url> ~/.dotfiles
@@ -39,258 +12,69 @@ cd ~/.dotfiles
 python3 bootstrap.py
 ```
 
-The bootstrap process will:
+Choose configurations, select the **Agent Harness** entries you need, then confirm the final review. For a Codex setup, select **Shared skills**, **Shared instructions**, and **Codex agents**. This installs the shared skills and instructions and copies the Codex agent definitions to `~/.codex/agents`.
 
-1. Process all strap configuration files
-2. Create symlinks to your home directory
-3. Copy files that need customization
-4. Install cron jobs (if configured)
-5. Set up the `deytefiles` command in your PATH
-
-After bootstrap, you can use the `deytefiles` command from anywhere:
+## Quick start
 
 ```bash
-deytefiles sync              # Sync changes with git
-deytefiles bootstrap         # Re-run bootstrap process
+git clone <your-repo-url> ~/.dotfiles
+cd ~/.dotfiles
+python3 bootstrap.py
 ```
 
-## Strap Configuration System
-
-The heart of this dotfiles system is the "strap" framework. Each component has a YAML configuration file that defines how it should be deployed.
-
-### File Naming
-
-Configuration files use platform-specific naming:
-
-- `strap.yaml` - Cross-platform configuration (deployed everywhere)
-- `strap@darwin.yaml` - macOS-specific configuration
-- `strap@linux.yaml` - Linux-specific configuration
-
-The bootstrap process automatically selects the appropriate files for your current platform.
-
-### YAML Format
-
-Basic structure of a strap configuration file:
-
-```yaml
-name: component-name
-link:
-  - file.conf
-  - [source.conf, ~/.config/target.conf]
-copy:
-  - [file.txt, ~/target.txt]
-cron:
-  - ["0 * * * *", "~/script.sh"]
-```
-
-### Entry Formats
-
-The `link` and `copy` sections support multiple formats for flexibility:
-
-#### 1. Simple String (Automatic Target)
-
-```yaml
-link:
-  - config.fish
-  - aliases.fish
-```
-
-The target path is automatically inferred from the directory structure.
-Example: `config.fish` in `.config/fish/` → `~/.config/fish/config.fish`
-
-#### 2. Explicit Target
-
-```yaml
-link:
-  - [source.conf, ~/.config/app/target.conf]
-  - [script.sh, ~/.local/bin/script.sh]
-```
-
-Specify both source and target paths explicitly.
-
-#### 3. Current Directory
-
-```yaml
-link:
-  - [., ~/.config/nvim]
-```
-
-Link the entire directory containing the strap file.
-
-### Examples
-
-**Simple configuration** (`.config/fish/strap.yaml`):
-
-```yaml
-name: fish
-link:
-  - config.fish
-  - aliases.fish
-  - functions.fish
-```
-
-**With explicit targets** (`.config/darkman/strap@linux.yaml`):
-
-```yaml
-name: darkman
-link:
-  - [config.yaml, ~/.config/darkman/config.yaml]
-  - [dark-mode.d, ~/.local/share/dark-mode.d]
-  - [light-mode.d, ~/.local/share/light-mode.d]
-```
-
-**Directory linking** (`.config/nvim/strap.yaml`):
-
-```yaml
-name: nvim
-link:
-  - [., ~/.config/nvim]
-```
-
-**With copy and cron** (`.config/app/strap.yaml`):
-
-```yaml
-name: app
-link:
-  - config.conf
-copy:
-  - [.theme.conf, ~/.config/app/.theme.conf]
-cron:
-  - ["0 * * * *", "~/.local/bin/hourly-sync.sh"]
-```
-
-## deytefiles CLI Reference
-
-The `deytefiles` command is the main interface for managing your dotfiles.
-
-### Commands
-
-#### bootstrap
-
-Run the bootstrap process to deploy all configurations:
+Interactive setup first asks whether to choose configurations or set up everything, then shows a final review. Nothing is selected by default in choose mode. For explicit unattended deployment use:
 
 ```bash
-deytefiles bootstrap        # Full bootstrap with notifications
-deytefiles bootstrap -q     # Quiet mode (no notifications)
+python3 bootstrap.py --all
+deytefiles bootstrap --all
 ```
 
-This command:
+Without `--all`, bootstrap requires an interactive terminal. `deytefiles bootstrap -q` suppresses notifications only.
 
-1. Locates the dotfiles repository
-2. Processes all strap files for your platform
-3. Creates symlinks and copies files
-4. Applies cron jobs
-5. Sends a completion notification
+## Strap files
 
-#### sync
+Accepted filenames are `strap.yaml` and `{id}.strap.yaml`; legacy executable `.strap` files and platform-suffixed names are rejected. Every strap has a name, category, and platform blocks. `generic` combines with the current `linux` or `darwin` block.
 
-Synchronize local changes with the remote git repository:
-
-```bash
-deytefiles sync                    # Auto-commit with timestamp
-deytefiles sync -m "Custom message"  # Custom commit message
-deytefiles sync -f                 # Force push (--force-with-lease)
-deytefiles sync -q                 # Quiet mode (no notifications)
+```yaml
+name: Example
+category: Desktop
+platforms:
+  generic:
+    link:
+      - config.ini
+  linux:
+    copy:
+      - [theme.ini, ~/.config/example/theme.ini]
 ```
 
-This command:
+Links accept a source string or `[source, target]`. Concise targets mirror the repository path beneath the home directory. Ordinary copies create missing targets, report matching targets as current, and leave conflicting targets unchanged. Forced copies explicitly authorize replacement:
 
-1. Stages all changes (`git add -A`)
-2. Creates a commit (with timestamp or custom message)
-3. Pulls with rebase from origin
-4. Pushes changes to remote
-5. Handles conflicts gracefully
-6. Sends a notification on completion or failure
-
-### Options
-
-- `-q, --quiet` - Suppress desktop notifications
-- `-m, --message MESSAGE` - Custom commit message for sync
-- `-f, --force` - Use `--force-with-lease` when pushing
-
-## Repository Structure
-
-```text
-.dotfiles/
-├── bootstrap.py              # Main bootstrap script
-├── strap.yaml                # Root configuration
-├── .config/                  # Application configurations
-│   ├── fish/
-│   │   ├── strap.yaml        # Fish shell config
-│   │   ├── config.fish
-│   │   ├── aliases.fish
-│   │   └── functions.fish
-│   ├── nvim/
-│   │   └── strap.yaml        # Neovim config
-│   ├── yabai/
-│   │   └── strap@darwin.yaml # macOS-only
-│   └── hypr/
-│       └── strap@linux.yaml  # Linux-only
-├── .hammerspoon/
-│   └── strap@darwin.yaml     # Hammerspoon (macOS)
-├── .local/
-│   ├── bin/
-│   │   ├── strap.yaml
-│   │   ├── deytefiles        # CLI command
-│   │   ├── copy              # Utility scripts
-│   │   └── git-semantic
-│   └── share/
-│       └── dotfiles/
-│           ├── utils.py      # Core utilities
-│           ├── cli/          # CLI implementation
-│           └── vendor/       # Vendored dependencies
-│               └── yaml_parser.py
-└── README.md
+```yaml
+name: Shared skills
+category: Agent Harness
+platforms:
+  generic:
+    copy:
+      - source: skills
+        target: ~/.agents/skills
+        force: true
 ```
 
-## Technical Details
+A forced directory copy overlays same-named managed children when its destination is a real directory, preserving unrelated children. If its destination root is missing, a file, or a symlink, bootstrap atomically replaces the root with a real full-directory copy. Links may replace reviewed conflicts. All filesystem changes are planned before execution and stale state aborts safely.
 
-### Vendored YAML Parser
+Cron entries are owned by individually marked strap sections. Selecting one strap updates only that section; Complete mode and `--all` reconcile all managed sections while preserving unmanaged crontab content.
 
-This dotfiles system includes a custom, minimal YAML parser that requires no external dependencies. This means you can bootstrap on any system with Python 3 installed, without needing pip or internet access.
+## Agent harness
 
-The parser supports all features needed for strap files:
+The harness parts are independently selectable.
 
-- Key-value pairs (strings, numbers, booleans)
-- Lists (block and flow style)
-- Nested structures
-- Comments
+| Strap | Destinations |
+| --- | --- |
+| OpenCode | `~/.config/opencode/opencode.jsonc` |
+| Shared skills | `~/.config/opencode/skills`, `~/.agents/skills`, `~/.claude/skills` |
+| Shared instructions | `~/.config/opencode/AGENTS.md`, `~/.codex/AGENTS.md`, `~/.claude/CLAUDE.md`, `~/.gemini/GEMINI.md` |
+| Codex agents | `~/.codex/agents` |
 
-### Cron Job Management
+## Vendored dependencies
 
-The system can automatically manage cron jobs through the `cron` section in strap files. Features:
-
-- **Validation**: All cron expressions are validated before applying
-- **Isolated Section**: Jobs are placed in a dedicated section marked with comments
-- **Automatic Rollback**: If cron installation fails, the original crontab is restored
-- **Platform Support**: Works on macOS and Linux
-
-Example cron section in crontab:
-
-```cron
-# BEGIN DEYTENIT DOTFILES STRAP CRON
-0 * * * * ~/.local/bin/hourly-sync.sh
-*/30 * * * * ~/.local/bin/backup.sh
-# END DEYTENIT DOTFILES STRAP CRON
-```
-
-### Notification System
-
-Desktop notifications use native OS facilities:
-
-- **macOS**: AppleScript via `osascript`
-- **Linux**: `notify-send` (works with dunst, mako, notification-daemon, etc.)
-
-Notifications can be disabled with the `-q/--quiet` flag.
-
-### Context-Aware Execution
-
-The `deytefiles` command automatically determines the repository location based on its installation path, allowing it to work from any directory on your system. This is achieved through:
-
-1. The `deytefiles` script calculates the repo root from its own location
-2. All git operations use the repo path explicitly
-3. Commands work regardless of your current working directory
-
-## Footnotes
-
-- <a name="footnote-1">[1]</a>: eng. Shell Magic _(Standard Galactic Alphabet)_
+Questionary 2.1.1, prompt-toolkit 3.0.52, and wcwidth 0.8.2 are embedded as wheels. Their checksums, licenses, upstream projects, and embedded notices are listed in `.local/share/dotfiles/vendor/THIRD_PARTY_LICENSES.md`.

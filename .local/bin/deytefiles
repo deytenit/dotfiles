@@ -40,6 +40,7 @@ def create_parser():
         action='store_true',
         help='Suppress notifications'
     )
+    bootstrap_parser.add_argument('--all', action='store_true', help='Set up every configuration without interactive prompts')
     
     # Pull command
     subparsers.add_parser(

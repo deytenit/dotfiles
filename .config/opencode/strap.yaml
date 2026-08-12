@@ -1,10 +1,7 @@
-name: opencode
-link:
-  - opencode.jsonc
-  - skills
-  - AGENTS.md
-  - [AGENTS.md, ~/.codex/AGENTS.md]
-  - [skills, ~/.codex/skills/skills]
-  - [agents/codex, ~/.codex/agents]
-  - [AGENTS.md, ~/.gemini/GEMINI.md]
-  - [skills, ~/.gemini/skills]
+name: OpenCode
+category: Agent Harness
+description: OpenCode application settings
+platforms:
+  generic:
+    link:
+      - opencode.jsonc

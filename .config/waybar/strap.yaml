@@ -1,0 +1,13 @@
+name: Waybar
+category: Desktop
+description: Linux status bar and themes
+platforms:
+  linux:
+    link:
+      - scripts
+      - config.jsonc
+      - [../../themes/rainby/powering/waybar/rainby-dark.css, ~/.config/waybar/dark.css]
+      - [../../themes/rainby/powering/waybar/rainby-light.css, ~/.config/waybar/light.css]
+      - style.css
+    copy:
+      - [.theme.css, ~/.config/waybar/.theme.css]

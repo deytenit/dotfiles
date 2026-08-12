@@ -1,0 +1,7 @@
+name: XDG desktop portal
+category: Desktop
+description: Desktop integration portal
+platforms:
+  linux:
+    link:
+      - portals.conf

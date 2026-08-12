@@ -1,0 +1,22 @@
+name: Rofi
+category: Desktop
+description: Application launcher and menus
+platforms:
+  linux:
+    link:
+      - bin
+      - config/askpass.rasi
+      - config/bluetooth.rasi
+      - config/confirm.rasi
+      - config/dark.rasi
+      - config/font.rasi
+      - config/launcher.rasi
+      - config/light.rasi
+      - config/mpd.rasi
+      - config/network.rasi
+      - config/networkmenu.rasi
+      - config/powermenu.rasi
+      - config/runner.rasi
+      - config/screenshot.rasi
+    copy:
+      - config/.theme.rasi

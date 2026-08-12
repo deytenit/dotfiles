@@ -1,6 +1,9 @@
-name: fish
-link:
-  - config.fish
-  - aliases.fish
-  - functions.fish
-
+name: Fish
+category: Shell
+description: Interactive shell configuration
+platforms:
+  generic:
+    link:
+      - config.fish
+      - aliases.fish
+      - functions.fish

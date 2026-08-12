@@ -49,6 +49,7 @@ assets/**
 .config/waybar/**
 !.config/waybar/**/*
 .config/waybar/.*
+!.config/waybar/.theme.css
 
 # Zellij
 !.config/zellij
@@ -110,7 +111,13 @@ assets/**
 !.gemini
 .gemini/**
 !.gemini/settings.json
-!.gemini/skills
+
+# Codex
+!.codex
+.codex/**
+!.codex/strap.yaml
+!.codex/agents/
+!.codex/agents/**
 
 # Still to ignore
 __pycache__

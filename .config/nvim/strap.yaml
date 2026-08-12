@@ -1,4 +1,7 @@
-name: nvim
-link:
-  - [., ~/.config/nvim]
-
+name: Neovim
+category: Editor
+description: Editor configuration and plugins
+platforms:
+  generic:
+    link:
+      - [., ~/.config/nvim]

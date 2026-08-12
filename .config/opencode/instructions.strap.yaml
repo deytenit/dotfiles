@@ -1,0 +1,18 @@
+name: Shared instructions
+category: Agent Harness
+description: Shared agent guidance
+platforms:
+  generic:
+    copy:
+      - source: AGENTS.md
+        target: ~/.config/opencode/AGENTS.md
+        force: true
+      - source: AGENTS.md
+        target: ~/.codex/AGENTS.md
+        force: true
+      - source: AGENTS.md
+        target: ~/.claude/CLAUDE.md
+        force: true
+      - source: AGENTS.md
+        target: ~/.gemini/GEMINI.md
+        force: true

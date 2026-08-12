@@ -47,10 +47,10 @@ class BootstrapCommand(BaseCommand):
             log_info(f"Executing: {bootstrap_script}")
             
             # Run bootstrap.py
-            result = subprocess.run(
-                [sys.executable, str(bootstrap_script)],
-                check=False
-            )
+            command = [sys.executable, str(bootstrap_script)]
+            if getattr(self.args, 'all', False):
+                command.append('--all')
+            result = subprocess.run(command, check=False)
             
             if result.returncode == 0:
                 log_success("Bootstrap completed successfully!")
@@ -80,4 +80,3 @@ class BootstrapCommand(BaseCommand):
                 success=False
             )
             return 1
-
