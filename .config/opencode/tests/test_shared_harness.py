@@ -82,22 +82,42 @@ class SharedHarnessTest(unittest.TestCase):
         self.assertIn("closest applicable project instructions", lowered)
         self.assertIn("comments that merely restate the code", lowered)
 
-    def test_straps_declare_split_harness_mappings(self):
+    def test_straps_link_individual_skill_entries_and_agents_but_copy_instructions(self):
         opencode = yaml_parser.safe_load((ROOT / "strap.yaml").read_text(encoding="utf-8"))
         skills = yaml_parser.safe_load((ROOT / "skills.strap.yaml").read_text(encoding="utf-8"))
         instructions = yaml_parser.safe_load((ROOT / "instructions.strap.yaml").read_text(encoding="utf-8"))
         codex = yaml_parser.safe_load((DOTFILES / ".codex" / "strap.yaml").read_text(encoding="utf-8"))
+        skill_entries = [
+            ("skills/_shared/artifact-policy.md", "_shared/artifact-policy.md"),
+            *[(f"skills/{name}", name) for name in sorted(PORTABLE_SKILLS)],
+        ]
+        skill_targets = (
+            "~/.config/opencode/skills",
+            "~/.agents/skills",
+            "~/.claude/skills",
+        )
         self.assertEqual(opencode["platforms"]["generic"]["link"], ["opencode.jsonc"])
         self.assertEqual(skills["platforms"]["generic"], {
             "link": [
-                ["skills", "~/.config/opencode/skills"],
-                ["skills", "~/.agents/skills"],
-                ["skills", "~/.claude/skills"],
+                [source, f"{target}/{relative_target}"]
+                for target in skill_targets
+                for source, relative_target in skill_entries
             ],
         })
-        self.assertEqual(len(instructions["platforms"]["generic"]["copy"]), 4)
+        self.assertEqual(instructions["platforms"]["generic"], {
+            "copy": [
+                {"source": "AGENTS.md", "target": "~/.config/opencode/AGENTS.md", "force": True},
+                {"source": "AGENTS.md", "target": "~/.codex/AGENTS.md", "force": True},
+                {"source": "AGENTS.md", "target": "~/.claude/CLAUDE.md", "force": True},
+                {"source": "AGENTS.md", "target": "~/.gemini/GEMINI.md", "force": True},
+            ],
+        })
         self.assertEqual(codex["platforms"]["generic"], {
-            "link": [["agents", "~/.codex/agents"]],
+            "link": [
+                ["agents/checker.toml", "~/.codex/agents/checker.toml"],
+                ["agents/implementer.toml", "~/.codex/agents/implementer.toml"],
+                ["agents/researcher.toml", "~/.codex/agents/researcher.toml"],
+            ],
         })
 
     def test_skill_entries_are_local_directories(self):

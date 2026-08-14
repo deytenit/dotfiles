@@ -4,4 +4,6 @@ description: Codex role definitions
 platforms:
   generic:
     link:
-      - [agents, ~/.codex/agents]
+      - [agents/checker.toml, ~/.codex/agents/checker.toml]
+      - [agents/implementer.toml, ~/.codex/agents/implementer.toml]
+      - [agents/researcher.toml, ~/.codex/agents/researcher.toml]
