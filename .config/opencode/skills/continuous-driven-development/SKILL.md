@@ -9,7 +9,11 @@ Critically review an approved plan, then execute it continuously with dependency
 
 ## Input Gate
 
-Accept the plan only when the caller supplies an absolute path whose normalized location is within `~/.agents/docs`. Reject a relative path or a path outside that directory and ask for the correct artifact path.
+Accept the plan only when the caller supplies an absolute path whose normalized location is within `~/.agents/docs`. A solve handoff may also supply an optional latest manifest at an absolute path within `~/.agents/docs`. For direct invocation, reject a relative path or a path outside that directory and ask for the correct artifact path.
+
+## Solve Handoff
+
+When a solve handoff supplies a manifest, re-read it during preflight and whenever context or external state changes. Return a critical concern or blocker to `solve` rather than asking the user. After execution, return `status: done | blocked`, `latest_manifest: absolute path`, `artifact: absolute execution-evidence path`, and concise `evidence_or_blocker` to `solve`. Do not publish branch state or claim end-to-end completion.
 
 ## Preflight Before Edits
 
@@ -17,7 +21,7 @@ Accept the plan only when the caller supplies an absolute path whose normalized 
 2. Read the applicable project instructions and the files needed to validate the plan's assumptions.
 3. Critically review scope, exact paths, responsibilities, interfaces, dependency order, verification commands, and expected results.
 4. Surface contradictions, unsafe actions, missing prerequisites, stale assumptions, or ambiguity that could change the implementation.
-5. Resolve critical concerns with the user before editing. Do not guess or silently rewrite the plan.
+5. For direct invocation, resolve critical concerns with the user before editing. For a solve handoff, return the concern and evidence to `solve`. Do not guess or silently rewrite the plan.
 
 ## Continuous Execution
 

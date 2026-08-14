@@ -3,13 +3,7 @@ category: Agent Harness
 description: Portable agent workflows
 platforms:
   generic:
-    copy:
-      - source: skills
-        target: ~/.config/opencode/skills
-        force: true
-      - source: skills
-        target: ~/.agents/skills
-        force: true
-      - source: skills
-        target: ~/.claude/skills
-        force: true
+    link:
+      - [skills, ~/.config/opencode/skills]
+      - [skills, ~/.agents/skills]
+      - [skills, ~/.claude/skills]

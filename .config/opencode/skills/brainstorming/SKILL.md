@@ -1,17 +1,21 @@
 ---
 name: brainstorming
-description: A user-invoked workflow for turning an idea into an approved design before implementation
+description: Use when the user explicitly requests design exploration or a solve handoff identifies material ambiguity that requires human decisions before implementation
 ---
 
 # Brainstorming Ideas Into Designs
 
 Turn an idea into an approved, durable design before implementation begins.
 
-Run this workflow only when the user explicitly invokes it. Once active, it may transition to `writing-plans` through the workflow below.
+Run this workflow only when the user explicitly requests it directly or when a high-ambiguity solve handoff identifies material decisions that require human approval. Once active, it may transition to `writing-plans` through the workflow below.
 
 <HARD-GATE>
 Do not write code, scaffold files, or take any other implementation action until the exact written design artifact has been reviewed and approved. Perceived simplicity is not an exception; a simple design may be brief, but the gate still applies.
 </HARD-GATE>
+
+## Solve Handoff
+
+Read the latest manifest supplied by a high-ambiguity solve handoff before design work. Interactive clarification and artifact approvals remain mandatory. After the user approves the exact design artifact, return `status: done | blocked`, `latest_manifest: absolute path`, `artifact: absolute design path`, and concise `evidence_or_blocker` to `solve`; do not independently select an execution route or finalize branch state.
 
 ## Workflow
 

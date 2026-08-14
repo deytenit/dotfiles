@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solve"
+  short_description: "Autonomous task-to-draft-review workflow"
+  default_prompt: "Use $solve to complete this assignment end to end."

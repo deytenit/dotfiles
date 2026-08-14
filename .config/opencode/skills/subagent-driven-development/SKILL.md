@@ -24,6 +24,12 @@ YYYY-MM-DD-HHMMSS-subagent-driven-development-<plan-slug>-task-<N>-review-correc
 
 The initial implementation uses the task report name. Each correction round gets a fresh, uniquely named correction report; never replace an earlier report. Give that report path to the correcting implementer and pass the same path to the scoped re-review. Each progress update is also a fresh, uniquely named artifact; the latest one is the recovery record. Record a task as complete only after its review passes.
 
+When a solve handoff supplies a manifest, preserve its absolute path in every progress document, task brief, implementer report, review document, and recovery record.
+
+## Solve Handoff
+
+When a solve handoff supplies a manifest, return `status: done | blocked`, `latest_manifest: absolute path`, `artifact: absolute integrated review-and-verification path`, and concise `evidence_or_blocker` to `solve`. Do not invoke a finishing workflow or claim end-to-end completion.
+
 ## Lifecycle
 
 1. Read the plan once. Before dispatch, reject internal contradictions and requirements that conflict with applicable constraints.

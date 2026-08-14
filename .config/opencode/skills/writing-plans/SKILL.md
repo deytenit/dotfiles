@@ -9,11 +9,15 @@ Create an implementation plan that a capable engineer can execute without hidden
 
 ## Input and Scope
 
-- Start from an approved specification and retain its absolute path in the plan.
+- Start from an approved specification and retain its absolute path in the plan, or from a low-ambiguity solve manifest whose assignment is the authorized specification.
 - Read applicable project instructions, the approved specification, and the relevant source before planning changes.
 - If the specification contains independent subsystems that cannot form one coherent, testable delivery, split it into ordered plans instead of hiding the decomposition inside oversized tasks.
 
-Before writing the plan, read ../_shared/artifact-policy.md and follow it. Reference the approved spec by absolute path. Save the plan artifact, self-review it, then offer subagent-driven-development for independent tasks or continuous-driven-development for inline execution. Do not require workspace isolation, a branch operation, or a save-to-VCS step.
+Before writing the plan, read ../_shared/artifact-policy.md and follow it. Reference the approved spec by absolute path when one exists. Save the plan artifact and self-review it. For direct invocation, then offer subagent-driven-development for independent tasks or continuous-driven-development for inline execution. Do not require workspace isolation, a branch operation, or a save-to-VCS step.
+
+## Solve Handoff
+
+When a solve handoff supplies a manifest, preserve its absolute path and shape the plan for its recorded route without offering a choice. A continuous plan uses one primary-agent sequence. A subagent plan defines bounded task ownership, role intent, dependencies, and review points. After self-review, return `status: done | blocked`, `latest_manifest: absolute path`, `artifact: absolute plan path`, and concise `evidence_or_blocker` to `solve`.
 
 ## File Responsibility Map
 
@@ -55,4 +59,4 @@ Before handing off the saved plan, review and fix it in place:
 4. **Dependency order:** Confirm every prerequisite is produced before it is consumed and that each task ends in a verifiable state.
 5. **Verification quality:** Confirm every relevant change has a discovered project-declared command and a concrete expected result.
 
-Report the absolute plan artifact path, then offer the two execution choices named in the output contract.
+For direct invocation, report the absolute plan artifact path, then offer the two execution choices named in the output contract. For a solve handoff, return the plan and manifest to `solve` without offering a choice.

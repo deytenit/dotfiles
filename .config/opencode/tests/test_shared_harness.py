@@ -20,12 +20,14 @@ PORTABLE_SKILLS = {
     "brainstorming",
     "continuous-driven-development",
     "dispatching-parallel-agents",
+    "finishing-a-development-branch",
     "grill-me",
     "grilling",
     "handoff",
     "receiving-code-review",
     "requesting-code-review",
     "research",
+    "solve",
     "subagent-driven-development",
     "systematic-debugging",
     "test-driven-development",
@@ -37,17 +39,20 @@ PORTABLE_SKILLS = {
 
 ARTIFACT_PRODUCERS = {
     "brainstorming",
+    "finishing-a-development-branch",
     "handoff",
     "research",
+    "solve",
     "subagent-driven-development",
     "to-questionnaire",
     "writing-plans",
 }
 
 DISALLOWED_SKILL_PATTERNS = {
-    "fixed VCS": re.compile(r"(?i)\bgit\b"),
+    "named VCS": re.compile(
+        r"(?i)\b(?:git|svn|subversion|mercurial|perforce|fossil)\b|(?<!\w)hg(?!\w)"
+    ),
     "worktree workflow": re.compile(r"(?i)\bworktrees?\b"),
-    "fixed commit workflow": re.compile(r"(?i)\bcommits?|committed|committing\b"),
     "Claude-specific wording": re.compile(r"(?i)\bclaude(?: code)?\b"),
     "Copilot-specific wording": re.compile(r"(?i)\bcopilot(?: cli)?\b"),
     "fixed task API": re.compile(r"(?i)\bTodoWrite\b|\bTask tool\b"),
@@ -65,6 +70,9 @@ PRIVATE_BUNDLE_PATTERNS = {
 
 
 class SharedHarnessTest(unittest.TestCase):
+    def skill_text(self, name):
+        return (SKILLS / name / "SKILL.md").read_text(encoding="utf-8")
+
     def test_personal_agents_is_portable(self):
         text = AGENTS.read_text(encoding="utf-8")
         lowered = text.lower()
@@ -80,9 +88,17 @@ class SharedHarnessTest(unittest.TestCase):
         instructions = yaml_parser.safe_load((ROOT / "instructions.strap.yaml").read_text(encoding="utf-8"))
         codex = yaml_parser.safe_load((DOTFILES / ".codex" / "strap.yaml").read_text(encoding="utf-8"))
         self.assertEqual(opencode["platforms"]["generic"]["link"], ["opencode.jsonc"])
-        self.assertEqual(len(skills["platforms"]["generic"]["copy"]), 3)
+        self.assertEqual(skills["platforms"]["generic"], {
+            "link": [
+                ["skills", "~/.config/opencode/skills"],
+                ["skills", "~/.agents/skills"],
+                ["skills", "~/.claude/skills"],
+            ],
+        })
         self.assertEqual(len(instructions["platforms"]["generic"]["copy"]), 4)
-        self.assertEqual(codex["platforms"]["generic"]["copy"][0]["target"], "~/.codex/agents")
+        self.assertEqual(codex["platforms"]["generic"], {
+            "link": [["agents", "~/.codex/agents"]],
+        })
 
     def test_skill_entries_are_local_directories(self):
         external = sorted(
@@ -120,6 +136,15 @@ class SharedHarnessTest(unittest.TestCase):
                         failures.append(f"{path.relative_to(SKILLS)}: {label}")
         self.assertEqual(failures, [])
 
+    def test_named_vcs_guard_catches_provider_assumptions(self):
+        pattern = DISALLOWED_SKILL_PATTERNS["named VCS"]
+        for text in ("git commit", "svn commit", "hg commit", "perforce submit", "fossil commit"):
+            with self.subTest(text=text):
+                self.assertRegex(text, pattern)
+        for text in ("semantic commit", "state-management capability", "safe synchronization"):
+            with self.subTest(text=text):
+                self.assertNotRegex(text, pattern)
+
     def test_public_bundle_contains_no_private_scope_markers(self):
         paths = [
             AGENTS,
@@ -155,8 +180,10 @@ class SharedHarnessTest(unittest.TestCase):
 
     def test_brainstorming_is_user_invoked_and_transitions_to_planning(self):
         text = (SKILLS / "brainstorming" / "SKILL.md").read_text(encoding="utf-8")
-        self.assertRegex(text, r"(?m)^description:\s*A user-invoked\b")
-        self.assertIn("only when the user explicitly invokes it", text.lower())
+        lowered = text.lower()
+        self.assertRegex(text, r"(?m)^description:\s*Use when\b")
+        self.assertIn("user explicitly requests", lowered)
+        self.assertIn("solve handoff", lowered)
         self.assertIn("use `writing-plans`", text)
 
     def test_skills_readme_documents_codex_workflow_and_credits(self):
@@ -168,10 +195,12 @@ class SharedHarnessTest(unittest.TestCase):
             "`implementer`",
             "`researcher`",
             "`checker`",
+            "`solve`",
             "`brainstorming`",
             "`writing-plans`",
             "`continuous-driven-development`",
             "`subagent-driven-development`",
+            "`finishing-a-development-branch`",
             "`requesting-code-review`",
             "`verification-before-completion`",
         ):
@@ -222,6 +251,68 @@ class SharedHarnessTest(unittest.TestCase):
                 self.assertTrue(data["description"])
                 self.assertIn("Do not spawn", data["developer_instructions"])
                 self.assertNotRegex(data["developer_instructions"].lower(), r"\bgit\b|worktree")
+
+    def test_solve_declares_autonomous_routes_and_manifest(self):
+        text = self.skill_text("solve")
+        lowered = text.lower()
+        self.assertIn("../_shared/artifact-policy.md", text)
+        self.assertIn("finishing-a-development-branch", text)
+        self.assertIn("continuous-driven-development", text)
+        self.assertIn("brainstorming", text)
+        self.assertIn("subagent-driven-development", text)
+        self.assertIn("only `brainstorming`", lowered)
+        self.assertIn("manifest-schema.md", text)
+        self.assertIn("environment-discovery.md", text)
+        self.assertIn("routing.md", text)
+
+    def test_finishing_is_autonomous_state_finalization_only(self):
+        text = self.skill_text("finishing-a-development-branch")
+        lowered = text.lower()
+        self.assertIn("../_shared/artifact-policy.md", text)
+        self.assertIn("preservation", lowered)
+        self.assertIn("delivery", lowered)
+        self.assertIn("semantic", lowered)
+        self.assertIn("draft", lowered)
+        self.assertIn("unassigned", lowered)
+        self.assertIn("expected-state", lowered)
+        self.assertIn("does not run", lowered)
+        for forbidden in ("npm test", "cargo test", "pytest", "go test", "present options", "which option"):
+            self.assertNotIn(forbidden, lowered)
+
+    def test_solve_references_are_direct_and_present(self):
+        text = self.skill_text("solve")
+        links = re.findall(r"\[[^]]+\]\(([^)]+\.md)\)", text)
+        self.assertEqual(
+            set(links),
+            {"manifest-schema.md", "environment-discovery.md", "routing.md", "../_shared/artifact-policy.md"},
+        )
+        for link in links:
+            self.assertTrue((SKILLS / "solve" / link).resolve().is_file())
+
+    def test_solve_handoffs_are_declared(self):
+        brainstorming = self.skill_text("brainstorming").lower()
+        planning = self.skill_text("writing-plans").lower()
+        continuous = self.skill_text("continuous-driven-development").lower()
+        subagent = self.skill_text("subagent-driven-development").lower()
+        self.assertIn("solve handoff", brainstorming)
+        self.assertIn("solve handoff", planning)
+        self.assertIn("solve handoff", continuous)
+        self.assertIn("solve handoff", subagent)
+        self.assertIn("return", continuous)
+        self.assertIn("return", subagent)
+
+    def test_solve_manifest_records_authority_identity_and_terminal_result(self):
+        text = (SKILLS / "solve" / "manifest-schema.md").read_text(encoding="utf-8")
+        self.assertIn("- Solve authorization", text)
+        self.assertIn("- Branch-name derivation", text)
+        self.assertIn("- Terminal result", text)
+
+    def test_silent_review_has_non_notifying_fallback(self):
+        finishing = self.skill_text("finishing-a-development-branch").lower()
+        discovery = (SKILLS / "solve" / "environment-discovery.md").read_text(encoding="utf-8").lower()
+        for text in (finishing, discovery):
+            self.assertIn("non-draft", text)
+            self.assertIn("non-notifying", text)
 
 
 if __name__ == "__main__":
