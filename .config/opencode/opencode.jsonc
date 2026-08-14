@@ -1,0 +1,24 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "ermnvldmr/qwen3.5:4b",
+  "enabled_providers": ["ermnvldmr"],
+  "provider": {
+    "ermnvldmr": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "ai.ermnvldmr.com (Open WebUI)",
+      "options": {
+        "baseURL": "https://ai.ermnvldmr.com/api/v1",
+        "apiKey": "{env:OPENCODE_ERMNVLDMR_API_KEY}"
+      },
+      "models": {
+        "qwen3.5:4b": {
+          "name": "Qwen 3.5 4B (Default)"
+        },
+        "llama3.2:3b": {
+          "name": "Llama 3.2 3B (Fallback)"
+        }
+      }
+    }
+  },
+  "plugin": []
+}
