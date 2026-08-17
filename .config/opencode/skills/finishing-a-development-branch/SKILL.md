@@ -11,6 +11,8 @@ Store the current branch state autonomously so the workspace can be released for
 
 Explicit invocation authorizes state inspection, semantic commits, safe branch synchronization, and draft unassigned review publication. This skill does not run tests, builds, linters, project commands, implementation checks, requirements review, or judge correctness.
 
+For each commit and review request, write only a title: use one single-line message and leave the description or body empty.
+
 Never merge, assign reviewers, discard work, delete branches, rewrite unrelated history, or destructively clean a workspace. Completion means branch state is durably stored; it does not mean the software is correct.
 
 Before writing an outcome, read and follow [the shared artifact policy](../_shared/artifact-policy.md).
@@ -28,10 +30,10 @@ Before writing an outcome, read and follow [the shared artifact policy](../_shar
 4. When preservation starts on the semantic base or detached state with pending changes, create a factual collision-safe preservation branch. Complete this step when the state has a named recoverable identity.
 5. Use discovered inspection capabilities to apply ignore rules and inspect pending content for credentials, private keys, and tokens. Unsafe content blocks revision storage and publication with path evidence. If ignore or content inspection is unavailable, record an unsafe blocker rather than assuming the pending state is safe.
 6. Through the native revision-capture mechanism, select every intended non-ignored change and split changes only into coherent semantic units. Prove the mechanism targets the preservation or task line and captures the complete intended set. Complete this step when no intended file is omitted or an unsafe capture gap is recorded.
-7. Follow declared commit conventions or use a concise semantic subject. Prefix the exact ticket identifier when known. Make preservation subjects explicitly describe preserved work. Create no empty commit and do not rewrite existing commits without need.
+7. Choose commit and review request titles by issue context. When an exact issue identifier is known, format each commit title as `<issue identifier>: <imperative short title starting with a verb>` and the review request title as `<issue identifier>: <issue title>`. Without an issue identifier, follow declared title conventions or use a concise semantic title. Make preservation titles explicitly describe preserved work. Create no empty commit and do not rewrite existing commits without need.
 8. When the mapped commit capability exists, store every intended change on the proven target line and require no intended pending state before reporting safe release. Safe release depends on durable state only; do not require project verification or optional remote/review publication. Without commit capability, record exact local state and report unsafe release.
 9. Publish a new task line when supported. Before synchronizing divergent state, prove the direction, target peer, task lineage, and peer revision, then use the capability's native expected-state protection. On stale-state rejection, re-inspect and repeat the proof or record synchronization unavailable. Never overwrite unknown provenance.
-10. Reuse an active review request or create a draft unassigned request using discovered templates and conventions. When draft state is unavailable, create an unassigned non-draft request only when authoritative platform semantics prove it is non-notifying. Otherwise record review publication as unavailable.
+10. Reuse an active review request or create a draft unassigned request with the title required by step 7, applying discovered templates and conventions only when compatible with the title-only boundary. When draft state is unavailable, create an unassigned non-draft request only when authoritative platform semantics prove it is non-notifying. Otherwise record review publication as unavailable.
 11. Write a `Branch Finalization Outcome v1` artifact and return its absolute path. Complete this step when durability, limitations, and release status are explicit.
 
 ## Capability Gaps

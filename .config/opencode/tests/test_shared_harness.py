@@ -95,6 +95,7 @@ class SharedHarnessTest(unittest.TestCase):
             "~/.config/opencode/skills",
             "~/.agents/skills",
             "~/.claude/skills",
+            "~/.gemini/skills",
         )
         self.assertEqual(opencode["platforms"]["generic"]["link"], ["opencode.jsonc"])
         self.assertEqual(skills["platforms"]["generic"], {

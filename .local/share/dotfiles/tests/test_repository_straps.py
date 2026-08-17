@@ -21,13 +21,20 @@ class RepositoryStrapsTest(unittest.TestCase):
         self.assertFalse(any(re.search(r"strap@|\.strap$", path.name) for path in ROOT.rglob("*")))
         harness = {item.name: item for item in linux if item.category == "Agent Harness"}
         self.assertEqual(set(harness), {"OpenCode", "Shared skills", "Shared instructions", "Codex agents"})
+        skills = ROOT / ".config/opencode/skills"
+        skill_entries = {
+            Path("_shared/artifact-policy.md"),
+            *(path.relative_to(skills) for path in skills.iterdir() if path.is_dir() and path.name != "_shared"),
+        }
+        skill_targets = (
+            home / ".config/opencode/skills",
+            home / ".agents/skills",
+            home / ".claude/skills",
+            home / ".gemini/skills",
+        )
         self.assertEqual(
             {op.target.as_posix() for op in harness["Shared skills"].file_operations},
-            {
-                str(home / ".config/opencode/skills"),
-                str(home / ".agents/skills"),
-                str(home / ".claude/skills"),
-            },
+            {str(target / entry) for target in skill_targets for entry in skill_entries},
         )
         self.assertEqual({op.target.as_posix() for op in harness["Shared instructions"].file_operations}, {str(home / ".config/opencode/AGENTS.md"), str(home / ".codex/AGENTS.md"), str(home / ".claude/CLAUDE.md"), str(home / ".gemini/GEMINI.md")})
 
