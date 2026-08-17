@@ -3,8 +3,7 @@
     "lazyvim.plugins.extras.lang.astro",
     "lazyvim.plugins.extras.lang.clangd",
     "lazyvim.plugins.extras.lang.dotnet",
-    "lazyvim.plugins.extras.lang.tailwind",
-    "lazyvim.plugins.extras.util.project"
+    "lazyvim.plugins.extras.lang.tailwind"
   ],
   "install_version": 7,
   "news": {

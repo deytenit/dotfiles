@@ -3,6 +3,7 @@
 -- Add any additional options here
 
 vim.opt.backup = false
+vim.opt.exrc = true
 vim.opt.wrap = false
 vim.opt.mouse = ""
 
@@ -53,4 +54,3 @@ elseif is_wsl() then
     },
   }
 end
-
