@@ -11,6 +11,42 @@ if [[ "$MODE" != "dark" && "$MODE" != "light" ]]; then
     exit 1
 fi
 
+mkdir -p "$HOME/.cache"
+echo "$MODE" > "$HOME/.cache/hypr_wallpaper_mode"
+
+is_on_ac() {
+    local has_battery=0
+    for b in /sys/class/power_supply/*; do
+        if [[ -f "$b/type" && "$(< "$b/type")" == "Battery" ]]; then
+            has_battery=1
+            break
+        fi
+    done
+
+    # If no battery in system (desktop PC), treat as always on AC
+    if [[ $has_battery -eq 0 ]]; then
+        return 0
+    fi
+
+    # Check for Mains power supplies online
+    for p in /sys/class/power_supply/*; do
+        if [[ -f "$p/type" && "$(< "$p/type")" == "Mains" ]]; then
+            if [[ -f "$p/online" && "$(< "$p/online")" -eq 1 ]]; then
+                return 0
+            fi
+        fi
+    done
+
+    # Fallback to upower if available
+    if command -v upower >/dev/null 2>&1; then
+        if upower -d 2>/dev/null | grep -q "on-battery:\s*no"; then
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
 MONITORS=($(hyprctl -i 0 monitors | grep Monitor | awk '{print $2}'))
 
 # --- 1. Static Wallpaper Fallback / Base Layer ---
@@ -29,12 +65,19 @@ if [[ -d "$STATIC_DIR" ]]; then
 fi
 
 # --- 2. Video Wallpaper ---
+# If running on battery, do not start linux-wallpaperengine to conserve power.
+if ! is_on_ac; then
+    echo "Running on battery power. Keeping static wallpaper and disabling video wallpaper."
+    pkill -f linux-wallpaperengine || true
+    exit 0
+fi
+
 CONFIG_FILE="$HOME/.config/hypr/wallpapers/${MODE}_scenes.txt"
 
 # If linux-wallpaperengine isn't installed or config is missing/empty, we gracefully stop here
 # The static fallback will remain visible.
 if ! command -v linux-wallpaperengine &> /dev/null || [[ ! -s "$CONFIG_FILE" ]]; then
-    pkill -x linux-wallpaperengine # clean up any running engines just in case
+    pkill -f linux-wallpaperengine # clean up any running engines just in case
     exit 0
 fi
 
