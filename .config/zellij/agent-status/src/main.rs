@@ -123,8 +123,8 @@ fn render_line(
 
     let mut output = String::new();
     let badge_width = if cols >= 9 { 9 } else { 0 };
-    let prefix_width = 21.min(cols - badge_width);
-    let (title, title_width) = clipped(" Harness      ", prefix_width);
+    let prefix_width = 16.min(cols - badge_width);
+    let (title, title_width) = clipped(" Harness ", prefix_width);
     if let Some(theme) = style {
         output.push_str(&color(theme.text_unselected.base, false));
         output.push_str(&color(theme.text_unselected.background, true));
@@ -143,7 +143,7 @@ fn render_line(
     let background = style.map(|theme| theme.text_unselected.background);
     let mut previous_bg = background;
     for (index, (text, emphasis)) in segments.iter().enumerate() {
-        if remaining <= if index > 0 { 4 } else { 1 } {
+        if remaining <= if index > 0 { 2 } else { 1 } {
             break;
         }
         let colors = style.map(|theme| {
@@ -158,13 +158,12 @@ fn render_line(
             (ribbon.base, background)
         });
         if index > 0 {
-            if let (Some(previous), Some(gap_bg)) = (previous_bg, background) {
+            if let (Some(previous), Some(background)) = (previous_bg, background) {
                 output.push_str(&color(previous, false));
-                output.push_str(&color(gap_bg, true));
+                output.push_str(&color(background, true));
             }
             output.push('');
-            fill(&mut output, style, 2);
-            remaining -= 3;
+            remaining -= 1;
             previous_bg = background;
         }
         if let (Some(previous), Some((_, next_bg))) = (previous_bg, colors) {
@@ -230,7 +229,7 @@ mod tests {
         agents.insert("codex".to_string(), AgentState { agent: "Codex".to_string(), state: "running".to_string() });
         tabs.insert(1, ("work".to_string(), agents));
 
-        assert_eq!(render_line(&tabs, None, 40), "\u{1b}[1m Harness      STATUS\u{1b}[22m  work ~ C\u{1b}[1m  AI  \u{1b}[22m \u{1b}[0m");
+        assert_eq!(render_line(&tabs, None, 40), "\u{1b}[1m Harness STATUS\u{1b}[22m  work ~ Codex \u{1b}[1m  AI  \u{1b}[22m \u{1b}[0m");
         assert_eq!(render_line(&tabs, None, 8), "\u{1b}[1m Harness\u{1b}[22m\u{1b}[0m");
         assert_eq!(render_line(&tabs, None, 2), "\u{1b}[1m H\u{1b}[22m\u{1b}[0m");
     }
@@ -245,13 +244,16 @@ mod tests {
         }
 
         let plain = render_line(&tabs, None, 80);
-        assert!(plain.starts_with("\u{1b}[1m Harness      STATUS\u{1b}[22m  one * Codex    two * Codex "));
+        assert!(plain.starts_with("\u{1b}[1m Harness STATUS\u{1b}[22m  one * Codex  two * Codex "));
         assert!(plain.ends_with("\u{1b}[1m  AI  \u{1b}[22m \u{1b}[0m"));
+
+        assert_eq!(plain.matches('').count(), 5);
 
         let mut style = Styling::default();
         style.text_unselected.background = PaletteColor::Rgb((38, 38, 38));
+        style.ribbon_unselected.emphasis_2 = PaletteColor::Rgb((100, 150, 200));
         let line = render_line(&tabs, Some(style), 80);
-        assert!(line.contains("\u{1b}[48;2;38;38;38m\u{1b}[38;2;38;38;38m██"));
+        assert!(line.contains(" Codex \u{1b}[38;2;100;150;200m\u{1b}[48;2;38;38;38m\u{1b}[38;2;38;38;38m\u{1b}[48;2;100;150;200m"));
     }
 
     #[test]

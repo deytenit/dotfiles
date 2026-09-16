@@ -8,6 +8,7 @@ return {
       "folke/snacks.nvim",
     },
     opts = {
+      manual_mode = true,
       fzf_lua = { enabled = true },
       snacks = { enabled = true },
     },
