@@ -202,6 +202,26 @@ platforms:
 
 The Agent Harness is split into independently selectable straps. For a Codex setup, choose **Shared skills**, **Shared instructions**, and **Codex agents** during interactive bootstrap.
 
+### Zellij agent status
+
+On another machine, run `python3 bootstrap.py` and select **Zellij** and **Codex status hooks**. The Zellij strap links the Python bridge and prebuilt plugin; the Codex strap links `~/.codex/hooks.json`. Use Zellij 0.45.1 for the supplied plugin, and keep `python3` and `zellij` on `PATH`.
+
+Add this line to `~/.codex/config.toml` to report completed Codex turns:
+
+```toml
+notify = ["sh", "-c", "python3 \"$HOME/.config/zellij/agent-status.py\" codex-notify \"$1\"", "--"]
+```
+
+In Codex, review and trust the hooks with `/hooks`. Add the plugin to the layout's tab template, using the machine's absolute home path:
+
+```kdl
+pane size=1 borderless=true {
+    plugin location="file:/ABSOLUTE/HOME/.config/zellij/plugins/agent-status.wasm"
+}
+```
+
+Other agents can publish status from a Zellij pane with `python3 ~/.config/zellij/agent-status.py emit NAME STATE ID`, where `STATE` is `running`, `waiting`, `done`, `stopped`, or `clear`. Keep any machine-specific layouts and shell settings local.
+
 Forced copies explicitly authorize replacement of managed files while preserving unrelated children in an existing destination directory:
 
 ```yaml

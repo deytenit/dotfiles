@@ -56,6 +56,14 @@ assets/**
 .config/zellij/**
 !.config/zellij/config.kdl
 !.config/zellij/layouts/*.kdl
+!.config/zellij/agent-status.py
+!.config/zellij/agent-status/
+!.config/zellij/agent-status/Cargo.toml
+!.config/zellij/agent-status/Cargo.lock
+!.config/zellij/agent-status/src/
+!.config/zellij/agent-status/src/main.rs
+!.config/zellij/plugins/
+!.config/zellij/plugins/agent-status.wasm
 ## Ignore local (private) layouts
 .config/zellij/layouts/*-local.kdl
 
@@ -116,6 +124,8 @@ assets/**
 !.codex
 .codex/**
 !.codex/strap.yaml
+!.codex/status.strap.yaml
+!.codex/hooks.json
 !.codex/agents/
 !.codex/agents/**
 

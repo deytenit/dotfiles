@@ -102,11 +102,13 @@ Match specificity to risk:
 
 ## Test Before Editing
 
+When the user explicitly requests an instruction change, make that change first. Do not delay it for a baseline behavior test or RED. Review the revised wording and run proportionate checks afterward.
+
 ~~~text
-NO NEW OR CHANGED INSTRUCTION WITHOUT A FAILING BEHAVIOR TEST FIRST
+FOR SELF-DIRECTED INSTRUCTION CHANGES, REQUIRE A FAILING BEHAVIOR TEST FIRST
 ~~~
 
-Before editing instruction text:
+For self-directed instruction changes, before editing instruction text:
 
 1. Define one observable behavior and its pass/fail criterion.
 2. Run a baseline without the skill or proposed instruction.
@@ -196,7 +198,7 @@ create more steering and more ambiguity.
 
 | Mistake | Correction |
 |---|---|
-| Writing before observing a baseline | Restore the old instruction and run RED first |
+| Self-directed writing before observing a baseline | Restore the old instruction and run RED first |
 | Describing the workflow in metadata | Keep only trigger conditions in the description |
 | Putting every branch in the main file | Move branch-only detail behind a precise pointer |
 | Adding vague advice | Replace it with an observable predicate and completion check |
@@ -213,7 +215,7 @@ create more steering and more ambiguity.
 - [ ] Branch-specific detail is behind a direct pointer.
 - [ ] Ordered actions and reference material are separate.
 - [ ] Every required step has a checkable completion criterion.
-- [ ] A baseline without the instruction exposed the intended failure.
+- [ ] For self-directed changes, a baseline without the instruction exposed the intended failure.
 - [ ] The smallest revised instruction passed the original scenario.
 - [ ] A realistic pressure scenario passed.
 - [ ] An adjacent regression scenario passed.
@@ -223,6 +225,6 @@ create more steering and more ambiguity.
 ## Final Rule
 
 ~~~text
-No observed failure -> no justified instruction change.
+No observed failure -> no justified self-directed instruction change.
 No pressure and regression evidence -> behavior is not verified.
 ~~~

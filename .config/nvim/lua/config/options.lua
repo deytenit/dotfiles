@@ -9,6 +9,11 @@ vim.opt.mouse = ""
 
 vim.g.autoformat = false
 
+local python_host = vim.fn.expand("~/.local/share/nvim-python/bin/python")
+if vim.fn.executable(python_host) == 1 then
+  vim.g.python3_host_prog = python_host
+end
+
 if require("util.arc").is_repo() then
   vim.o.fsync = false
 end

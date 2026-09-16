@@ -32,6 +32,12 @@ These are portable personal defaults. Follow higher-priority instructions and th
 - Derive commands from project evidence. Check that a required executable exists before relying on it.
 - Prefer reversible operations. Confirm exact targets before destructive changes.
 
+## Write useful tests
+
+- Test observable behavior, not constants, attributes, or other literals already stated in the tested module.
+- Cover visual appearance with screenshot tests or an equivalent such as Storybook, not unit tests.
+- Use unit tests for interactive behavior and function logic. For components, exercise real user interactions and assert what becomes visible or changes; do not assert their internal implementation.
+
 ## Skills and delegation
 
 - Use a relevant skill when its trigger matches the task.

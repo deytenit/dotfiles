@@ -17,15 +17,17 @@ Write the test first. Watch it fail for the expected reason. Write the smallest 
 
 Use for new behavior, bug fixes, refactoring, and behavior changes.
 
-Possible exceptions require explicit agreement from the user: disposable experiments, generated output, or declarative configuration that has no executable behavior.
+When the user explicitly requests a change, implement it first without requiring a reproduction or failing test. Add proportionate tests afterward and run the relevant checks; do not block the requested change on RED.
+
+Other exceptions require explicit agreement from the user: disposable experiments, generated output, or declarative configuration that has no executable behavior.
 
 ## The Iron Law
 
 ```
-NO PRODUCTION IMPLEMENTATION WITHOUT A FAILING TEST FIRST
+NO PRODUCTION IMPLEMENTATION WITHOUT A FAILING TEST FIRST, EXCEPT FOR AN EXPLICIT USER CHANGE REQUEST
 ```
 
-Implementation written first must be removed and recreated from the test. Do not keep it as a reference, adapt it while writing the test, or treat tests written afterward as equivalent.
+Outside that exception, implementation written first must be removed and recreated from the test. Do not keep it as a reference, adapt it while writing the test, or treat tests written afterward as equivalent.
 
 ## Red-Green-Refactor
 
@@ -103,12 +105,12 @@ Manual exploration can be useful, but it is not a repeatable regression test. Th
 - A production method exists only to support tests.
 - You are calling tests-after "equivalent" or "pragmatic."
 
-Any of these means return to RED. Remove implementation that preceded the test and begin again.
+Outside the explicit-request exception, any of these means return to RED. Remove implementation that preceded the test and begin again.
 
 ## Before Finishing
 
-- Every changed behavior has a focused test that failed first for the expected reason.
-- The implementation is the minimum required by those tests.
+- Every changed behavior has a focused test when warranted. Outside the explicit-request exception, it failed first for the expected reason.
+- The implementation is limited to the requested behavior and any relevant test expectations.
 - Tests exercise real behavior and use independently derived expectations.
 - The mutation check in [writing-good-tests.md](writing-good-tests.md) identifies a test that fails for each realistic regression.
 - Fresh output from the relevant project-declared checks supports any completion claim.
@@ -116,8 +118,6 @@ Any of these means return to RED. Remove implementation that preceded the test a
 ## Final Rule
 
 ```
-Production behavior -> test existed and failed first
-Otherwise -> not test-driven development
+Self-directed production behavior -> test existed and failed first
+Explicit user change request -> implement first, then verify and add proportionate tests
 ```
-
-No exception without explicit user agreement.

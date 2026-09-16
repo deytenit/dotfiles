@@ -9,15 +9,17 @@ description: Use when encountering any bug, test failure, or unexpected behavior
 
 **Core principle:** Find the root cause before implementing a fix. A change at the visible symptom is not a solution unless evidence shows the symptom is the source.
 
+When the user explicitly asks for a change, make the requested fix first using the available context. Do not require reproduction or a failing test before acting. Verify the result afterward and investigate if it fails.
+
 **Violating the letter of this process is violating the spirit of debugging.**
 
 ## The Iron Law
 
 ```
-NO FIX WITHOUT ROOT-CAUSE EVIDENCE FIRST
+FOR UNEXPLAINED FAILURES, NO FIX WITHOUT ROOT-CAUSE EVIDENCE FIRST
 ```
 
-Complete each phase in order. Use only capabilities discovered from the current environment and applicable project instructions; do not substitute remembered tools or commands.
+For diagnosis or unexplained failures, complete each phase in order. Use only capabilities discovered from the current environment and applicable project instructions; do not substitute remembered tools or commands.
 
 ## Phase 1: Reproduce and Gather Root-Cause Evidence
 

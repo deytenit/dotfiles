@@ -1,0 +1,7 @@
+name: Codex status hooks
+category: Agent Harness
+description: Send Codex activity to the Zellij agent status plugin
+platforms:
+  generic:
+    link:
+      - hooks.json
