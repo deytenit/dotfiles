@@ -54,7 +54,7 @@ impl ZellijPlugin for AgentStatus {
         *name = event.tab_name;
         match event.state.as_str() {
             "clear" => { agents.remove(&event.agent_id); }
-            "seen" => { agents.retain(|_, agent| agent.state != "done" && agent.state != "stopped"); }
+            "seen" => { agents.retain(|_, agent| agent.state != "stopped"); }
             _ => { agents.insert(event.agent_id, AgentState { agent: event.agent, state: event.state }); }
         }
         true
@@ -87,12 +87,23 @@ fn clipped(text: &str, max_width: usize) -> (String, usize) {
     (result, width)
 }
 
+fn fill(output: &mut String, style: Option<Styling>, width: usize) {
+    if let Some(theme) = style {
+        let background = theme.text_unselected.background;
+        output.push_str(&color(background, true));
+        output.push_str(&color(background, false));
+        output.push_str(&"█".repeat(width));
+    } else {
+        output.push_str(&" ".repeat(width));
+    }
+}
+
 fn render_line(
     tabs: &BTreeMap<usize, (String, BTreeMap<String, AgentState>)>,
     style: Option<Styling>,
     cols: usize,
 ) -> String {
-    let mut segments = vec![(" AI ".to_string(), None)];
+    let mut segments = Vec::new();
     for (name, agents) in tabs.values() {
         if agents.is_empty() {
             continue;
@@ -111,14 +122,32 @@ fn render_line(
     }
 
     let mut output = String::new();
-    let mut remaining = cols;
-    let mut previous_bg = None;
+    let badge_width = if cols >= 9 { 9 } else { 0 };
+    let prefix_width = 21.min(cols - badge_width);
+    let (title, title_width) = clipped(" Harness      ", prefix_width);
+    if let Some(theme) = style {
+        output.push_str(&color(theme.text_unselected.base, false));
+        output.push_str(&color(theme.text_unselected.background, true));
+    }
+    output.push_str("\x1b[1m");
+    output.push_str(&title);
+    let (status, status_width) = clipped("STATUS", prefix_width - title_width);
+    if let Some(theme) = style {
+        output.push_str(&color(theme.ribbon_selected.background, false));
+    }
+    output.push_str(&status);
+    output.push_str("\x1b[22m");
+    fill(&mut output, style, prefix_width - title_width - status_width);
+
+    let mut remaining = cols - prefix_width - badge_width;
+    let background = style.map(|theme| theme.text_unselected.background);
+    let mut previous_bg = background;
     for (index, (text, emphasis)) in segments.iter().enumerate() {
-        if remaining == 0 {
+        if remaining <= if index > 0 { 4 } else { 1 } {
             break;
         }
         let colors = style.map(|theme| {
-            let ribbon = if index == 0 { theme.ribbon_selected } else { theme.ribbon_unselected };
+            let ribbon = theme.ribbon_unselected;
             let background = match emphasis {
                 Some(0) => ribbon.emphasis_0,
                 Some(1) => ribbon.emphasis_1,
@@ -129,16 +158,21 @@ fn render_line(
             (ribbon.base, background)
         });
         if index > 0 {
-            if remaining <= 1 {
-                break;
-            }
-            if let (Some(previous), Some((_, background))) = (previous_bg, colors) {
+            if let (Some(previous), Some(gap_bg)) = (previous_bg, background) {
                 output.push_str(&color(previous, false));
-                output.push_str(&color(background, true));
+                output.push_str(&color(gap_bg, true));
             }
             output.push('');
-            remaining -= 1;
+            fill(&mut output, style, 2);
+            remaining -= 3;
+            previous_bg = background;
         }
+        if let (Some(previous), Some((_, next_bg))) = (previous_bg, colors) {
+            output.push_str(&color(previous, false));
+            output.push_str(&color(next_bg, true));
+        }
+        output.push('');
+        remaining -= 1;
         if let Some((foreground, background)) = colors {
             output.push_str(&color(foreground, false));
             output.push_str(&color(background, true));
@@ -148,18 +182,35 @@ fn render_line(
         output.push_str(&visible);
         remaining -= width;
     }
-    if let Some(theme) = style {
-        if remaining > 0 {
-            let background = theme.text_unselected.background;
-            if let Some(previous) = previous_bg {
+    if remaining > 0 {
+        if let (Some(previous), Some(background)) = (previous_bg, background) {
+            if previous != background {
                 output.push_str(&color(previous, false));
                 output.push_str(&color(background, true));
                 output.push('');
                 remaining -= 1;
             }
-            output.push_str(&color(background, true));
-            output.push_str(&color(background, false));
-            output.push_str(&"█".repeat(remaining));
+        }
+        fill(&mut output, style, remaining);
+        previous_bg = background;
+    }
+    if badge_width > 0 {
+        if let Some(theme) = style {
+            let green = theme.ribbon_selected.background;
+            output.push_str(&color(previous_bg.unwrap_or(theme.text_unselected.background), false));
+            output.push_str(&color(green, true));
+            output.push('');
+            output.push_str(&color(theme.ribbon_selected.base, false));
+            output.push_str(&color(green, true));
+            output.push_str("\x1b[1m");
+            output.push_str("  AI  ");
+            output.push_str("\x1b[22m");
+            output.push_str(&color(green, false));
+            output.push_str(&color(theme.text_unselected.background, true));
+            output.push('');
+            output.push(' ');
+        } else {
+            output.push_str("\x1b[1m  AI  \x1b[22m ");
         }
     }
     output.push_str("\x1b[0m");
@@ -179,9 +230,28 @@ mod tests {
         agents.insert("codex".to_string(), AgentState { agent: "Codex".to_string(), state: "running".to_string() });
         tabs.insert(1, ("work".to_string(), agents));
 
-        assert_eq!(render_line(&tabs, None, 40), " AI  work ~ Codex \u{1b}[0m");
-        assert_eq!(render_line(&tabs, None, 8), " AI  wo\u{1b}[0m");
-        assert_eq!(render_line(&tabs, None, 2), " A\u{1b}[0m");
+        assert_eq!(render_line(&tabs, None, 40), "\u{1b}[1m Harness      STATUS\u{1b}[22m  work ~ C\u{1b}[1m  AI  \u{1b}[22m \u{1b}[0m");
+        assert_eq!(render_line(&tabs, None, 8), "\u{1b}[1m Harness\u{1b}[22m\u{1b}[0m");
+        assert_eq!(render_line(&tabs, None, 2), "\u{1b}[1m H\u{1b}[22m\u{1b}[0m");
+    }
+
+    #[test]
+    fn separates_statuses_for_multiple_tabs() {
+        let mut tabs = BTreeMap::new();
+        for (id, name) in [(1, "one"), (2, "two")] {
+            let mut agents = BTreeMap::new();
+            agents.insert("codex".to_string(), AgentState { agent: "Codex".to_string(), state: "done".to_string() });
+            tabs.insert(id, (name.to_string(), agents));
+        }
+
+        let plain = render_line(&tabs, None, 80);
+        assert!(plain.starts_with("\u{1b}[1m Harness      STATUS\u{1b}[22m  one * Codex    two * Codex "));
+        assert!(plain.ends_with("\u{1b}[1m  AI  \u{1b}[22m \u{1b}[0m"));
+
+        let mut style = Styling::default();
+        style.text_unselected.background = PaletteColor::Rgb((38, 38, 38));
+        let line = render_line(&tabs, Some(style), 80);
+        assert!(line.contains("\u{1b}[48;2;38;38;38m\u{1b}[38;2;38;38;38m██"));
     }
 
     #[test]
@@ -194,12 +264,20 @@ mod tests {
     fn uses_the_active_theme_for_background_colors() {
         let mut light = Styling::default();
         light.ribbon_selected.background = PaletteColor::Rgb((20, 30, 40));
+        light.text_unselected.background = PaletteColor::Rgb((246, 246, 246));
         let mut dark = Styling::default();
         dark.ribbon_selected.background = PaletteColor::Rgb((40, 30, 20));
+        dark.text_unselected.background = PaletteColor::Rgb((38, 38, 38));
         let tabs = BTreeMap::new();
 
-        assert!(render_line(&tabs, Some(light), 20).contains("\u{1b}[48;2;20;30;40m"));
-        assert!(render_line(&tabs, Some(dark), 20).contains("\u{1b}[48;2;40;30;20m"));
+        let light_line = render_line(&tabs, Some(light), 40);
+        let dark_line = render_line(&tabs, Some(dark), 40);
+        assert!(light_line.contains("\u{1b}[38;2;20;30;40mSTATUS\u{1b}[22m"));
+        assert!(dark_line.contains("\u{1b}[38;2;40;30;20mSTATUS\u{1b}[22m"));
+        assert!(light_line.contains("\u{1b}[38;2;246;246;246m\u{1b}[48;2;20;30;40m"));
+        assert!(dark_line.contains("\u{1b}[38;2;38;38;38m\u{1b}[48;2;40;30;20m"));
+        assert!(light_line.contains("\u{1b}[1m  AI  \u{1b}[22m\u{1b}[38;2;20;30;40m\u{1b}[48;2;246;246;246m "));
+        assert!(dark_line.contains("\u{1b}[1m  AI  \u{1b}[22m\u{1b}[38;2;40;30;20m\u{1b}[48;2;38;38;38m "));
     }
 
     #[test]
@@ -228,8 +306,10 @@ mod tests {
         let dark_line = render_line(&tabs, Some(dark), 10);
         assert!(light_line.contains("\u{1b}[48;2;246;246;246m"));
         assert!(dark_line.contains("\u{1b}[48;2;38;38;38m"));
-        assert!(light_line.ends_with("█████\u{1b}[0m"));
-        assert!(dark_line.ends_with("█████\u{1b}[0m"));
+        assert!(light_line.contains("  AI  "));
+        assert!(dark_line.contains("  AI  "));
+        assert!(light_line.ends_with(" \u{1b}[0m"));
+        assert!(dark_line.ends_with(" \u{1b}[0m"));
         assert!(!light_line.contains("\u{1b}[0K"));
         assert!(!dark_line.contains("\u{1b}[0K"));
     }

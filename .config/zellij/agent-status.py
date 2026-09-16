@@ -95,6 +95,7 @@ def main():
             "PermissionRequest": "waiting",
             "PostToolUse": "running",
             "Interrupt": "stopped",
+            "Stop": "done",
             "SessionEnd": "clear",
             "SubagentStart": "running",
             "SubagentStop": "clear",
