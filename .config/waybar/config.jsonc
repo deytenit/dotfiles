@@ -134,12 +134,14 @@
   },
   "group/audio": {
     "orientation": "inherit",
-    "drawer": {
-      "transition-duration": 300,
-      "children-class": "group-audio",
-      "transition-left-to-right": false
-    },
-    "modules": ["wireplumber"]
+    "modules": ["wireplumber#source", "wireplumber"]
+  },
+  "wireplumber#source": {
+    "node-type": "Audio/Source",
+    "format": "",
+    "format-muted": "",
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+    "tooltip-format": "{node_name} ({volume}%)"
   },
   "wireplumber": {
     "format": "{volume}% {icon}",

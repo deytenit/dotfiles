@@ -160,6 +160,14 @@ window#waybar.hidden {
   transition: none;
 }
 
+#media #audio #wireplumber.source {
+  padding: 0 8px 0 12px;
+}
+
+#media #audio #wireplumber:not(.source) {
+  padding: 0 12px 0 8px;
+}
+
 #hardware {
   background: @base;
   color: @text;

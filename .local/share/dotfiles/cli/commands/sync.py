@@ -6,6 +6,7 @@ from datetime import datetime
 from .base import BaseCommand
 from ..logger import log_info, log_success, log_error, log_warning
 from ..git_ops import GitRepository
+from packages import sync_packages
 
 
 class SyncCommand(BaseCommand):
@@ -37,6 +38,16 @@ class SyncCommand(BaseCommand):
             branch = repo.get_current_branch()
             log_info(f"Current branch: {branch}")
             
+            # Export installed OS packages
+            try:
+                log_info("Exporting installed packages...")
+                exported_path = sync_packages(repo.repo_root)
+                if exported_path:
+                    rel_path = exported_path.relative_to(repo.repo_root)
+                    log_info(f"Updated package list: {rel_path}")
+            except Exception as e:
+                log_warning(f"Could not export package list: {e}")
+
             # Check for changes
             if not repo.has_changes():
                 log_info("No changes to sync")
