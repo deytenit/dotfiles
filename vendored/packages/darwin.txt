@@ -23,6 +23,7 @@ python@3.13
 rclone
 restic
 ripgrep
+ruby@3.3
 shadowsocks-rust
 tree
 tree-sitter-cli

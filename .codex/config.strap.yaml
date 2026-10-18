@@ -1,0 +1,7 @@
+name: Codex configuration
+category: Agent Harness
+description: Copy portable defaults while preserving existing local configuration
+platforms:
+  generic:
+    copy:
+      - [config.base.toml, ~/.codex/config.toml]

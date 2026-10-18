@@ -1,0 +1,65 @@
+model = "gpt-6-astra"
+model_reasoning_effort = "high"
+service_tier = "priority"
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+sandbox_mode = "workspace-write"
+web_search = "live"
+
+[tui]
+theme = "coldark-dark"
+status_line = ["model-with-reasoning", "project-name", "context-remaining", "total-input-tokens", "total-output-tokens", "five-hour-limit", "weekly-limit"]
+notifications = ["agent-turn-complete", "approval-requested"]
+notification_method = "auto"
+
+[desktop]
+followUpQueueMode = "steer"
+conversationDetailMode = "STEPS_COMMANDS"
+ambient-suggestions-enabled = false
+
+[features]
+apps = false
+worktrees = false
+
+[mcp_servers.joplin]
+command = "/bin/sh"
+args = ["-c", 'exec "$HOME/.local/share/joplin-agent/runtime/bin/python" -I "$HOME/.local/share/joplin-agent/app/agent.py" serve']
+enabled = true
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+[plugins."codex-app-tools@openai-bundled".mcp_servers.codex_app]
+enabled = false
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."unified-computer-use@openai-bundled"]
+enabled = true
+[plugins."unified-computer-use@openai-bundled".mcp_servers.cua_repl]
+enabled = false
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
+[plugins."code-review@openai-bundled"]
+enabled = true
+[plugins."code-review@openai-bundled".mcp_servers.code-review]
+enabled = false

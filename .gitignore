@@ -128,6 +128,8 @@ assets/**
 !.codex
 .codex/**
 !.codex/strap.yaml
+!.codex/config.base.toml
+!.codex/config.strap.yaml
 !.codex/status.strap.yaml
 !.codex/hooks.json
 !.codex/agents/
