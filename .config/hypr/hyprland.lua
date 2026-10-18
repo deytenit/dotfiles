@@ -161,11 +161,10 @@ hl.window_rule({
     idle_inhibit = "fullscreen",
 })
 
--- Firefox Picture-in-Picture
+-- Picture-in-Picture
 hl.window_rule({
-    name           = "firefox-pip-overlay",
+    name           = "pip-overlay",
     match          = {
-        class = "(f|F)irefox.*",
         title = "Picture-in-Picture",
     },
     float          = true,
@@ -178,7 +177,7 @@ hl.window_rule({
 ---------------------
 local mainMod    = "SUPER"
 local terminal   = "ghostty"
-local browser    = "firefox-beta"
+local browser    = "librewolf"
 local explorer   = "nautilus"
 local launcher   = "sh " .. os.getenv("HOME") .. "/.config/rofi/bin/launcher"
 local powermenu  = "sh " .. os.getenv("HOME") .. "/.config/rofi/bin/powermenu"

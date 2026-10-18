@@ -1,0 +1,19 @@
+name: Gemini agents
+category: Agent Harness
+description: Antigravity and Gemini agent definitions
+platforms:
+  generic:
+    link:
+      - config/agents/checker.md
+      - config/agents/implementer.md
+      - config/agents/researcher.md
+      - config/agents/code-reviewer.md
+      - config/plugins/custom-agents/plugin.json
+      - [config/agents/checker.md, ~/.gemini/config/plugins/custom-agents/agents/checker.md]
+      - [config/agents/implementer.md, ~/.gemini/config/plugins/custom-agents/agents/implementer.md]
+      - [config/agents/researcher.md, ~/.gemini/config/plugins/custom-agents/agents/researcher.md]
+      - [config/agents/code-reviewer.md, ~/.gemini/config/plugins/custom-agents/agents/code-reviewer.md]
+      - [config/agents/checker.md, ~/.gemini/agents/checker.md]
+      - [config/agents/implementer.md, ~/.gemini/agents/implementer.md]
+      - [config/agents/researcher.md, ~/.gemini/agents/researcher.md]
+      - [config/agents/code-reviewer.md, ~/.gemini/agents/code-reviewer.md]

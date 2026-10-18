@@ -239,9 +239,10 @@ platforms:
 | Strap | Destinations |
 | --- | --- |
 | OpenCode | `~/.config/opencode/opencode.jsonc` |
-| Shared skills | `~/.config/opencode/skills`, `~/.agents/skills`, `~/.claude/skills` |
+| Shared skills | `~/.config/opencode/skills`, `~/.agents/skills`, `~/.claude/skills`, `~/.gemini/config/skills` |
 | Shared instructions | `~/.config/opencode/AGENTS.md`, `~/.codex/AGENTS.md`, `~/.claude/CLAUDE.md`, `~/.gemini/GEMINI.md` |
 | Codex agents | `~/.codex/agents` |
+| Gemini agents | `~/.gemini/config/agents`, `~/.gemini/agents` |
 
 ## deytefiles CLI Reference
 

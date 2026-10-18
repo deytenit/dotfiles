@@ -20,7 +20,7 @@ class RepositoryStrapsTest(unittest.TestCase):
         self.assertNotIn("Rofi", {item.name for item in darwin})
         self.assertFalse(any(re.search(r"strap@|\.strap$", path.name) for path in ROOT.rglob("*")))
         harness = {item.name: item for item in linux if item.category == "Agent Harness"}
-        self.assertEqual(set(harness), {"OpenCode", "Shared skills", "Shared instructions", "Codex agents"})
+        self.assertEqual(set(harness), {"OpenCode", "Shared skills", "Shared instructions", "Codex agents", "Codex status hooks", "Gemini agents"})
         skills = ROOT / ".config/opencode/skills"
         skill_entries = {
             Path("_shared/artifact-policy.md"),
@@ -30,7 +30,7 @@ class RepositoryStrapsTest(unittest.TestCase):
             home / ".config/opencode/skills",
             home / ".agents/skills",
             home / ".claude/skills",
-            home / ".gemini/skills",
+            home / ".gemini/config/skills",
         )
         self.assertEqual(
             {op.target.as_posix() for op in harness["Shared skills"].file_operations},

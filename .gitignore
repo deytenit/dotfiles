@@ -119,6 +119,9 @@ assets/**
 !.gemini
 .gemini/**
 !.gemini/settings.json
+!.gemini/strap.yaml
+!.gemini/config/
+!.gemini/config/**
 
 # Codex
 !.codex

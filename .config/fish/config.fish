@@ -6,7 +6,7 @@ if type -q nvim
   set -gx EDITOR nvim
 end
 
-set -gx AGY_CLI_DISABLE_AUTO_UPDATE 1
+set -gx AGY_CLI_DISABLE_AUTO_UPDATE true
 
 source $HOME/.config/fish/aliases.fish
 source $HOME/.config/fish/functions.fish
