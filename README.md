@@ -204,19 +204,27 @@ The Agent Harness is split into independently selectable straps. For a Codex set
 
 ### Zellij agent status
 
-On another machine, run `python3 bootstrap.py` and select **Zellij** and **Codex status hooks**. The Zellij strap links the Python bridge and prebuilt plugin; the Codex strap links `~/.codex/hooks.json`. Use Zellij 0.45.1 for the supplied plugin, and keep `python3` and `zellij` on `PATH`.
+On another machine, run `python3 bootstrap.py` and select **Zellij**, **Codex status hooks**, and **Fish**. With another shell, pass `--no-daemon` when launching Codex inside Zellij. The Zellij strap links the layouts, Python bridge, and prebuilt plugin; the Codex strap links `~/.codex/hooks.json`. Use Zellij 0.45.1 for the supplied plugin, and keep `python3` and `zellij` on `PATH`.
 
-Add this line to `~/.codex/config.toml` to report completed Codex turns:
+Start `zellij --layout agent-status` to load the portable status layout and grant the plugin's requested permissions. Installing the plugin alone does not load it into existing layouts or sessions. In Codex, review and trust the hooks with `/hooks`; new or changed hook definitions remain inactive until trusted.
+
+The `Stop` hook reports completed Codex turns. For clients that need the legacy notification bridge, add this line to `~/.codex/config.toml` only if it has no existing `notify` handler:
 
 ```toml
 notify = ["sh", "-c", "python3 \"$HOME/.config/zellij/agent-status.py\" codex-notify \"$1\"", "--"]
 ```
 
-In Codex, review and trust the hooks with `/hooks`. Add the plugin to the layout's tab template, using the machine's absolute home path:
+The harness row sits below the compact bar and combines agent status across all tabs in the current Zellij session, including tabs opened later. Grant both application-state and plugin-messaging permissions so new instances can synchronize.
+
+Each session is displayed as `tab name : pane ID ~ Codex`, with `~` for running, `?` for waiting, `*` for done, and `!` for stopped. Sessions in separate panes of the same tab keep independent statuses.
+
+The Fish configuration launches `codex` with `--no-daemon` inside Zellij so hooks inherit the correct pane identity. Install the **Fish** strap too, or pass `--no-daemon` explicitly from other shells and layout commands. The shared Codex server inherits its first client's pane environment and can otherwise attribute later sessions to that pane. After updating, reload Fish functions or open a new shell, then exit and resume existing terminal Codex sessions with `codex resume`. Replacing the plugin file takes effect when the plugin is reloaded or the Zellij session is restarted.
+
+To add status to another layout, include the plugin after its main status bar in the tab template:
 
 ```kdl
 pane size=1 borderless=true {
-    plugin location="file:/ABSOLUTE/HOME/.config/zellij/plugins/agent-status.wasm"
+    plugin location="file:~/.config/zellij/plugins/agent-status.wasm"
 }
 ```
 

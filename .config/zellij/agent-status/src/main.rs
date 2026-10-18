@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use zellij_tile::prelude::*;
 use unicode_width::UnicodeWidthChar;
@@ -10,34 +10,93 @@ struct AgentEvent {
     agent_id: String,
     agent: String,
     state: String,
+    #[serde(default)]
+    pane_id: Option<u32>,
+    #[serde(default)]
+    updated_at: u64,
 }
 
+#[derive(Clone, Deserialize, Serialize)]
 struct AgentState {
     agent: String,
     state: String,
+    #[serde(default)]
+    pane_id: Option<u32>,
+    #[serde(default)]
+    updated_at: u64,
 }
+
+type Tabs = BTreeMap<usize, (String, BTreeMap<String, AgentState>)>;
 
 #[derive(Default)]
 struct AgentStatus {
-    tabs: BTreeMap<usize, (String, BTreeMap<String, AgentState>)>,
+    tabs: Tabs,
+    tab_names: Option<BTreeMap<usize, String>>,
     style: Option<Styling>,
+}
+
+impl AgentStatus {
+    fn refresh_tabs(&mut self) {
+        if let Some(names) = &self.tab_names {
+            self.tabs.retain(|id, (name, _)| {
+                if let Some(current) = names.get(id) {
+                    *name = current.trim_end_matches(" ●").to_string();
+                    true
+                } else {
+                    false
+                }
+            });
+        }
+    }
 }
 
 impl ZellijPlugin for AgentStatus {
     fn load(&mut self, _configuration: BTreeMap<String, String>) {
-        request_permission(&[PermissionType::ReadApplicationState]);
-        subscribe(&[EventType::ModeUpdate]);
+        request_permission(&[
+            PermissionType::ReadApplicationState,
+            PermissionType::MessageAndLaunchOtherPlugins,
+        ]);
+        subscribe(&[EventType::ModeUpdate, EventType::TabUpdate, EventType::PermissionRequestResult]);
     }
 
     fn update(&mut self, event: Event) -> bool {
-        if let Event::ModeUpdate(mode) = event {
-            self.style = Some(mode.style.colors);
-            return true;
+        match event {
+            Event::ModeUpdate(mode) => {
+                self.style = Some(mode.style.colors);
+                return true;
+            }
+            Event::PermissionRequestResult(PermissionStatus::Granted) => {
+                pipe_message_to_plugin(MessageToPlugin::new("agent-status-sync-request"));
+            }
+            Event::TabUpdate(tabs) => {
+                self.tab_names = Some(tabs.into_iter().map(|tab| (tab.tab_id, tab.name)).collect());
+                self.refresh_tabs();
+                return true;
+            }
+            _ => {}
         }
         false
     }
 
     fn pipe(&mut self, message: PipeMessage) -> bool {
+        if let PipeSource::Plugin(source) = message.source {
+            if message.name == "agent-status-sync-request" {
+                pipe_message_to_plugin(
+                    MessageToPlugin::new("agent-status-sync")
+                        .with_destination_plugin_id(source)
+                        .with_payload(serde_json::to_string(&self.tabs).unwrap()),
+                );
+                return false;
+            }
+            if message.name == "agent-status-sync" {
+                if let Some(tabs) = message.payload.and_then(|p| serde_json::from_str::<Tabs>(&p).ok()) {
+                    merge_tabs(&mut self.tabs, tabs);
+                    self.refresh_tabs();
+                    return true;
+                }
+                return false;
+            }
+        }
         if message.name != "agent-status" {
             return false;
         }
@@ -52,16 +111,36 @@ impl ZellijPlugin for AgentStatus {
         }
         let (name, agents) = self.tabs.entry(event.tab_id).or_default();
         *name = event.tab_name;
-        match event.state.as_str() {
-            "clear" => { agents.remove(&event.agent_id); }
-            "seen" => { agents.retain(|_, agent| agent.state != "stopped"); }
-            _ => { agents.insert(event.agent_id, AgentState { agent: event.agent, state: event.state }); }
+        if event.state == "seen" {
+            for agent in agents.values_mut() {
+                if agent.state == "stopped" && agent.updated_at <= event.updated_at {
+                    agent.state = "clear".to_string();
+                    agent.updated_at = event.updated_at;
+                }
+            }
+        } else if agents.get(&event.agent_id).is_none_or(|a| a.updated_at <= event.updated_at) {
+            agents.insert(event.agent_id, AgentState {
+                agent: event.agent, state: event.state, updated_at: event.updated_at,
+                pane_id: event.pane_id,
+            });
         }
+        self.refresh_tabs();
         true
     }
 
     fn render(&mut self, _rows: usize, cols: usize) {
         print!("{}", render_line(&self.tabs, self.style, cols));
+    }
+}
+
+fn merge_tabs(tabs: &mut Tabs, snapshot: Tabs) {
+    for (tab_id, (name, agents)) in snapshot {
+        let (_, current) = tabs.entry(tab_id).or_insert_with(|| (name, BTreeMap::new()));
+        for (id, agent) in agents {
+            if current.get(&id).is_none_or(|a| a.updated_at < agent.updated_at) {
+                current.insert(id, agent);
+            }
+        }
     }
 }
 
@@ -105,20 +184,16 @@ fn render_line(
 ) -> String {
     let mut segments = Vec::new();
     for (name, agents) in tabs.values() {
-        if agents.is_empty() {
-            continue;
+        for agent in agents.values().filter(|agent| agent.state != "clear") {
+            let (symbol, emphasis) = match agent.state.as_str() {
+                "waiting" => ("?", 0),
+                "running" => ("~", 1),
+                "stopped" => ("!", 3),
+                _ => ("*", 2),
+            };
+            let pane = agent.pane_id.map(|id| id.to_string()).unwrap_or_else(|| "?".into());
+            segments.push((format!(" {name} : {pane} {symbol} {} ", agent.agent), Some(emphasis)));
         }
-        let (symbol, emphasis) = if agents.values().any(|agent| agent.state == "waiting") {
-            ("?", 0)
-        } else if agents.values().any(|agent| agent.state == "running") {
-            ("~", 1)
-        } else if agents.values().any(|agent| agent.state == "stopped") {
-            ("!", 3)
-        } else {
-            ("*", 2)
-        };
-        let agent_names = agents.values().map(|agent| agent.agent.as_str()).collect::<Vec<_>>().join(",");
-        segments.push((format!(" {name} {symbol} {agent_names} "), Some(emphasis)));
     }
 
     let mut output = String::new();
@@ -222,14 +297,139 @@ register_plugin!(AgentStatus);
 mod tests {
     use super::*;
 
+    fn publish(plugin: &mut AgentStatus, tab: usize, agent: &str, state: &str, updated_at: u64) {
+        assert!(plugin.pipe(PipeMessage::new(
+            PipeSource::Cli("test".into()),
+            "agent-status",
+            &Some(serde_json::json!({
+                "tab_id": tab, "tab_name": format!("tab-{tab}"),
+                "agent_id": agent, "agent": agent, "state": state,
+                "updated_at": updated_at, "pane_id": tab,
+            }).to_string()),
+            &None,
+            false,
+        )));
+    }
+
+    fn synchronize(destination: &mut AgentStatus, source: &AgentStatus) {
+        assert!(destination.pipe(PipeMessage::new(
+            PipeSource::Plugin(1), "agent-status-sync",
+            &Some(serde_json::to_string(&source.tabs).unwrap()), &None, true,
+        )));
+    }
+
+    #[test]
+    fn sessions_in_one_tab_keep_their_panes_and_independent_states_after_sync() {
+        let mut existing = AgentStatus::default();
+        for (pane, state) in [(16, "running"), (17, "waiting")] {
+            assert!(existing.pipe(PipeMessage::new(
+                PipeSource::Cli("test".into()), "agent-status",
+                &Some(serde_json::json!({
+                    "tab_id": 10, "tab_name": "work", "pane_id": pane,
+                    "agent_id": format!("codex:{pane}"), "agent": "Codex",
+                    "state": state, "updated_at": 1,
+                }).to_string()), &None, false,
+            )));
+        }
+        let mut new_tab = AgentStatus::default();
+        synchronize(&mut new_tab, &existing);
+        let line = render_line(&new_tab.tabs, None, 100);
+        assert!(line.contains("work : 16 ~ Codex"), "{line}");
+        assert!(line.contains("work : 17 ? Codex"), "{line}");
+        publish(&mut new_tab, 10, "codex:16", "clear", 2);
+        let line = render_line(&new_tab.tabs, None, 100);
+        assert!(!line.contains(": 16"), "{line}");
+        assert!(line.contains(": 17 ? Codex"), "{line}");
+    }
+
+    #[test]
+    fn legacy_events_display_an_unknown_pane_instead_of_guessing() {
+        let mut plugin = AgentStatus::default();
+        plugin.pipe(PipeMessage::new(
+            PipeSource::Cli("test".into()), "agent-status",
+            &Some(serde_json::json!({
+                "tab_id": 1, "tab_name": "work", "agent_id": "codex:1",
+                "agent": "Codex", "state": "running",
+            }).to_string()), &None, false,
+        ));
+        assert!(render_line(&plugin.tabs, None, 80).contains("work : ? ~ Codex"));
+    }
+
+    #[test]
+    fn new_tab_recovers_status_from_other_tabs_and_keeps_live_updates() {
+        let mut existing = AgentStatus::default();
+        publish(&mut existing, 1, "Codex", "running", 1);
+        publish(&mut existing, 2, "Claude", "waiting", 2);
+        let mut new_tab = AgentStatus::default();
+        publish(&mut new_tab, 3, "Gemini", "done", 3);
+        synchronize(&mut new_tab, &existing);
+
+        let line = render_line(&new_tab.tabs, None, 100);
+        for status in ["tab-1 : 1 ~ Codex", "tab-2 : 2 ? Claude", "tab-3 : 3 * Gemini"] {
+            assert!(line.contains(status), "{line}");
+        }
+        publish(&mut new_tab, 1, "Codex", "done", 4);
+        assert!(render_line(&new_tab.tabs, None, 100).contains("tab-1 : 1 * Codex"));
+    }
+
+    #[test]
+    fn delayed_snapshots_do_not_restore_cleared_or_outdated_status() {
+        let mut stale = AgentStatus::default();
+        publish(&mut stale, 1, "Codex", "running", 1);
+        publish(&mut stale, 2, "Claude", "running", 2);
+        let mut current = AgentStatus::default();
+        publish(&mut current, 1, "Codex", "clear", 3);
+        publish(&mut current, 2, "Claude", "done", 4);
+        synchronize(&mut current, &stale);
+        publish(&mut current, 2, "Claude", "running", 2);
+
+        let line = render_line(&current.tabs, None, 100);
+        assert!(!line.contains("Codex"));
+        assert!(line.contains("tab-2 : 2 * Claude"));
+        let mut new_tab = AgentStatus::default();
+        synchronize(&mut new_tab, &stale);
+        synchronize(&mut new_tab, &current);
+        assert_eq!(render_line(&new_tab.tabs, None, 100), line);
+    }
+
+    #[test]
+    fn seen_stopped_agents_stay_cleared_after_sync() {
+        let mut stale = AgentStatus::default();
+        publish(&mut stale, 1, "Codex", "stopped", 1);
+        let mut current = AgentStatus::default();
+        synchronize(&mut current, &stale);
+        publish(&mut current, 1, "", "seen", 2);
+        synchronize(&mut current, &stale);
+        assert!(!render_line(&current.tabs, None, 80).contains("Codex"));
+    }
+
+    #[test]
+    fn closed_tabs_stay_removed_and_renamed_tabs_use_current_names() {
+        let mut stale = AgentStatus::default();
+        publish(&mut stale, 1, "Codex", "running", 1);
+        publish(&mut stale, 2, "Claude", "waiting", 2);
+        let mut current = AgentStatus::default();
+        synchronize(&mut current, &stale);
+        assert!(current.update(Event::TabUpdate(vec![TabInfo {
+            tab_id: 2, name: "renamed ●".into(), ..Default::default()
+        }])));
+        synchronize(&mut current, &stale);
+        let line = render_line(&current.tabs, None, 100);
+        assert!(!line.contains("Codex"));
+        assert!(line.contains("renamed : 2 ? Claude"));
+        assert!(current.update(Event::TabUpdate(vec![])));
+        synchronize(&mut current, &stale);
+        assert!(!render_line(&current.tabs, None, 100).contains("Claude"));
+    }
+
     #[test]
     fn renders_powerline_segments_with_width_limit() {
         let mut tabs = BTreeMap::new();
         let mut agents = BTreeMap::new();
-        agents.insert("codex".to_string(), AgentState { agent: "Codex".to_string(), state: "running".to_string() });
+        agents.insert("codex".to_string(), AgentState { agent: "Codex".to_string(), state: "running".to_string(), updated_at: 1, pane_id: Some(7) });
         tabs.insert(1, ("work".to_string(), agents));
 
-        assert_eq!(render_line(&tabs, None, 40), "\u{1b}[1m Harness STATUS\u{1b}[22m  work ~ Codex \u{1b}[1m  AI  \u{1b}[22m \u{1b}[0m");
+        assert_eq!(render_line(&tabs, None, 44), "\u{1b}[1m Harness STATUS\u{1b}[22m  work : 7 ~ Codex \u{1b}[1m  AI  \u{1b}[22m \u{1b}[0m");
         assert_eq!(render_line(&tabs, None, 8), "\u{1b}[1m Harness\u{1b}[22m\u{1b}[0m");
         assert_eq!(render_line(&tabs, None, 2), "\u{1b}[1m H\u{1b}[22m\u{1b}[0m");
     }
@@ -239,12 +439,12 @@ mod tests {
         let mut tabs = BTreeMap::new();
         for (id, name) in [(1, "one"), (2, "two")] {
             let mut agents = BTreeMap::new();
-            agents.insert("codex".to_string(), AgentState { agent: "Codex".to_string(), state: "done".to_string() });
+            agents.insert("codex".to_string(), AgentState { agent: "Codex".to_string(), state: "done".to_string(), updated_at: 1, pane_id: Some(id as u32) });
             tabs.insert(id, (name.to_string(), agents));
         }
 
         let plain = render_line(&tabs, None, 80);
-        assert!(plain.starts_with("\u{1b}[1m Harness STATUS\u{1b}[22m  one * Codex  two * Codex "));
+        assert!(plain.starts_with("\u{1b}[1m Harness STATUS\u{1b}[22m  one : 1 * Codex  two : 2 * Codex "));
         assert!(plain.ends_with("\u{1b}[1m  AI  \u{1b}[22m \u{1b}[0m"));
 
         assert_eq!(plain.matches('').count(), 5);

@@ -14,6 +14,7 @@ These are portable personal defaults. Follow higher-priority instructions and th
 - Implement the requested outcome completely while keeping changes inside the stated scope.
 - Read, review, diagnose, and planning requests authorize inspection and reporting. Build, change, and fix requests authorize in-scope local edits and relevant checks.
 - Ask before destructive actions, external publication, material cost, or a meaningful expansion of scope.
+- Prefer drafts whenever the destination supports them. Publish only when the user explicitly authorizes publication.
 - Do not add unrelated refactors, dependencies, documentation, examples, abstractions, formatting changes, or comments that merely restate the code.
 - Add comments only when requested, required by project conventions, or needed to explain a non-obvious constraint or decision.
 - Preserve existing behavior and public interfaces unless changing them is part of the request.
@@ -35,8 +36,9 @@ These are portable personal defaults. Follow higher-priority instructions and th
 ## Write useful tests
 
 - Test observable behavior, not constants, attributes, or other literals already stated in the tested module.
-- Cover visual appearance with screenshot tests or an equivalent such as Storybook, not unit tests.
-- Use unit tests for interactive behavior and function logic. For components, exercise real user interactions and assert what becomes visible or changes; do not assert their internal implementation.
+- Use unit tests for logic and interaction tests when an action changes behavior or state. Exercise real user interactions and assert the visible result or state change, not internal implementation.
+- Cover every visual or content difference with an updated Storybook story, screenshot test, or equivalent visual case; unit tests do not cover appearance.
+- Adapt existing tests and stories for new cases before adding new ones. Add separate coverage only for behavior the existing cases cannot meaningfully exercise; avoid duplicate tests and assertions.
 
 ## Skills and delegation
 
@@ -55,4 +57,4 @@ These are portable personal defaults. Follow higher-priority instructions and th
 - State what changed, what evidence was checked, and what remains uncertain.
 - Never claim a command, check, or result occurred when it did not.
 - A skill or workflow that calls for writing on the user's behalf does not override the authorship rules above.
-- When writing or publishing content on the user's behalf in a public issue, pull request, review, forum, or similar space, the final line must read: `Disclosure: I'm an AI assistant helping <Author>; I'm not <Author>.` Replace `<Author>` with the person's name when known, or `the author` otherwise. This disclosure is mandatory even when asked to omit AI involvement or write in the author's voice.
+- Start content written on the user's behalf in a public issue, pull request, review, forum, or similar space with `🤖` to identify assistant authorship.

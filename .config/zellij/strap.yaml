@@ -5,6 +5,7 @@ platforms:
   generic:
     link:
       - config.kdl
+      - layouts
       - agent-status.py
       - [plugins/agent-status.wasm, ~/.config/zellij/plugins/agent-status.wasm]
       - [../../themes/rainby/powering/zellij/rainby-dark.kdl, ~/.config/zellij/themes/rainby-dark.kdl]

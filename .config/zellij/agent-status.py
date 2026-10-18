@@ -33,7 +33,9 @@ def current_tab():
 def send_pipe(tab_id, tab_name, agent_id, agent, state):
     payload = json.dumps(
         {"tab_id": tab_id, "tab_name": tab_name.removesuffix(" ●"),
-         "agent_id": agent_id, "agent": agent, "state": state},
+         "agent_id": agent_id, "agent": agent, "state": state,
+         "pane_id": int(os.environ["ZELLIJ_PANE_ID"].removeprefix("terminal_")) if agent_id else None,
+         "updated_at": time.time_ns()},
         separators=(",", ":"),
     )
     subprocess.run(

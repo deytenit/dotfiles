@@ -35,6 +35,16 @@ class BootstrapAppTest(unittest.TestCase):
             self.assertEqual(unmanaged.read_text(), "keep")
             self.assertTrue((home / ".config/opencode/skills").is_dir())
             self.assertTrue((home / ".agents/skills/brainstorming/SKILL.md").is_file())
+            for relative in (
+                ".local/bin/paste",
+                ".codex/hooks.json",
+                ".config/zellij/agent-status.py",
+                ".config/zellij/plugins/agent-status.wasm",
+                ".config/zellij/layouts/agent-status.kdl",
+            ):
+                with self.subTest(installed=relative):
+                    self.assertTrue((home / relative).is_file())
+                    self.assertEqual((home / relative).resolve(), ROOT / relative)
             self.assertTrue(cron.content.startswith("unmanaged entry\n"))
 
 

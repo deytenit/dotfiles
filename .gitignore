@@ -55,6 +55,7 @@ assets/**
 !.config/zellij
 .config/zellij/**
 !.config/zellij/config.kdl
+!.config/zellij/layouts/
 !.config/zellij/layouts/*.kdl
 !.config/zellij/agent-status.py
 !.config/zellij/agent-status/
