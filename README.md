@@ -202,6 +202,55 @@ platforms:
 
 The Agent Harness is split into independently selectable straps. For a Codex setup, choose **Shared skills**, **Shared instructions**, and **Codex agents** during interactive bootstrap.
 
+### Joplin knowledge partner
+
+The original code in `.local/share/joplin-agent/`, the `.local/bin/joplin-agent` entry point, the shared `joplin` skill, and the Joplin-specific additions to shared straps, instructions, documentation, and tests are covered by the [MIT license](.local/share/joplin-agent/LICENSE). The skill includes its own copy of the license for standalone distribution. Unrelated dotfiles and third-party dependencies retain their existing licensing.
+
+Select **Joplin integration**, **Shared skills**, and **Shared instructions** in `python3 bootstrap.py`. The integration uses Joplin Desktop's local Web Clipper API, a locked `joplin-mcp` runtime, and the shared `joplin` skill for recall, inbox capture, and approved curation. Requires Python 3.11+ and `uv` on macOS or Linux.
+
+Enable **Web Clipper** in Joplin's settings. Create the desired root notebook (`Work` or `Personal`) in Joplin, then provision this machine locally:
+
+```sh
+joplin-agent setup --install --profile work --credentials --hierarchy --harness codex
+```
+
+The token prompt is hidden. Use `--port PORT` if Joplin displays a different port. For a home machine, use `--profile home`: it grants all notebooks except the root `Work` and its children. Work mode grants only the root `Work` and its children. Anchored patterns distinguish the root from an unrelated nested notebook named `Work`.
+
+Credentials live in `~/.config/joplin-agent/server.json`; notebook rules, hierarchy paths, and tool switches live in `~/.config/joplin-agent/policy.json`. Both files are private (0600), in a private directory (0700), outside this repository. Examples live in [.local/share/joplin-agent/examples](.local/share/joplin-agent/examples). `setup --profile` explicitly replaces the policy with that preset; keep custom policies by omitting this option. `joplin-agent context` shows only nonsecret scope and hierarchy information.
+
+The `--hierarchy` option prepares **Agent Inbox**, **Projects**, **Areas**, **Reference**, and **Archive** under the existing chosen root. Existing content is preserved. Agents can create deeper notebooks for meaningful content and can propose approved inbox triage. Custom paths can be set in the private policy before rerunning `setup --hierarchy`.
+
+For a narrower scope, use an anchored rule such as `["/Work/Agent Inbox"]` and place all hierarchy destinations inside that subtree. Create that scope root in Joplin first. Its existing ancestors may be resolved during setup, but only descendants of the existing scope root can be created automatically; notes outside that subtree remain inaccessible.
+
+Register Antigravity when desired:
+
+```sh
+joplin-agent setup --harness antigravity
+```
+
+Its default configuration is `~/.gemini/config/mcp_config.json`. If the installed surface's **View raw config** points elsewhere, supply `--harness-config /absolute/path/to/mcp_config.json`. The same option supports a nonstandard Codex configuration. Registration preserves unrelated settings, keeps a private backup when changing an existing file, and is idempotent. It refuses symlinked configurations and destinations inside a checkout or Joplin's private/runtime directories. A legacy `~/.gemini` symlink into dotfiles therefore needs a local harness configuration location before registration. Reload the harness's MCP connections after registration.
+
+Each connection owns an independent stdio process. The startup guard validates private settings and removes inherited Joplin overrides before replacing itself with the server process. A small initialization module applies the validated configuration to the upstream tools, publishes the nonsecret hierarchy as server instructions, and suppresses upstream logs that may contain note previews. There is no shared daemon or public endpoint.
+
+Run `joplin-agent doctor` to verify credentials, destinations, and the MCP handshake without displaying notes. Run a real note query in each harness afterward to verify that it loaded its registration. Missing Joplin does not block unrelated agent work.
+
+Access rules are path-based, with exclusions taking precedence. Renames and moves can change access; upstream caches notebook paths for up to five seconds. Private policy changes require restarting **every existing Joplin MCP connection**. This does not remove previously retrieved text from conversations. The guard is not an OS sandbox against programs that already possess the same user's credentials.
+
+The pinned upstream release exposes global tag names through listing and lookup errors, so global tag operations and tag mutations are withheld. Note-specific tag inspection remains available. Its ping tool can return credential-bearing error URLs, so use `doctor` for health checks. Deletion, restore, bulk import, and whole-library enumeration are also disabled. Normal agents must not enable withheld tools or bypass them through the raw API. Explicit deletion requests require separately authorized maintenance.
+
+Concurrent recall and separate captures are supported. Rereading and exact-match editing reduce conflicts, but independent sessions can still overwrite the same note; the integration does not claim atomic edits or distributed locks.
+
+For development, install the locked dependencies in an isolated directory and run the behavioral suites:
+
+```sh
+UV_PROJECT_ENVIRONMENT=/tmp/joplin-agent-tests uv sync --project .local/share/joplin-agent --frozen --no-dev --no-install-project
+/tmp/joplin-agent-tests/bin/python -m unittest discover -s .local/share/joplin-agent/tests -v
+python3 -m unittest discover -s .local/share/dotfiles/tests -p test_repository_straps.py
+python3 -m unittest discover -s .config/opencode/tests
+```
+
+The MCP tests use a synthetic loopback Clipper service, never your notes. Upgrades must update the lock, reviewed tool set, and pinned-version check together, then rerun these tests before redeploying with `setup --install`.
+
 ### Zellij agent status
 
 On another machine, run `python3 bootstrap.py` and select **Zellij**, **Codex status hooks**, and **Fish**. With another shell, pass `--no-daemon` when launching Codex inside Zellij. The Zellij strap links the layouts, Python bridge, and prebuilt plugin; the Codex strap links `~/.codex/hooks.json`. Use Zellij 0.45.1 for the supplied plugin, and keep `python3` and `zellij` on `PATH`.

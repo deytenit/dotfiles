@@ -43,6 +43,7 @@ These are portable personal defaults. Follow higher-priority instructions and th
 ## Skills and delegation
 
 - Use a relevant skill when its trigger matches the task.
+- When Joplin is connected and substantial work benefits from prior decisions or personal context, use the `joplin` skill for relevant recall and durable capture within the machine's configured scope.
 - Delegate only when a written multi-task plan, genuinely independent investigation, or independent review makes the extra context worthwhile.
 - Keep small, tightly coupled, or overlapping work on the primary agent.
 - Give workers only their bounded task, constraints, relevant paths, and artifact references. Do not duplicate the full conversation.

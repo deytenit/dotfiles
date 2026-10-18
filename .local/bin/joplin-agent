@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+from pathlib import Path
+import runpy
+
+root = Path(__file__).resolve().parent.parent / "share" / "joplin-agent"
+runpy.run_path(str(root / "agent.py"), run_name="__main__")

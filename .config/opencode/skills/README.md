@@ -2,6 +2,8 @@
 
 This directory contains portable, manually maintained skills shared by OpenCode, Codex, and Antigravity.
 
+The `joplin` skill provides scoped recall, durable capture, and approved curation through the optional **Joplin integration** strap. Its machine-specific access policy and credentials stay outside this public bundle.
+
 ## Codex workflow
 
 Codex uses the primary agent as the controller and exposes three focused roles. Their source manifests live in the repository at `.codex/agents`; the **Codex agents** strap deploys them to `~/.codex/agents`:

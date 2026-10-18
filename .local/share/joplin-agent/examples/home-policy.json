@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "notebook_allowlist": [
+    "**",
+    "!/Work"
+  ],
+  "hierarchy": {
+    "inbox": "Personal/Agent Inbox",
+    "projects": "Personal/Projects",
+    "areas": "Personal/Areas",
+    "reference": "Personal/Reference",
+    "archive": "Personal/Archive"
+  },
+  "tools": {
+    "find_notes": true,
+    "find_notes_with_tag": false,
+    "find_notes_in_notebook": true,
+    "find_in_note": true,
+    "get_all_notes": false,
+    "get_note": true,
+    "get_note_resources": true,
+    "get_links": true,
+    "create_note": true,
+    "update_note": true,
+    "edit_note": true,
+    "delete_note": false,
+    "list_notebooks": true,
+    "create_notebook": true,
+    "update_notebook": true,
+    "delete_notebook": false,
+    "list_tags": false,
+    "create_tag": false,
+    "update_tag": false,
+    "delete_tag": false,
+    "get_tags_by_note": true,
+    "tag_note": false,
+    "untag_note": false,
+    "ping_joplin": false,
+    "restore_from_trash": false,
+    "import_from_file": false
+  }
+}

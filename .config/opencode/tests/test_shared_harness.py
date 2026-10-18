@@ -17,6 +17,7 @@ import yaml_parser  # noqa: E402
 
 
 PORTABLE_SKILLS = {
+    "joplin",
     "brainstorming",
     "continuous-driven-development",
     "dispatching-parallel-agents",

@@ -1,0 +1,8 @@
+name: Joplin integration
+category: Agent Harness
+description: Local Joplin MCP guard and setup command (credentials remain private)
+platforms:
+  generic:
+    link:
+      - [., ~/.local/share/joplin-agent/app]
+      - [../../bin/joplin-agent, ~/.local/bin/joplin-agent]
