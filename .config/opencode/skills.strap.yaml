@@ -5,6 +5,8 @@ platforms:
   generic:
     link:
       - [skills/_shared/artifact-policy.md, ~/.config/opencode/skills/_shared/artifact-policy.md]
+      - [skills/_shared/agent-workflow.md, ~/.config/opencode/skills/_shared/agent-workflow.md]
+      - [skills/all-green, ~/.config/opencode/skills/all-green]
       - [skills/brainstorming, ~/.config/opencode/skills/brainstorming]
       - [skills/continuous-driven-development, ~/.config/opencode/skills/continuous-driven-development]
       - [skills/dispatching-parallel-agents, ~/.config/opencode/skills/dispatching-parallel-agents]
@@ -22,10 +24,13 @@ platforms:
       - [skills/test-driven-development, ~/.config/opencode/skills/test-driven-development]
       - [skills/to-questionnaire, ~/.config/opencode/skills/to-questionnaire]
       - [skills/verification-before-completion, ~/.config/opencode/skills/verification-before-completion]
+      - [skills/vibe-review, ~/.config/opencode/skills/vibe-review]
       - [skills/writing-plans, ~/.config/opencode/skills/writing-plans]
       - [skills/writing-skills, ~/.config/opencode/skills/writing-skills]
 
       - [skills/_shared/artifact-policy.md, ~/.agents/skills/_shared/artifact-policy.md]
+      - [skills/_shared/agent-workflow.md, ~/.agents/skills/_shared/agent-workflow.md]
+      - [skills/all-green, ~/.agents/skills/all-green]
       - [skills/brainstorming, ~/.agents/skills/brainstorming]
       - [skills/continuous-driven-development, ~/.agents/skills/continuous-driven-development]
       - [skills/dispatching-parallel-agents, ~/.agents/skills/dispatching-parallel-agents]
@@ -43,10 +48,13 @@ platforms:
       - [skills/test-driven-development, ~/.agents/skills/test-driven-development]
       - [skills/to-questionnaire, ~/.agents/skills/to-questionnaire]
       - [skills/verification-before-completion, ~/.agents/skills/verification-before-completion]
+      - [skills/vibe-review, ~/.agents/skills/vibe-review]
       - [skills/writing-plans, ~/.agents/skills/writing-plans]
       - [skills/writing-skills, ~/.agents/skills/writing-skills]
 
       - [skills/_shared/artifact-policy.md, ~/.claude/skills/_shared/artifact-policy.md]
+      - [skills/_shared/agent-workflow.md, ~/.claude/skills/_shared/agent-workflow.md]
+      - [skills/all-green, ~/.claude/skills/all-green]
       - [skills/brainstorming, ~/.claude/skills/brainstorming]
       - [skills/continuous-driven-development, ~/.claude/skills/continuous-driven-development]
       - [skills/dispatching-parallel-agents, ~/.claude/skills/dispatching-parallel-agents]
@@ -64,10 +72,13 @@ platforms:
       - [skills/test-driven-development, ~/.claude/skills/test-driven-development]
       - [skills/to-questionnaire, ~/.claude/skills/to-questionnaire]
       - [skills/verification-before-completion, ~/.claude/skills/verification-before-completion]
+      - [skills/vibe-review, ~/.claude/skills/vibe-review]
       - [skills/writing-plans, ~/.claude/skills/writing-plans]
       - [skills/writing-skills, ~/.claude/skills/writing-skills]
 
       - [skills/_shared/artifact-policy.md, ~/.gemini/config/skills/_shared/artifact-policy.md]
+      - [skills/_shared/agent-workflow.md, ~/.gemini/config/skills/_shared/agent-workflow.md]
+      - [skills/all-green, ~/.gemini/config/skills/all-green]
       - [skills/brainstorming, ~/.gemini/config/skills/brainstorming]
       - [skills/continuous-driven-development, ~/.gemini/config/skills/continuous-driven-development]
       - [skills/dispatching-parallel-agents, ~/.gemini/config/skills/dispatching-parallel-agents]
@@ -85,6 +96,7 @@ platforms:
       - [skills/test-driven-development, ~/.gemini/config/skills/test-driven-development]
       - [skills/to-questionnaire, ~/.gemini/config/skills/to-questionnaire]
       - [skills/verification-before-completion, ~/.gemini/config/skills/verification-before-completion]
+      - [skills/vibe-review, ~/.gemini/config/skills/vibe-review]
       - [skills/writing-plans, ~/.gemini/config/skills/writing-plans]
       - [skills/writing-skills, ~/.gemini/config/skills/writing-skills]
 

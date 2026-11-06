@@ -9,6 +9,10 @@ description: Use when executing a written implementation plan with bounded tasks
 
 Execute a written plan through bounded implementation tasks and independent combined reviews. Keep tightly coupled work sequential, preserve progress in durable artifacts, and stop repeated correction loops with a concrete blocker.
 
+Read and follow [the agent workflow contract](../_shared/agent-workflow.md).
+The main session coordinates from a plan index when present and compact worker
+returns; workers read detailed task sections and perform bounded investigation.
+
 ## Durable Artifacts
 
 Before creating a progress document, task brief, implementer report, or review document, read and follow [the shared artifact policy](../_shared/artifact-policy.md). Put every document directly in the resolved scope directory. Use names such as:
@@ -32,9 +36,9 @@ When a solve handoff supplies a manifest, return `status: done | blocked`, `late
 
 ## Lifecycle
 
-1. Read the plan once. Before dispatch, reject internal contradictions and requirements that conflict with applicable constraints.
-2. Work directly for a small or tightly coupled plan. Otherwise dispatch one `implementer` per bounded task, sequentially unless the plan explicitly proves disjoint file ownership.
-3. Give the worker only its task brief, applicable constraints, earlier interfaces it consumes, and the implementer-report path.
+1. Read the plan once, moving detailed reading to the initial assigned worker when it would overwhelm the main session. Reject internal contradictions and requirements that conflict with applicable constraints before implementation. An index is optional: the assigned worker extracts a compact summary during normal preflight when needed, without a separate bootstrap or checker phase.
+2. Work directly for a small or tightly coupled plan. Otherwise dispatch one `implementer` per bounded task, sequentially unless the plan explicitly proves disjoint file ownership. A heavy tightly coupled slice may stay with one bounded worker; the primary agent can handle tiny coordination. Honor explicit inline requests and continue inline when delegation is unavailable, reporting the limitation.
+3. Give the worker its brief path or exact plan-task anchor, applicable constraints, consumed interfaces and report path. The worker reads and extracts task detail; the controller retains compact coordination state.
 4. Handle `DONE`, `DONE_WITH_CONCERNS`, `NEEDS_CONTEXT`, and `BLOCKED` according to their meaning; never repeat an unchanged dispatch blindly.
 5. Dispatch one `checker` for a combined requirements and quality review.
 6. Resume the same implementer for a substantial correction when the client supports resumption; otherwise dispatch one corrected task. Stop after three unsuccessful correction rounds and report the concrete blocker.
@@ -44,7 +48,7 @@ When a solve handoff supplies a manifest, return `status: done | blocked`, `late
 
 ## Task Dispatch
 
-Create a bounded brief from the plan. The brief owns the exact task requirements; do not send the worker the entire plan or accumulated session history. State writable paths explicitly and keep ownership disjoint before any parallel implementation.
+Create a bounded brief from the plan, using the planning or assigned worker for detailed extraction when needed. The brief owns the exact task requirements; do not send the worker the entire plan or accumulated session history. State writable paths explicitly and keep ownership disjoint before any parallel implementation.
 
 Use [implementer-prompt.md](implementer-prompt.md). An implementer must never spawn additional agents.
 
@@ -61,7 +65,7 @@ Status is evidence, not a retry signal. Never repeat the same prompt after `NEED
 
 Use [task-reviewer-prompt.md](task-reviewer-prompt.md) with one `checker`. Supply the requirements path, implementer-report path, relevant changed paths, and verification evidence. The checker returns both requirements and quality verdicts using the contract from [requesting-code-review](../requesting-code-review/code-reviewer.md).
 
-The controller saves every checker result as a fresh, uniquely named review artifact under the shared artifact policy. Use the task review name for the initial review and a correction suffix for each scoped re-review; never replace an earlier review artifact.
+Read-only checkers return bounded findings and verdicts rather than writing files. The controller saves every checker result as a fresh, uniquely named review artifact under the shared artifact policy. Use the task review name for the initial review and a correction suffix for each scoped re-review; never replace an earlier review artifact.
 
 If the checker finds a substantial problem, send its exact findings to the same implementer when resumption is available. Otherwise dispatch one corrected implementation task with the findings and fix scope. Use [re-review-prompt.md](re-review-prompt.md) to verify only the prior findings against the correction.
 

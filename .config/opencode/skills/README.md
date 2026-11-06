@@ -27,12 +27,24 @@ The main feature workflow has an optional autonomous entry:
 
 `solve` is the lifecycle controller for an authorized ticket or text assignment. It preserves pre-existing work before task preparation, routes from recorded ambiguity evidence, and receives artifacts and verification evidence from downstream skills. Missing optional tracker, remote, or review-publication capability permits an explicitly recorded local completion; missing correctness evidence remains a blocker.
 
-`brainstorming` remains a supported direct, user-invoked design and planning entry. After the design artifact is approved, it may transition to `writing-plans`. When `solve` records high ambiguity, `brainstorming` is the sole stage that may ask the user questions. Planning then selects the recorded execution mode:
+`brainstorming` remains a supported direct, user-invoked design and planning entry. After the design artifact is approved, it may transition to `writing-plans`. When `solve` records high ambiguity, `brainstorming` is the sole stage that may ask the user questions. Planning preserves the recorded execution mode:
 
-- `continuous-driven-development` keeps tightly coupled work in the primary agent's context and runs the plan continuously in dependency order.
-- `subagent-driven-development` lets the controller work directly on a small slice or assign bounded slices to `implementer`; each delegated task receives an independent `checker` review, correction and scoped re-review when needed, and durable progress artifacts.
+- `continuous-driven-development` gives one worker the dependent plan and runs it continuously; the original inline workflow remains available when requested or delegation is unavailable.
+- `subagent-driven-development` assigns bounded slices to `implementer`, sequentially by default; each task receives an independent `checker` review, correction and scoped re-review when needed, and durable progress artifacts.
 
 `finishing-a-development-branch` finalizes branch state in preservation or delivery mode through semantic commits, safe synchronization, and a draft unassigned review request when supported. It never runs project verification or judges correctness; `solve`, the execution skills, `requesting-code-review`, and `verification-before-completion` own those decisions and evidence.
+
+Across these stages, `_shared/agent-workflow.md` makes the main session the
+accumulator: it retains accepted decisions, a coordination index, evidence paths
+and the latest recovery snapshot. Brainstorming keeps its
+interactive questions, approach comparison and section approvals in the main
+session. Researchers investigate; document workers record the agreed design
+after section approvals and draft detailed plans; implementers execute. These
+are workload boundaries, preserving each skill's original stages and gates. Workers receive bounded
+inputs and return at most 200 words plus artifact paths. Document workers use an
+available role that can write the named artifacts; read-only roles return evidence
+for the controller to persist. New references are deployed by the Shared skills
+strap; existing skill-directory links expose their local references immediately.
 
 The controller may use `researcher` for an independent read-only question without granting edit scope. Substantial completed work uses `requesting-code-review` for combined requirements and quality review, and every completion claim passes through `verification-before-completion` with fresh project-declared evidence. A Codex Goal is an optional outer continuation contract: `solve` evaluates and marks an active Goal complete only after the terminal manifest, required verification, and durable intended state are present. Without Goal support, the terminal manifest and final report define the result.
 

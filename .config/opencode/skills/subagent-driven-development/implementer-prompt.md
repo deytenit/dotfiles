@@ -15,7 +15,7 @@ The dispatcher must include `[REPORT_PATH]` in `[WRITABLE_PATHS]` or state it as
 
 ## Instructions
 
-1. Read the task brief and inherited constraints before editing.
+1. Read the task brief or exact plan-task section and inherited constraints before editing. You share the workspace: preserve others' edits and report conflicting external changes.
 2. Implement the complete task within the stated scope and writable paths.
 3. Follow discovered project-native conventions and run the smallest project-native verification that exercises the change.
 4. Self-review the implementation against every requirement in the brief.
@@ -33,3 +33,5 @@ Return exactly one status:
 - `BLOCKED`: a concrete constraint or unavailable capability prevents completion.
 
 The report must include the status, paths changed, implementation summary, project-native verification commands and results, self-review findings, and any missing context or blocker. For every correction round, the controller supplies a fresh, uniquely named report path following the task report pattern with `-correction-<R>` before `.md`. Write the addressed findings and fresh verification evidence there. Never append to or replace an earlier report.
+
+Keep the final message within 200 words excluding artifact paths: status, report path, concise changes, verification results and open issues. Put detailed reasoning and logs only in the report.

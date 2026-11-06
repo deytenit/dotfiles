@@ -17,6 +17,7 @@ import yaml_parser  # noqa: E402
 
 
 PORTABLE_SKILLS = {
+    "all-green",
     "joplin",
     "brainstorming",
     "continuous-driven-development",
@@ -34,6 +35,7 @@ PORTABLE_SKILLS = {
     "test-driven-development",
     "to-questionnaire",
     "verification-before-completion",
+    "vibe-review",
     "writing-plans",
     "writing-skills",
 }
@@ -90,6 +92,7 @@ class SharedHarnessTest(unittest.TestCase):
         codex = yaml_parser.safe_load((DOTFILES / ".codex" / "strap.yaml").read_text(encoding="utf-8"))
         skill_entries = [
             ("skills/_shared/artifact-policy.md", "_shared/artifact-policy.md"),
+            ("skills/_shared/agent-workflow.md", "_shared/agent-workflow.md"),
             *[(f"skills/{name}", name) for name in sorted(PORTABLE_SKILLS)],
         ]
         skill_targets = (
@@ -150,13 +153,22 @@ class SharedHarnessTest(unittest.TestCase):
 
     def test_skill_instructions_are_tool_neutral(self):
         failures = []
+        paths = [SKILLS / "_shared" / "agent-workflow.md"]
         for name in sorted(PORTABLE_SKILLS):
-            for path in sorted((SKILLS / name).rglob("*.md")):
-                text = path.read_text(encoding="utf-8")
-                for label, pattern in DISALLOWED_SKILL_PATTERNS.items():
-                    if pattern.search(text):
-                        failures.append(f"{path.relative_to(SKILLS)}: {label}")
+            paths.extend(sorted((SKILLS / name).rglob("*.md")))
+        for path in paths:
+            text = path.read_text(encoding="utf-8")
+            for label, pattern in DISALLOWED_SKILL_PATTERNS.items():
+                if pattern.search(text):
+                    failures.append(f"{path.relative_to(SKILLS)}: {label}")
         self.assertEqual(failures, [])
+
+    def test_local_markdown_references_resolve(self):
+        for path in sorted(SKILLS.rglob("*.md")):
+            links = re.findall(r"\[[^]]+\]\(([^)]+\.md)\)", path.read_text(encoding="utf-8"))
+            for link in links:
+                with self.subTest(path=path.relative_to(SKILLS), link=link):
+                    self.assertTrue((path.parent / link).resolve().is_file())
 
     def test_named_vcs_guard_catches_provider_assumptions(self):
         pattern = DISALLOWED_SKILL_PATTERNS["named VCS"]

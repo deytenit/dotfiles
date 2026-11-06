@@ -41,6 +41,7 @@ Write every snapshot as Markdown with this exact heading and these sections in t
 - Routing evidence
 
 ## Artifacts
+- Controller state
 - Design
 - Plan
 - Execution evidence
@@ -71,3 +72,7 @@ Treat multiple successors that name one predecessor as a lineage conflict. Recon
 ## Handoff Paths
 
 Carry the latest manifest snapshot and, when available, the authoritative assignment or approved design and current plan as absolute paths. Every solve-controlled return includes the current manifest path, its artifact path, and concise evidence or blocker.
+
+The Controller state field links the latest compact recovery snapshot: accepted decisions and approvals, task index and statuses, evidence references, blockers and next action. Keep detailed worker material in its own artifacts. Only the controller advances manifest lineage.
+
+For a legacy v1 manifest lacking Controller state, read that field as `unavailable: not yet recorded`. Restore from its existing artifact and continuation fields, then add the new reference in the next controller-owned snapshot; preserve the original snapshot.

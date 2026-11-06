@@ -7,6 +7,13 @@ description: Use when a ticket identifier or raw development assignment should b
 
 Carry one ticket or text assignment from state preparation through verified implementation and final branch storage.
 
+Read and follow ../_shared/agent-workflow.md. Keep the main session as the
+lifecycle controller and accumulator. Delegate detailed project discovery,
+ambiguity evidence and source investigation to bounded researchers; receive
+compact findings and paths. Keep authority decisions, state preparation and
+manifest transitions in the controller. Downstream planning and both execution
+routes use workers, including sequential work on the low-ambiguity route.
+
 ## Authority and Completion
 
 Explicit invocation authorizes in-scope workspace preparation, semantic commits, safe branch synchronization, and draft unassigned review publication. Only `brainstorming` may ask the user questions. Other stages continue from discovered evidence, use a defined fallback, or return an evidence-backed blocker.
